@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local PathfindingService = game:GetService("PathfindingService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
 
 local MODEL_ID = 112753955356148
@@ -33,6 +32,8 @@ scream.SoundId = "rbxassetid://9118821436"
 scream.Volume = 1
 scream.Parent = workspace
 
+local walkAnimation = Instance.new("Animation")
+walkAnimation.AnimationId = "rbxassetid://10921271234"
 local function spawnMonster()
 	local character = player.Character
 	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -41,17 +42,30 @@ local function spawnMonster()
 	if not asset then return end
 	asset.Parent = workspace
 	asset.PrimaryPart = asset:FindFirstChildWhichIsA("BasePart")
+	asset.PrimaryPart.Anchored = false
+
+	local humanoid = asset:FindFirstChildWhichIsA("Humanoid")
+	if not humanoid then
+		humanoid = Instance.new("Humanoid")
+		humanoid.Parent = asset
+	end
+	humanoid.WalkSpeed = 16
+	humanoid.JumpPower = 0
+	humanoid.AutoRotate = true
+	local animTrack = humanoid:LoadAnimation(walkAnimation)
+	animTrack:Play()
 
 	local hrp = character.HumanoidRootPart
 	asset:SetPrimaryPartCFrame(hrp.CFrame * CFrame.new(0,0,-SPAWN_DISTANCE))
 
-	local humanoid = asset:FindFirstChildWhichIsA("Humanoid")
 	local rayParams = RaycastParams.new()
 	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
 	rayParams.FilterDescendantsInstances = {asset}
 
-	RunService.Heartbeat:Connect(function()
+	local heartbeat
+	heartbeat = RunService.Heartbeat:Connect(function()
 		if not character.Parent then
+			heartbeat:Disconnect()
 			asset:Destroy()
 			return
 		end
@@ -60,10 +74,11 @@ local function spawnMonster()
 		local ray = workspace:Raycast(asset.PrimaryPart.Position, targetPos - asset.PrimaryPart.Position, rayParams)
 
 		if ray and ray.Instance:IsDescendantOf(character) then
-			local path = PathfindingService:CreatePath()
+			local path = PathfindingService:CreatePath({AgentRadius = 2, AgentHeight = 5, AgentCanJump = true, AgentJumpHeight = 2, AgentMaxSlope = 45})
 			path:ComputeAsync(asset.PrimaryPart.Position, targetPos)
 
 			for _, waypoint in ipairs(path:GetWaypoints()) do
+				if humanoid.Health <= 0 then break end
 				humanoid:MoveTo(waypoint.Position)
 				humanoid.MoveToFinished:Wait()
 			end
@@ -90,6 +105,7 @@ local function spawnMonster()
 			end
 			local hum = character:FindFirstChildWhichIsA("Humanoid")
 			if hum then hum.Health = 0 end
+			heartbeat:Disconnect()
 			asset:Destroy()
 		end
 	end)
