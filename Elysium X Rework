@@ -1,0 +1,33 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "door-open",
+    Author = "By Fusion",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    Resizable = true,
+    HideSearchBar = false,
+    ScrollBarEnabled = true,
+  },
+
+KeySystem = { 
+        Key = { "260126", "0000" },
+        Note = "The key is 260126 or 0000",
+    },
+})
+
+Window:EditOpenButton({
+    Title = "Open Elysium",
+    Icon = "monitor",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 2,
+    Color = ColorSequence.new( -- gradient
+        Color3.fromHex("FF0F7B"), 
+        Color3.fromHex("F89B29")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = false,
+})
