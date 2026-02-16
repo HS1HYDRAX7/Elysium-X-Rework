@@ -10,9 +10,8 @@ local Window = WindUI:CreateWindow({
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true,
-  },
 
-KeySystem = { 
+    KeySystem = {
         Key = { "260126", "0000" },
         Note = "The key is 260126 or 0000",
     },
@@ -23,9 +22,9 @@ Window:EditOpenButton({
     Icon = "monitor",
     CornerRadius = UDim.new(0,50),
     StrokeThickness = 2,
-    Color = ColorSequence.new( -- gradient
-        Color3.fromHex("FF0F7B"), 
-        Color3.fromHex("F89B29")
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
     ),
     OnlyMobile = false,
     Enabled = true,
