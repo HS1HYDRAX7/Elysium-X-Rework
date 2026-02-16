@@ -35,7 +35,7 @@ Window:EditOpenButton({
     ),
     OnlyMobile = false,
     Enabled = true,
-    Draggable = false,
+    Draggable = true,
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
