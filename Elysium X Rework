@@ -2,7 +2,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
-    Icon = "door-open",
+    Icon = "award",
     Author = "By Fusion",
     Folder = "Elysium X Rework",
     Transparent = true,
@@ -15,6 +15,13 @@ local Window = WindUI:CreateWindow({
         Key = { "260126", "0000" },
         Note = "The key is 260126 or 0000",
     },
+})
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
 })
 
 Window:EditOpenButton({
