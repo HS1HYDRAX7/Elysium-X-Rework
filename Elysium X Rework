@@ -49,10 +49,14 @@ PlayBreakTab:Toggle({
 		local Workspace = game:GetService("Workspace")
 
 		local ESPObjects = {}
+		local Conn1
+		local Conn2
 
 		local function Clear()
-			for _, box in pairs(ESPObjects) do
-				if box then box:Destroy() end
+			if Conn1 then Conn1:Disconnect() Conn1 = nil end
+			if Conn2 then Conn2:Disconnect() Conn2 = nil end
+			for _, h in pairs(ESPObjects) do
+				if h then h:Destroy() end
 			end
 			table.clear(ESPObjects)
 		end
@@ -62,25 +66,29 @@ PlayBreakTab:Toggle({
 			return
 		end
 
-		RunService.RenderStepped:Connect(function()
+		local function Apply(model)
+			if model:IsA("Model") and model:FindFirstChild("Attack") and not ESPObjects[model] then
+				local highlight = Instance.new("Highlight")
+				highlight.Adornee = model
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineTransparency = 0
+				highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+				highlight.Parent = model
+				ESPObjects[model] = highlight
+			end
+		end
+
+		for _, model in pairs(Workspace:GetChildren()) do
+			Apply(model)
+		end
+
+		Conn1 = Workspace.ChildAdded:Connect(Apply)
+
+		Conn2 = RunService.RenderStepped:Connect(function()
 			if not state then
 				Clear()
-				return
-			end
-
-			for _, model in pairs(Workspace:GetChildren()) do
-				if model:IsA("Model") and model:FindFirstChild("Attack") and not ESPObjects[model] then
-					local box = Instance.new("BoxHandleAdornment")
-					box.Adornee = model
-					box.AlwaysOnTop = true
-					box.ZIndex = 10
-					box.Color3 = Color3.fromRGB(255, 0, 0)
-					box.Transparency = 0.5
-					box.Size = model:GetExtentsSize()
-					box.Parent = model
-
-					ESPObjects[model] = box
-				end
 			end
 		end)
 	end
@@ -94,10 +102,14 @@ PlayBreakTab:Toggle({
 		local Workspace = game:GetService("Workspace")
 
 		local ESPObjects = {}
+		local Conn1
+		local Conn2
 
 		local function Clear()
-			for _, box in pairs(ESPObjects) do
-				if box then box:Destroy() end
+			if Conn1 then Conn1:Disconnect() Conn1 = nil end
+			if Conn2 then Conn2:Disconnect() Conn2 = nil end
+			for _, h in pairs(ESPObjects) do
+				if h then h:Destroy() end
 			end
 			table.clear(ESPObjects)
 		end
@@ -107,25 +119,29 @@ PlayBreakTab:Toggle({
 			return
 		end
 
-		RunService.RenderStepped:Connect(function()
+		local function Apply(model)
+			if model:IsA("Model") and model:FindFirstChild("PerkScripts") and not ESPObjects[model] then
+				local highlight = Instance.new("Highlight")
+				highlight.Adornee = model
+				highlight.FillColor = Color3.fromRGB(0, 255, 0)
+				highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineTransparency = 0
+				highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+				highlight.Parent = model
+				ESPObjects[model] = highlight
+			end
+		end
+
+		for _, model in pairs(Workspace:GetChildren()) do
+			Apply(model)
+		end
+
+		Conn1 = Workspace.ChildAdded:Connect(Apply)
+
+		Conn2 = RunService.RenderStepped:Connect(function()
 			if not state then
 				Clear()
-				return
-			end
-
-			for _, model in pairs(Workspace:GetChildren()) do
-				if model:IsA("Model") and model:FindFirstChild("PerkScripts") and not ESPObjects[model] then
-					local box = Instance.new("BoxHandleAdornment")
-					box.Adornee = model
-					box.AlwaysOnTop = true
-					box.ZIndex = 10
-					box.Color3 = Color3.fromRGB(0, 255, 0)
-					box.Transparency = 0.5
-					box.Size = model:GetExtentsSize()
-					box.Parent = model
-
-					ESPObjects[model] = box
-				end
 			end
 		end)
 	end
