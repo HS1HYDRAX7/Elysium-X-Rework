@@ -9,19 +9,6 @@ screenGui.Parent = playerGui
 local batteryLevel = 100
 
 local function updateBattery()
-    local imgId
-    if batteryLevel >= 100 then
-        imgId = "rbxassetid://71736017350939"
-    elseif batteryLevel >= 75 then
-        imgId = "rbxassetid://128913376931127"
-    elseif batteryLevel >= 50 then
-        imgId = "rbxassetid://111952849474041"
-    elseif batteryLevel >= 25 then
-        imgId = "rbxassetid://78532599567031"
-    else
-        imgId = "rbxassetid://86348292929476"
-    end
-    batteryImage.Image = imgId
     batteryLabel.Text = batteryLevel.."%"
 end
 
@@ -31,25 +18,24 @@ main.Position = UDim2.new(0,20,0,20)
 main.BackgroundTransparency = 1
 main.Parent = screenGui
 
-local batteryImage = Instance.new("ImageLabel")
-batteryImage.Size = UDim2.new(0,50,0,50)
-batteryImage.Position = UDim2.new(0,0,0,0)
-batteryImage.BackgroundTransparency = 1
-batteryImage.Parent = main
-
 local batteryLabel = Instance.new("TextLabel")
-batteryLabel.Size = UDim2.new(0,50,0,20)
-batteryLabel.Position = UDim2.new(0,0,0,55)
+batteryLabel.Size = UDim2.new(0,200,0,30)
+batteryLabel.Position = UDim2.new(0,0,0,0)
 batteryLabel.BackgroundTransparency = 1
 batteryLabel.TextColor3 = Color3.new(1,1,1)
-batteryLabel.Font = Enum.Font.GothamBold
-batteryLabel.TextSize = 14
+batteryLabel.TextSize = 20
 batteryLabel.Text = batteryLevel.."%"
+batteryLabel.Font = Enum.Font.Custom
+batteryLabel.TextScaled = true
+batteryLabel.TextStrokeTransparency = 0
+batteryLabel.TextXAlignment = Enum.TextXAlignment.Left
 batteryLabel.Parent = main
+local fontId = 12187360881
+pcall(function() batteryLabel.FontFace = Font.fromId(fontId) end)
 
 local recoverButton = Instance.new("ImageButton")
 recoverButton.Size = UDim2.new(0,50,0,50)
-recoverButton.Position = UDim2.new(0,60,0,15)
+recoverButton.Position = UDim2.new(0,0,0,40)
 recoverButton.Image = "rbxassetid://12444519928"
 recoverButton.BackgroundTransparency = 1
 recoverButton.Parent = main
@@ -64,7 +50,7 @@ end)
 
 local flashlightButton = Instance.new("ImageButton")
 flashlightButton.Size = UDim2.new(0,50,0,50)
-flashlightButton.Position = UDim2.new(0,130,0,15)
+flashlightButton.Position = UDim2.new(0,150,0,40)
 flashlightButton.Image = "rbxassetid://108860650354064"
 flashlightButton.BackgroundTransparency = 1
 flashlightButton.Parent = main
