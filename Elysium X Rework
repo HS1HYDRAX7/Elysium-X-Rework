@@ -31,4 +31,4 @@ Window:EditOpenButton({
     Draggable = false,
 })
 
-local TestTab = Window:Tab({ Title = "Test", Icon = "star", Locked = false })
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
