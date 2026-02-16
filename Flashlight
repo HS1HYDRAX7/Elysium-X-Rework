@@ -1,0 +1,100 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+
+local batteryLevel = 100
+
+local function updateBattery()
+    local imgId
+    if batteryLevel >= 100 then
+        imgId = "rbxassetid://71736017350939"
+    elseif batteryLevel >= 75 then
+        imgId = "rbxassetid://128913376931127"
+    elseif batteryLevel >= 50 then
+        imgId = "rbxassetid://111952849474041"
+    elseif batteryLevel >= 25 then
+        imgId = "rbxassetid://78532599567031"
+    else
+        imgId = "rbxassetid://86348292929476"
+    end
+    batteryImage.Image = imgId
+    batteryLabel.Text = batteryLevel.."%"
+end
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0,200,0,80)
+main.Position = UDim2.new(0,20,0,20)
+main.BackgroundTransparency = 1
+main.Parent = screenGui
+
+local batteryImage = Instance.new("ImageLabel")
+batteryImage.Size = UDim2.new(0,50,0,50)
+batteryImage.Position = UDim2.new(0,0,0,0)
+batteryImage.BackgroundTransparency = 1
+batteryImage.Parent = main
+
+local batteryLabel = Instance.new("TextLabel")
+batteryLabel.Size = UDim2.new(0,50,0,20)
+batteryLabel.Position = UDim2.new(0,0,0,55)
+batteryLabel.BackgroundTransparency = 1
+batteryLabel.TextColor3 = Color3.new(1,1,1)
+batteryLabel.Font = Enum.Font.GothamBold
+batteryLabel.TextSize = 14
+batteryLabel.Text = batteryLevel.."%"
+batteryLabel.Parent = main
+
+local recoverButton = Instance.new("ImageButton")
+recoverButton.Size = UDim2.new(0,50,0,50)
+recoverButton.Position = UDim2.new(0,60,0,15)
+recoverButton.Image = "rbxassetid://12444519928"
+recoverButton.BackgroundTransparency = 1
+recoverButton.Parent = main
+
+recoverButton.MouseButton1Click:Connect(function()
+    batteryLevel = math.min(batteryLevel + 5, 100)
+    updateBattery()
+    recoverButton:TweenSize(UDim2.new(0,55,0,55), "Out", "Bounce", 0.1, true, function()
+        recoverButton:TweenSize(UDim2.new(0,50,0,50), "Out", "Bounce", 0.1, true)
+    end)
+end)
+
+local flashlightButton = Instance.new("ImageButton")
+flashlightButton.Size = UDim2.new(0,50,0,50)
+flashlightButton.Position = UDim2.new(0,130,0,15)
+flashlightButton.Image = "rbxassetid://108860650354064"
+flashlightButton.BackgroundTransparency = 1
+flashlightButton.Parent = main
+
+local flashlightOn = false
+local flashlight = Instance.new("SpotLight")
+flashlight.Enabled = false
+flashlight.Range = 20
+flashlight.Brightness = 2
+flashlight.Angle = 60
+flashlight.Parent = humanoidRootPart
+
+flashlightButton.MouseButton1Click:Connect(function()
+    flashlightOn = not flashlightOn
+    flashlight.Enabled = flashlightOn
+    if flashlightOn then
+        flashlightButton.Image = "rbxassetid://135873273752805"
+    else
+        flashlightButton.Image = "rbxassetid://108860650354064"
+    end
+    flashlightButton:TweenSize(UDim2.new(0,55,0,55), "Out", "Bounce", 0.1, true, function()
+        flashlightButton:TweenSize(UDim2.new(0,50,0,50), "Out", "Bounce", 0.1, true)
+    end)
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if flashlightOn then
+        local camera = workspace.CurrentCamera
+        flashlight.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + camera.CFrame.LookVector)
+    end
+end)
+
+updateBattery()
