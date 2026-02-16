@@ -39,3 +39,94 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local PlayBreakTab = Window:Tab({ Title = "Play Break", Icon = "sword", Locked = false })
+
+PlayBreakTab:Toggle({
+	Title = "ESP Monsters",
+	Value = false,
+	Callback = function(state)
+		local RunService = game:GetService("RunService")
+		local Workspace = game:GetService("Workspace")
+
+		local ESPObjects = {}
+
+		local function Clear()
+			for _, box in pairs(ESPObjects) do
+				if box then box:Destroy() end
+			end
+			table.clear(ESPObjects)
+		end
+
+		if not state then
+			Clear()
+			return
+		end
+
+		RunService.RenderStepped:Connect(function()
+			if not state then
+				Clear()
+				return
+			end
+
+			for _, model in pairs(Workspace:GetChildren()) do
+				if model:IsA("Model") and model:FindFirstChild("Attack") and not ESPObjects[model] then
+					local box = Instance.new("BoxHandleAdornment")
+					box.Adornee = model
+					box.AlwaysOnTop = true
+					box.ZIndex = 10
+					box.Color3 = Color3.fromRGB(255, 0, 0)
+					box.Transparency = 0.5
+					box.Size = model:GetExtentsSize()
+					box.Parent = model
+
+					ESPObjects[model] = box
+				end
+			end
+		end)
+	end
+})
+
+PlayBreakTab:Toggle({
+	Title = "ESP Survivors",
+	Value = false,
+	Callback = function(state)
+		local RunService = game:GetService("RunService")
+		local Workspace = game:GetService("Workspace")
+
+		local ESPObjects = {}
+
+		local function Clear()
+			for _, box in pairs(ESPObjects) do
+				if box then box:Destroy() end
+			end
+			table.clear(ESPObjects)
+		end
+
+		if not state then
+			Clear()
+			return
+		end
+
+		RunService.RenderStepped:Connect(function()
+			if not state then
+				Clear()
+				return
+			end
+
+			for _, model in pairs(Workspace:GetChildren()) do
+				if model:IsA("Model") and model:FindFirstChild("PerkScripts") and not ESPObjects[model] then
+					local box = Instance.new("BoxHandleAdornment")
+					box.Adornee = model
+					box.AlwaysOnTop = true
+					box.ZIndex = 10
+					box.Color3 = Color3.fromRGB(0, 255, 0)
+					box.Transparency = 0.5
+					box.Size = model:GetExtentsSize()
+					box.Parent = model
+
+					ESPObjects[model] = box
+				end
+			end
+		end)
+	end
+})
