@@ -54,7 +54,7 @@ MainTab:Paragraph({
     Desc = "By Atlas (Solo Developer)",
     Color = "Red",
     Image = "rbxassetid://99235854616828",
-    ImageSize = 80,
+    ImageSize = 30,
     Locked = false
 })
 
