@@ -17,10 +17,6 @@ local Window = WindUI:CreateWindow({
     },
 })
 
-Window:DisableTopbarButtons({
-    "Fullscreen",
-})
-
 Window:CreateTopbarButton("YouTube","youtube",function()
     WindUI:Notify({
         Title = "YouTube",
@@ -55,7 +51,7 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 MainTab:Dropdown({
     Title = "Theme",
-    Values = { "Rose","Rainbow","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
     Value = "Crimson",
     Callback = function(option)
         WindUI:SetTheme(option)
