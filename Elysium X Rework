@@ -53,8 +53,8 @@ MainTab:Paragraph({
     Title = "Credits",
     Desc = "By Atlas (Solo Developer)",
     Color = "Red",
-    Image = "rbxassetid://99235854616828",
-    ImageSize = 30,
+    Thumbnail = "rbxassetid://140061635845890",
+    ThumbnailSize = 80,
     Locked = false
 })
 
