@@ -71,7 +71,10 @@ MainTab:Toggle({
 SettingsTab:Dropdown({
     Title = "Configs",
     Values = Window.ConfigManager:GetConfigs(),
-    Flag = "SelectedConfig"
+    Value = Window.Flags.SelectedConfig,
+    Callback = function(option)
+        Window.Flags.SelectedConfig = option
+    end
 })
 
 SettingsTab:Input({
