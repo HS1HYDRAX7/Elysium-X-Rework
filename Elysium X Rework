@@ -57,7 +57,7 @@ MainTab:Paragraph({
                     Title = "Discord",
                     Content = "Link Copied",
                     Duration = 3,
-                    Icon = "link",
+                    Icon = "external-link",
                 })
             end,
         },
@@ -68,9 +68,9 @@ MainTab:Paragraph({
                 setclipboard("@mrnexus000")
                 WindUI:Notify({
                     Title = "TikTok",
-                    Content = "Link Copied",
+                    Content = "Username Copied",
                     Duration = 3,
-                    Icon = "link",
+                    Icon = "external-link",
                 })
             end,
         },
@@ -81,9 +81,9 @@ MainTab:Paragraph({
                 setclipboard("@Atlas_Scripts")
                 WindUI:Notify({
                     Title = "YouTube",
-                    Content = "Link Copied",
+                    Content = "Username Copied",
                     Duration = 3,
-                    Icon = "link",
+                    Icon = "external-link",
                 })
             end,
         },
