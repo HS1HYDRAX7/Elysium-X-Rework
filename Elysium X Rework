@@ -17,34 +17,6 @@ local Window = WindUI:CreateWindow({
     },
 })
 
-WindUI:Localization({
-    Enabled = true,
-    Prefix = "loc:",
-    DefaultLanguage = "en",
-    Translations = {
-        ["en"] = {
-            ["TITLE"] = "Elysium X Rework",
-            ["AUTHOR"] = "By Atlas",
-            ["CREDITS_TITLE"] = "Credits",
-            ["CREDITS_DESC"] = "By Atlas (Solo Developer)",
-            ["THEME"] = "Theme",
-            ["TRANSPARENT"] = "Transparent",
-            ["OPEN"] = "Open Elysium",
-            ["REWORK"] = "Rework In Progress",
-        },
-        ["pt"] = {
-            ["TITLE"] = "Elysium X Rework",
-            ["AUTHOR"] = "Por Atlas",
-            ["CREDITS_TITLE"] = "Créditos",
-            ["CREDITS_DESC"] = "Por Atlas (Desenvolvedor Solo)",
-            ["THEME"] = "Tema",
-            ["TRANSPARENT"] = "Transparente",
-            ["OPEN"] = "Abrir Elysium",
-            ["REWORK"] = "Retrabalho em Progresso",
-        }
-    }
-})
-
 Window:CreateTopbarButton("YouTube","youtube",function()
     WindUI:Notify({
         Title = "YouTube",
