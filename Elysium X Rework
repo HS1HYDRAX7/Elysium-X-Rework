@@ -17,6 +17,10 @@ local Window = WindUI:CreateWindow({
     },
 })
 
+Window:DisableTopbarButtons({
+    "Fullscreen",
+})
+
 Window:CreateTopbarButton("YouTube","youtube",function()
     WindUI:Notify({
         Title = "YouTube",
