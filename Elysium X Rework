@@ -48,6 +48,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings", Locked = false })
 
 MainTab:Dropdown({
     Title = "Theme",
@@ -64,5 +65,37 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+SettingsTab:Dropdown({
+    Title = "Configs",
+    Values = Window.ConfigManager:GetConfigs(),
+    Flag = "SelectedConfig"
+})
+
+SettingsTab:Input({
+    Title = "Config Name",
+    Placeholder = "config_name",
+    Flag = "ConfigNameInput"
+})
+
+SettingsTab:Button({
+    Title = "Create Config",
+    Callback = function()
+        local name = Window.Flags.ConfigNameInput
+        if name and name ~= "" then
+            Window.ConfigManager:CreateConfig(name):Save()
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Delete Config",
+    Callback = function()
+        local name = Window.Flags.SelectedConfig
+        if name and name ~= "" then
+            Window.ConfigManager:DeleteConfig(name)
+        end
     end
 })
