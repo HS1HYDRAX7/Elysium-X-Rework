@@ -49,14 +49,14 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
-MainTab:Paragraph({
-    Title = "Credits",
-    Desc = "By Atlas (Solo Developer)",
-    Color = "Red",
-    Thumbnail = "rbxassetid://140061635845890",
-    ThumbnailSize = 80,
-    Locked = false
-})
+MainTab:Paragraph({    
+    Title = "Credits",    
+    Desc = "By Atlas (Solo Developer)",    
+    Color = "Red",    
+    Image = "rbxassetid://18631102886",    
+    ImageSize = 50,    
+    Locked = false    
+})    
 
 MainTab:Dropdown({
     Title = "Theme",
