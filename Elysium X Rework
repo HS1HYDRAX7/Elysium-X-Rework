@@ -5,9 +5,16 @@ local Window = WindUI:CreateWindow({
     Icon = "award",
     Author = "By Atlas",
     Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true,
+
+    KeySystem = {
+        Key = { "260126", "0000" },
+        Note = "The key is 260126 or 0000",
+    },
 })
 
 Window:Tag({
