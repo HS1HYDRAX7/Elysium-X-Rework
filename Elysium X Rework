@@ -39,3 +39,13 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+
+MainTab:Dropdown({
+    Title = "Dropdown",
+    Desc = "Dropdown Description",
+    Values = { "Category A", "Category B", "Category C" },
+    Value = "Category A",
+    Callback = function(option) 
+        print("Category selected: " .. option) 
+    end
+})
