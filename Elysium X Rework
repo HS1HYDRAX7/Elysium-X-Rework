@@ -49,6 +49,17 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
+MainTab:Paragraph({
+    Title = "Credits",
+    Desc = "By Atlas (Solo Developer)",
+    Color = "Red",
+    Image = "140061635845890",
+    ImageSize = 80,
+    Thumbnail = "",
+    ThumbnailSize = 80,
+    Locked = false
+})
+
 MainTab:Dropdown({
     Title = "Theme",
     Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
