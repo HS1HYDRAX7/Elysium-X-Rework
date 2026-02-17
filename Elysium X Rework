@@ -50,9 +50,12 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 local Paragraph = MainTab:Paragraph({
-    Title = "Elysium X Reworked",
+    Title = "Elysium X Rework",
+    Desc = "By Atlas",
     Color = "Red",
-    Locked = false
+    Image = "rbxassetid://140061635845890",
+    ImageSize = 120,
+    Locked = true
 })
 
 MainTab:Dropdown({
