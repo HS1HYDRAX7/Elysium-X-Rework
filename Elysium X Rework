@@ -5,8 +5,6 @@ local Window = WindUI:CreateWindow({
     Icon = "award",
     Author = "By Atlas",
     Folder = "Elysium X Rework",
-    Transparent = true,
-    Theme = "Crimson",
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true,
@@ -41,10 +39,19 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 MainTab:Dropdown({
-    Title = "Themes",
-    Values = { "Rose","Vaporwave","Rainbow","Light","Horizon","MonokaiPro","Plant","Valentine","Midnight","Nebula","CottonCandy","Dark","Envy","Indigo","Sky","Crimson","Amber","Esmeralda","Violet","Red" },
+    Title = "Theme",
+    Values = { "Rose","Vaporwave","Rainbow","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
     Value = "Crimson",
     Callback = function(option)
         WindUI:SetTheme(option)
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparent",
+    Icon = "palette",
+    Value = true,
+    Callback = function(state)
+        WindUI:SetTransparency(state)
     end
 })
