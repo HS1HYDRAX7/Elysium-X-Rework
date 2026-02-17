@@ -8,10 +8,6 @@ local Window = WindUI:CreateWindow({
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true,
-
-    KeySystem = {
-        Key = { "260126", "0000" },
-        Note = "The key is 260126 or 0000",
     },
 })
 
@@ -52,6 +48,6 @@ MainTab:Toggle({
     Icon = "palette",
     Value = true,
     Callback = function(state)
-        WindUI:SetTransparency(state)
+        Window:ToggleTransparency(state)
     end
 })
