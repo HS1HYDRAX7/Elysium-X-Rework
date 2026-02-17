@@ -49,14 +49,6 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
-local Paragraph = MainTab:Paragraph({
-    Title = "",
-    Color = "Red",
-    Image = "rbxassetid://140061635845890",
-    ImageSize = 120,
-    Locked = true
-})
-
 MainTab:Dropdown({
     Title = "Theme",
     Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
