@@ -55,9 +55,7 @@ MainTab:Paragraph({
     Color = "Red",
     Image = "rbxassetid://140061635845890",
     ImageSize = 90,
-    Locked = false,
-        }
-    }
+    Locked = false
 })
 
 MainTab:Dropdown({
