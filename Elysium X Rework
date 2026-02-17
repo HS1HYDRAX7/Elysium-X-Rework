@@ -148,6 +148,32 @@ MainTab:Input({
     end
 })
 
+MainTab:Button({
+    Title = "Update Dropdown",
+    Callback = function()
+        local text = MainTab.InputValue or ""
+        local songs = MainTab.Songs or {}
+        local num, id = text:match("%[(%d+):(%d+)%]")
+        if num and id then
+            num = tonumber(num)
+            songs[num] = {ID = "rbxassetid://"..id, Name = "Music "..num}
+            MainTab.Songs = songs
+
+            local sortedKeys = {}
+            for k,_ in pairs(songs) do table.insert(sortedKeys, k) end
+            table.sort(sortedKeys)
+
+            local values = {}
+            for _,key in ipairs(sortedKeys) do
+                table.insert(values, songs[key].Name)
+            end
+
+            MainTab.DropdownValues = values
+            MainTab.DropdownValue = values[1]
+        end
+    end
+})
+
 MainTab:Dropdown({
     Title = "Musics",
     Values = {},
