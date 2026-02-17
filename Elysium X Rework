@@ -41,11 +41,10 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 MainTab:Dropdown({
-    Title = "Dropdown",
-    Desc = "Dropdown Description",
-    Values = { "Category A", "Category B", "Category C" },
-    Value = "Category A",
-    Callback = function(option) 
-        print("Category selected: " .. option) 
+    Title = "Themes",
+    Values = { "Rose","Vaporwave","Rainbow","Light","Horizon","MonokaiPro","Plant","Valentine","Midnight","Nebula","CottonCandy","Dark","Envy","Indigo","Sky","Crimson","Amber","Esmeralda","Violet","Red" },
+    Value = "Crimson",
+    Callback = function(option)
+        WindUI:SetTheme(option)
     end
 })
