@@ -50,8 +50,7 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 local Paragraph = MainTab:Paragraph({
-    Title = "Elysium X Rework",
-    Desc = "By Atlas",
+    Title = "Elysium X Reworked",
     Color = "Red",
     Locked = false
 })
