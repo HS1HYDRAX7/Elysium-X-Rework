@@ -17,6 +17,15 @@ local Window = WindUI:CreateWindow({
     },
 })
 
+Window:CreateTopbarButton("YouTube","youtube",function()
+    WindUI:Notify({
+        Title = "YouTube",
+        Content = "@Atlas_Scripts",
+        Duration = 5,
+        Icon = "youtube",
+    })
+end,1)
+
 Window:Tag({
     Title = "Rework In Progress",
     Icon = "book-plus",
