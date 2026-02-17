@@ -108,8 +108,6 @@ MainTab:Toggle({
     end
 })
 
-local MainTab = MainTab
-
 MainTab:Input({
     Title = "URL Library",
     Callback = function(text)
@@ -172,22 +170,6 @@ MainTab:Dropdown({
                     break
                 end
             end
-        end
-    end
-})
-
-MainTab.SliderInstance = MainTab:Slider({
-    Title = "00:00/00:00",
-    Step = 1,
-    Value = {
-        Min = 0,
-        Max = 1000,
-        Default = 0,
-    },
-    Callback = function(value)
-        local sound = MainTab.CurrentSound
-        if sound and sound.TimeLength > 0 then
-            sound.TimePosition = (value/1000) * sound.TimeLength
         end
     end
 })
