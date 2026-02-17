@@ -17,15 +17,6 @@ local Window = WindUI:CreateWindow({
     },
 })
 
-Window:CreateTopbarButton("YouTube","youtube",function()
-    WindUI:Notify({
-        Title = "YouTube",
-        Content = "@Atlas_Scripts",
-        Duration = 5,
-        Icon = "youtube",
-    })
-end,1)
-
 Window:Tag({
     Title = "Rework In Progress",
     Icon = "book-plus",
@@ -49,14 +40,55 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
-MainTab:Paragraph({    
-    Title = "Credits",    
-    Desc = "By Atlas (Solo Developer)",    
-    Color = "Red",    
-    Image = "rbxassetid://18631102886",    
-    ImageSize = 50,    
-    Locked = false    
-})    
+MainTab:Paragraph({
+    Title = "Credits",
+    Desc = "By Atlas (Solo Developer)",
+    Color = "Red",
+    Image = "rbxassetid://18631102886",
+    ImageSize = 50,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "link",
+            Title = "Discord",
+            Callback = function()
+                setclipboard("https://discord.gg/JEpRMHSkpq")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link",
+                })
+            end,
+        },
+        {
+            Icon = "link",
+            Title = "TikTok",
+            Callback = function()
+                setclipboard("@mrnexus000")
+                WindUI:Notify({
+                    Title = "TikTok",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link",
+                })
+            end,
+        },
+        {
+            Icon = "link",
+            Title = "YouTube",
+            Callback = function()
+                setclipboard("@Atlas_Scripts")
+                WindUI:Notify({
+                    Title = "YouTube",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link",
+                })
+            end,
+        },
+    }
+})
 
 MainTab:Dropdown({
     Title = "Theme",
