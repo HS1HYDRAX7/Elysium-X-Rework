@@ -49,7 +49,7 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
-MainTab:Paragraph({
+local Paragraph = MainTab:Paragraph({
     Title = "Elysium X Rework",
     Desc = "By Atlas",
     Color = "Red",
