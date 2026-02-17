@@ -48,7 +48,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings", Locked = false })
+local ForsakenTab = Window:Tab({ Title = "Forsaken", Icon = "sword", Locked = false })
 
 MainTab:Dropdown({
     Title = "Theme",
@@ -65,5 +65,208 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "Fullbright",
+    Default = false,
+    Callback = function(v)
+        local Lighting = game:GetService("Lighting")
+        if v then
+            Lighting.Brightness = 3
+            Lighting.ClockTime = 14
+            Lighting.Ambient = Color3.new(1,1,1)
+            Lighting.OutdoorAmbient = Color3.new(1,1,1)
+            Lighting.FogEnd = 1e9
+            Lighting.GlobalShadows = false
+            for _,x in ipairs(Lighting:GetChildren()) do
+                if x:IsA("Atmosphere") or x:IsA("BloomEffect") or x:IsA("ColorCorrectionEffect")
+                or x:IsA("BlurEffect") or x:IsA("SunRaysEffect") or x:IsA("DepthOfFieldEffect") then
+                    x:Destroy()
+                end
+            end
+        else
+            Lighting.Brightness = 3
+            Lighting.ClockTime = 5.6
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = true
+        end
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "No Fall Slowness",
+    Default = false,
+    Callback = function(v)
+        if v then
+            _G._nofall = game:GetService("RunService").Stepped:Connect(function()
+                local c = game.Players.LocalPlayer.Character
+                local sm = c and c:FindFirstChild("SpeedMultipliers")
+                local fs = sm and sm:FindFirstChild("FallSlowness")
+                if fs then fs:Destroy() end
+            end)
+        else
+            if _G._nofall then _G._nofall:Disconnect() _G._nofall=nil end
+        end
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "Spam Footsteps (FE)",
+    Default = false,
+    Callback = function(v)
+        if v then
+            _G._foot = game:GetService("RunService").Stepped:Connect(function()
+                game:GetService("ReplicatedStorage")
+                    :WaitForChild("Modules")
+                    :WaitForChild("Network")
+                    :WaitForChild("UnreliableRemoteEvent")
+                    :FireServer("FootstepPlayed",9)
+            end)
+        else
+            if _G._foot then _G._foot:Disconnect() _G._foot=nil end
+        end
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "Invisible",
+    Default = false,
+    Callback = function(v)
+        local c = game.Players.LocalPlayer.Character
+        local h = c and c:FindFirstChild("Humanoid")
+        if not h then return end
+        if v then
+            local a = Instance.new("Animation")
+            a.AnimationId = "rbxassetid://75804462760596"
+            local t = h:LoadAnimation(a)
+            t:Play(0,1,1)
+            t:AdjustSpeed(0)
+            _G._inv = t
+        else
+            if _G._inv then _G._inv:Stop() _G._inv=nil end
+        end
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "Auto Generator",
+    Default = false,
+    Callback = function(v)
+        if v then
+            _G._autogen = true
+            task.spawn(function()
+                while _G._autogen do
+                    for _,g in ipairs(workspace.Map.Ingame.Map:GetChildren()) do
+                        if g.Name=="Generator" then
+                            g.Remotes.RE:FireServer()
+                        end
+                    end
+                    task.wait(_G._gendelay or 3)
+                end
+            end)
+        else
+            _G._autogen = false
+        end
+    end
+})
+
+ForsakenTab:Slider({
+    Name = "Auto Gen Delay",
+    Min = 3,
+    Max = 30,
+    Increase = 1,
+    Default = 3,
+    Callback = function(v)
+        _G._gendelay = v
+    end
+})
+
+ForsakenTab:Toggle({
+    Name = "FrontFlip",
+    Default = false,
+    Callback = function(state)
+        local Players = game:GetService("Players")
+        local InsertService = game:GetService("InsertService")
+        local LocalPlayer = Players.LocalPlayer
+
+        if state then
+            if _G.__FrontFlipBtn then return end
+
+            local asset = InsertService:LoadAsset(92368439343389)
+            local TopbarPlus = require(asset:GetChildren()[1])
+
+            local button = TopbarPlus.new()
+            button:setImage("rbxassetid://6212253422")
+            button:setLabel("FrontFlip")
+
+            _G.__FrontFlipBtn = button
+
+            button:bindEvent("selected", function()
+                local char = LocalPlayer.Character
+                local hum = char and char:FindFirstChild("Humanoid")
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not (hum and hrp) then return end
+
+                if char:FindFirstChild("Animate") then
+                    char.Animate.Disabled = true
+                end
+
+                local animator = hum:FindFirstChildOfClass("Animator")
+                if animator then
+                    for _,v in ipairs(animator:GetPlayingAnimationTracks()) do
+                        v:Stop()
+                    end
+                end
+
+                for _,s in ipairs({
+                    Enum.HumanoidStateType.FallingDown,
+                    Enum.HumanoidStateType.Freefall,
+                    Enum.HumanoidStateType.Running,
+                    Enum.HumanoidStateType.Seated,
+                    Enum.HumanoidStateType.Climbing
+                }) do
+                    hum:SetStateEnabled(s,false)
+                end
+
+                hum:ChangeState(Enum.HumanoidStateType.Physics)
+
+                local cf = hrp.CFrame
+                task.spawn(function()
+                    for i=1,120 do
+                        local t=i/120
+                        local y=4*(t-t^2)*10
+                        hrp.CFrame =
+                            CFrame.new(
+                                cf.Position + cf.LookVector*(35*t) + Vector3.yAxis*y
+                            ) * cf.Rotation * CFrame.Angles(-math.rad(360*t),0,0)
+                        task.wait(0.45/120)
+                    end
+
+                    hrp.CFrame = CFrame.new(cf.Position + cf.LookVector*35) * cf.Rotation
+
+                    for _,s in ipairs({
+                        Enum.HumanoidStateType.FallingDown,
+                        Enum.HumanoidStateType.Freefall,
+                        Enum.HumanoidStateType.Running,
+                        Enum.HumanoidStateType.Seated,
+                        Enum.HumanoidStateType.Climbing
+                    }) do
+                        hum:SetStateEnabled(s,true)
+                    end
+
+                    hum:ChangeState(Enum.HumanoidStateType.Running)
+                    if char:FindFirstChild("Animate") then
+                        char.Animate.Disabled = false
+                    end
+                end)
+            end)
+        else
+            if _G.__FrontFlipBtn then
+                _G.__FrontFlipBtn:destroy()
+                _G.__FrontFlipBtn = nil
+            end
+        end
     end
 })
