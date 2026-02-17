@@ -71,15 +71,16 @@ MainTab:Toggle({
 SettingsTab:Dropdown({
     Title = "Configs",
     Values = Window.ConfigManager:GetConfigs(),
-    Value = Window.Flags.SelectedConfig,
     Callback = function(option)
-        Window.Flags.SelectedConfig = option
+        local myConfig = Window.ConfigManager:CreateConfig(option)
+        Window.Flags.__ActiveConfig = myConfig
+        myConfig:Load()
     end
 })
 
 SettingsTab:Input({
     Title = "Config Name",
-    Placeholder = "config_name",
+    Placeholder = "myConfigExample",
     Flag = "ConfigNameInput"
 })
 
@@ -88,7 +89,9 @@ SettingsTab:Button({
     Callback = function()
         local name = Window.Flags.ConfigNameInput
         if name and name ~= "" then
-            Window.ConfigManager:CreateConfig(name):Save()
+            local myConfig = Window.ConfigManager:CreateConfig(name)
+            Window.Flags.__ActiveConfig = myConfig
+            myConfig:Save()
         end
     end
 })
@@ -96,9 +99,10 @@ SettingsTab:Button({
 SettingsTab:Button({
     Title = "Delete Config",
     Callback = function()
-        local name = Window.Flags.SelectedConfig
-        if name and name ~= "" then
-            Window.ConfigManager:DeleteConfig(name)
+        local myConfig = Window.Flags.__ActiveConfig
+        if myConfig then
+            myConfig:Delete()
+            Window.Flags.__ActiveConfig = nil
         end
     end
 })
