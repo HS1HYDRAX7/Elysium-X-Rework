@@ -69,21 +69,21 @@ MainTab:Toggle({
 })
 
 ForsakenTab:Toggle({
-    Name = "Fullbright",
-    Default = false,
-    Callback = function(v)
+    Title = "Fullbright",
+    Value = false,
+    Callback = function(state)
         local Lighting = game:GetService("Lighting")
-        if v then
+        if state then
             Lighting.Brightness = 3
             Lighting.ClockTime = 14
             Lighting.Ambient = Color3.new(1,1,1)
             Lighting.OutdoorAmbient = Color3.new(1,1,1)
             Lighting.FogEnd = 1e9
             Lighting.GlobalShadows = false
-            for _,x in ipairs(Lighting:GetChildren()) do
-                if x:IsA("Atmosphere") or x:IsA("BloomEffect") or x:IsA("ColorCorrectionEffect")
-                or x:IsA("BlurEffect") or x:IsA("SunRaysEffect") or x:IsA("DepthOfFieldEffect") then
-                    x:Destroy()
+            for _,v in ipairs(Lighting:GetChildren()) do
+                if v:IsA("Atmosphere") or v:IsA("BloomEffect") or v:IsA("ColorCorrectionEffect")
+                or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("DepthOfFieldEffect") then
+                    v:Destroy()
                 end
             end
         else
@@ -96,28 +96,31 @@ ForsakenTab:Toggle({
 })
 
 ForsakenTab:Toggle({
-    Name = "No Fall Slowness",
-    Default = false,
-    Callback = function(v)
-        if v then
-            _G._nofall = game:GetService("RunService").Stepped:Connect(function()
+    Title = "No Fall Slowness",
+    Value = false,
+    Callback = function(state)
+        if state then
+            _G.__NoFallConn = game:GetService("RunService").Stepped:Connect(function()
                 local c = game.Players.LocalPlayer.Character
                 local sm = c and c:FindFirstChild("SpeedMultipliers")
                 local fs = sm and sm:FindFirstChild("FallSlowness")
                 if fs then fs:Destroy() end
             end)
         else
-            if _G._nofall then _G._nofall:Disconnect() _G._nofall=nil end
+            if _G.__NoFallConn then
+                _G.__NoFallConn:Disconnect()
+                _G.__NoFallConn = nil
+            end
         end
     end
 })
 
 ForsakenTab:Toggle({
-    Name = "Spam Footsteps (FE)",
-    Default = false,
-    Callback = function(v)
-        if v then
-            _G._foot = game:GetService("RunService").Stepped:Connect(function()
+    Title = "Spam Footsteps (FE)",
+    Value = false,
+    Callback = function(state)
+        if state then
+            _G.__FootstepConn = game:GetService("RunService").Stepped:Connect(function()
                 game:GetService("ReplicatedStorage")
                     :WaitForChild("Modules")
                     :WaitForChild("Network")
@@ -125,67 +128,73 @@ ForsakenTab:Toggle({
                     :FireServer("FootstepPlayed",9)
             end)
         else
-            if _G._foot then _G._foot:Disconnect() _G._foot=nil end
+            if _G.__FootstepConn then
+                _G.__FootstepConn:Disconnect()
+                _G.__FootstepConn = nil
+            end
         end
     end
 })
 
 ForsakenTab:Toggle({
-    Name = "Invisible",
-    Default = false,
-    Callback = function(v)
+    Title = "Invisible",
+    Value = false,
+    Callback = function(state)
         local c = game.Players.LocalPlayer.Character
         local h = c and c:FindFirstChild("Humanoid")
         if not h then return end
-        if v then
+        if state then
             local a = Instance.new("Animation")
             a.AnimationId = "rbxassetid://75804462760596"
             local t = h:LoadAnimation(a)
             t:Play(0,1,1)
             t:AdjustSpeed(0)
-            _G._inv = t
+            _G.__InvisibleTrack = t
         else
-            if _G._inv then _G._inv:Stop() _G._inv=nil end
+            if _G.__InvisibleTrack then
+                _G.__InvisibleTrack:Stop()
+                _G.__InvisibleTrack = nil
+            end
         end
     end
 })
 
 ForsakenTab:Toggle({
-    Name = "Auto Generator",
-    Default = false,
-    Callback = function(v)
-        if v then
-            _G._autogen = true
+    Title = "Auto Generator",
+    Value = false,
+    Callback = function(state)
+        _G.__AutoGen = state
+        if state then
             task.spawn(function()
-                while _G._autogen do
+                while _G.__AutoGen do
                     for _,g in ipairs(workspace.Map.Ingame.Map:GetChildren()) do
-                        if g.Name=="Generator" then
+                        if g.Name == "Generator" then
                             g.Remotes.RE:FireServer()
                         end
                     end
-                    task.wait(_G._gendelay or 3)
+                    task.wait(_G.__AutoGenDelay or 3)
                 end
             end)
-        else
-            _G._autogen = false
         end
     end
 })
 
 ForsakenTab:Slider({
-    Name = "Auto Gen Delay",
-    Min = 3,
-    Max = 30,
-    Increase = 1,
-    Default = 3,
-    Callback = function(v)
-        _G._gendelay = v
+    Title = "Auto Gen Delay",
+    Step = 1,
+    Value = {
+        Min = 3,
+        Max = 30,
+        Default = 3,
+    },
+    Callback = function(value)
+        _G.__AutoGenDelay = value
     end
 })
 
 ForsakenTab:Toggle({
-    Name = "FrontFlip",
-    Default = false,
+    Title = "FrontFlip",
+    Value = false,
     Callback = function(state)
         local Players = game:GetService("Players")
         local InsertService = game:GetService("InsertService")
