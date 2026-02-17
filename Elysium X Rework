@@ -53,8 +53,6 @@ local Paragraph = MainTab:Paragraph({
     Title = "Elysium X Rework",
     Desc = "By Atlas",
     Color = "Red",
-    Image = "rbxassetid://140061635845890",
-    ImageSize = 230,
     Locked = false
 })
 
