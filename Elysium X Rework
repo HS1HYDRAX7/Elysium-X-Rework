@@ -42,7 +42,7 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 
 MainTab:Dropdown({
     Title = "Theme",
-    Values = { "Rose","Vaporwave","Rainbow","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Values = { "Rose","Rainbow","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
     Value = "Crimson",
     Callback = function(option)
         WindUI:SetTheme(option)
