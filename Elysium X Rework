@@ -110,69 +110,7 @@ MainTab:Toggle({
 })
 
 ElysiumAITab:Paragraph({
-    Title = "[ CHAT ]",
+    Title = "Coming soon",
     Desc = "",
-    Color = "Grey",
-    Locked = false,
-    Buttons = {}
-})
-
-ElysiumAITab:Input({
-    Title = "API Key",
-    Value = "",
-    InputIcon = "key",
-    Type = "Text",
-    Placeholder = "Enter your API Key...",
-    Callback = function(key) end
-})
-
-ElysiumAITab:Input({
-    Title = "Message",
-    Value = "",
-    InputIcon = "code",
-    Type = "Textarea",
-    Placeholder = "Enter text...",
-    Callback = function(msg) end
-})
-
-ElysiumAITab:Button({
-    Title = "Send",
-    Locked = false,
-    Callback = function()
-        local apiKey = ElysiumAITab:GetInputValue("API Key") or ""
-        local userMessage = ElysiumAITab:GetInputValue("Message") or ""
-        if apiKey == "" or userMessage == "" then return end
-
-        local paragraph = ElysiumAITab:GetParagraph("[ CHAT ]")
-        paragraph.Desc = paragraph.Desc .. string.format("\n[Player]: %s", userMessage)
-
-        local HttpService = game:GetService("HttpService")
-        local url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent"
-
-        local ok, resp = pcall(function()
-            return request({
-                Url = url,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json",
-                    ["Authorization"] = "Bearer " .. apiKey
-                },
-                Body = HttpService:JSONEncode({
-                    contents = {
-                        {role="user", parts={{text=userMessage}}}
-                    }
-                })
-            })
-        end)
-
-        local reply = "Error contacting AI"
-        if ok and resp and resp.StatusCode == 200 then
-            local data = HttpService:JSONDecode(resp.Body)
-            if data and data.candidates and #data.candidates > 0 then
-                reply = data.candidates[1].content or "No reply"
-            end
-        end
-
-        paragraph.Desc = paragraph.Desc .. string.format("\n[Elysium AI]: %s", reply)
-    end
+    Color = "Grey"
 })
