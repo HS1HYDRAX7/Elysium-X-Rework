@@ -40,10 +40,11 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings", Locked = false })
 
 MainTab:Paragraph({
     Title = "Credits",
-    Desc = "By Atlas (Solo Developer)",
+    Desc = "By Atlas and .dekydied",
     Color = "Red",
     Image = "rbxassetid://18631102886",
     ImageSize = 50,
