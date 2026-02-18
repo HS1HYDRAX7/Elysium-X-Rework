@@ -39,7 +39,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local ElysiumAITab = Window:Tab({ Title = "Elysium AI", Icon = "cpu", Locked = false })
+local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
 
 MainTab:Paragraph({
     Title = "Credits",
@@ -109,8 +109,85 @@ MainTab:Toggle({
     end
 })
 
-ElysiumAITab:Paragraph({
-    Title = "Coming soon",
-    Desc = "",
-    Color = "Grey"
+PlayerTab:Toggle({
+    Title = "Toggle",
+    Value = false,
+    Callback = function(state)
+        PlayerTab.__enabled = state
+
+        if not state then
+            if PlayerTab.__conn then
+                PlayerTab.__conn:Disconnect()
+                PlayerTab.__conn = nil
+            end
+            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                local h = game.Players.LocalPlayer.Character.Humanoid
+                h.WalkSpeed = 16
+                h.JumpPower = 50
+            end
+            workspace.Gravity = 196.2
+            return
+        end
+
+        PlayerTab.__conn = game:GetService("RunService").RenderStepped:Connect(function(dt)
+            if not PlayerTab.__enabled then return end
+
+            local char = game.Players.LocalPlayer.Character
+            if not char then return end
+
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            local hum = char:FindFirstChild("Humanoid")
+
+            if hrp then
+                hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -(PlayerTab.__cframeSpeed or 0) * dt)
+            end
+
+            if hum then
+                hum.WalkSpeed = PlayerTab.__walkSpeed or 16
+                hum.JumpPower = PlayerTab.__jumpPower or 50
+            end
+
+            workspace.Gravity = PlayerTab.__gravity or 196.2
+        end)
+    end
+})
+
+PlayerTab:Input({
+    Title = "CFrame Speed",
+    Value = "0",
+    Type = "Input",
+    Placeholder = "Number",
+    Callback = function(input)
+        PlayerTab.__cframeSpeed = tonumber(input) or 0
+    end
+})
+
+PlayerTab:Input({
+    Title = "WalkSpeed",
+    Value = "16",
+    Type = "Input",
+    Placeholder = "Number",
+    Callback = function(input)
+        PlayerTab.__walkSpeed = tonumber(input) or 16
+    end
+})
+
+PlayerTab:Input({
+    Title = "JumpPower",
+    Value = "50",
+    Type = "Input",
+    Placeholder = "Number",
+    Callback = function(input)
+        PlayerTab.__jumpPower = tonumber(input) or 50
+    end
+})
+
+PlayerTab:Input({
+    Title = "Gravity",
+    Value = "196.2",
+    Type = "Input",
+    Placeholder = "Number",
+    Callback = function(input)
+        PlayerTab.__gravity = tonumber(input) or 196.2
+    end
 })
