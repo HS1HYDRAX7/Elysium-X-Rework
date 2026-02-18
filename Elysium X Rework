@@ -123,9 +123,7 @@ ElysiumAITab:Input({
     InputIcon = "key",
     Type = "Text",
     Placeholder = "Enter your API Key...",
-    Callback = function(apiKey)
-        print("API Key set")
-    end
+    Callback = function(key) end
 })
 
 ElysiumAITab:Input({
@@ -134,34 +132,47 @@ ElysiumAITab:Input({
     InputIcon = "code",
     Type = "Textarea",
     Placeholder = "Enter text...",
-    Callback = function(input)
-    end
+    Callback = function(msg) end
 })
 
 ElysiumAITab:Button({
     Title = "Send",
     Locked = false,
     Callback = function()
-        local message = ElysiumAITab:GetInputValue("Message") or ""
         local apiKey = ElysiumAITab:GetInputValue("API Key") or ""
-        if message ~= "" and apiKey ~= "" then
-            local paragraph = ElysiumAITab:GetParagraph("[ CHAT ]")
-            local history = paragraph.Desc
-            history = history .. string.format("\n[Player]: %s", message)
-            local HttpService = game:GetService("HttpService")
-            local success, reply = pcall(function()
-                local data = HttpService:JSONEncode({prompt = message})
-                local headers = {
+        local userMessage = ElysiumAITab:GetInputValue("Message") or ""
+        if apiKey == "" or userMessage == "" then return end
+
+        local paragraph = ElysiumAITab:GetParagraph("[ CHAT ]")
+        paragraph.Desc = paragraph.Desc .. string.format("\n[Player]: %s", userMessage)
+
+        local HttpService = game:GetService("HttpService")
+        local url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent"
+
+        local ok, resp = pcall(function()
+            return request({
+                Url = url,
+                Method = "POST",
+                Headers = {
                     ["Content-Type"] = "application/json",
                     ["Authorization"] = "Bearer " .. apiKey
-                }
-                local response = HttpService:PostAsync("https://api.gemini.com/v1/chat", data, Enum.HttpContentType.ApplicationJson, false, headers)
-                local decoded = HttpService:JSONDecode(response)
-                return decoded.response or "No reply"
-            end)
-            if not success then reply = "Error contacting AI" end
-            history = history .. string.format("\n[Elysium AI]: %s", reply)
-            paragraph.Desc = history
+                },
+                Body = HttpService:JSONEncode({
+                    contents = {
+                        {role="user", parts={{text=userMessage}}}
+                    }
+                })
+            })
+        end)
+
+        local reply = "Error contacting AI"
+        if ok and resp and resp.StatusCode == 200 then
+            local data = HttpService:JSONDecode(resp.Body)
+            if data and data.candidates and #data.candidates > 0 then
+                reply = data.candidates[1].content or "No reply"
+            end
         end
+
+        paragraph.Desc = paragraph.Desc .. string.format("\n[Elysium AI]: %s", reply)
     end
 })
