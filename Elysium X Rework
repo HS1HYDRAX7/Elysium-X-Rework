@@ -120,10 +120,10 @@ PlayerTab:Toggle({
                 PlayerTab.__conn:Disconnect()
                 PlayerTab.__conn = nil
             end
-            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-                local h = game.Players.LocalPlayer.Character.Humanoid
-                h.WalkSpeed = 16
-                h.JumpPower = 50
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = 16
+                char.Humanoid.JumpPower = 50
             end
             workspace.Gravity = 196.2
             return
@@ -152,42 +152,54 @@ PlayerTab:Toggle({
     end
 })
 
-PlayerTab:Input({
+PlayerTab:Slider({
     Title = "CFrame Speed",
-    Value = "0",
-    Type = "Input",
-    Placeholder = "Number",
-    Callback = function(input)
-        PlayerTab.__cframeSpeed = tonumber(input) or 0
+    Step = 0.1,
+    Value = {
+        Min = 0,
+        Max = 200,
+        Default = 0,
+    },
+    Callback = function(value)
+        PlayerTab.__cframeSpeed = value
     end
 })
 
-PlayerTab:Input({
+PlayerTab:Slider({
     Title = "WalkSpeed",
-    Value = "16",
-    Type = "Input",
-    Placeholder = "Number",
-    Callback = function(input)
-        PlayerTab.__walkSpeed = tonumber(input) or 16
+    Step = 0.1,
+    Value = {
+        Min = 0,
+        Max = 200,
+        Default = 16,
+    },
+    Callback = function(value)
+        PlayerTab.__walkSpeed = value
     end
 })
 
-PlayerTab:Input({
+PlayerTab:Slider({
     Title = "JumpPower",
-    Value = "50",
-    Type = "Input",
-    Placeholder = "Number",
-    Callback = function(input)
-        PlayerTab.__jumpPower = tonumber(input) or 50
+    Step = 0.1,
+    Value = {
+        Min = 0,
+        Max = 200,
+        Default = 50,
+    },
+    Callback = function(value)
+        PlayerTab.__jumpPower = value
     end
 })
 
-PlayerTab:Input({
+PlayerTab:Slider({
     Title = "Gravity",
-    Value = "196.2",
-    Type = "Input",
-    Placeholder = "Number",
-    Callback = function(input)
-        PlayerTab.__gravity = tonumber(input) or 196.2
+    Step = 0.1,
+    Value = {
+        Min = 0,
+        Max = 300,
+        Default = 196.2,
+    },
+    Callback = function(value)
+        PlayerTab.__gravity = value
     end
 })
