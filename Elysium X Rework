@@ -13,7 +13,7 @@ local Window = WindUI:CreateWindow({
 
     KeySystem = {
         Key = { "260126" },
-        Note = "The key is 260126",
+        Note = "Still under development expect bugs",
     },
 })
 
