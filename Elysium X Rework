@@ -39,6 +39,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local ElysiumAITab = Window:Tab({ Title = "Elysium AI", Icon = "cpu", Locked = false })
 
 MainTab:Paragraph({
     Title = "Credits",
@@ -105,5 +106,62 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+ElysiumAITab:Paragraph({
+    Title = "[ CHAT ]",
+    Desc = "",
+    Color = "Grey",
+    Locked = false,
+    Buttons = {}
+})
+
+ElysiumAITab:Input({
+    Title = "API Key",
+    Value = "",
+    InputIcon = "key",
+    Type = "Text",
+    Placeholder = "Enter your API Key...",
+    Callback = function(apiKey)
+        print("API Key set")
+    end
+})
+
+ElysiumAITab:Input({
+    Title = "Message",
+    Value = "",
+    InputIcon = "code",
+    Type = "Textarea",
+    Placeholder = "Enter text...",
+    Callback = function(input)
+    end
+})
+
+ElysiumAITab:Button({
+    Title = "Send",
+    Locked = false,
+    Callback = function()
+        local message = ElysiumAITab:GetInputValue("Message") or ""
+        local apiKey = ElysiumAITab:GetInputValue("API Key") or ""
+        if message ~= "" and apiKey ~= "" then
+            local paragraph = ElysiumAITab:GetParagraph("[ CHAT ]")
+            local history = paragraph.Desc
+            history = history .. string.format("\n[Player]: %s", message)
+            local HttpService = game:GetService("HttpService")
+            local success, reply = pcall(function()
+                local data = HttpService:JSONEncode({prompt = message})
+                local headers = {
+                    ["Content-Type"] = "application/json",
+                    ["Authorization"] = "Bearer " .. apiKey
+                }
+                local response = HttpService:PostAsync("https://api.gemini.com/v1/chat", data, Enum.HttpContentType.ApplicationJson, false, headers)
+                local decoded = HttpService:JSONDecode(response)
+                return decoded.response or "No reply"
+            end)
+            if not success then reply = "Error contacting AI" end
+            history = history .. string.format("\n[Elysium AI]: %s", reply)
+            paragraph.Desc = history
+        end
     end
 })
