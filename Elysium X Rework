@@ -39,12 +39,11 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings", Locked = false })
 
 MainTab:Paragraph({
     Title = "Credits",
-    Desc = "By Atlas and .dekydied",
+    Desc = "By Atlas and deky",
     Color = "Red",
     Image = "rbxassetid://18631102886",
     ImageSize = 50,
@@ -54,8 +53,7 @@ MainTab:Paragraph({
             Icon = "link",
             Title = "Discord",
             Callback = function()
-                setclipboard("https://discord.gg/JEpRMHSkpq")
-                WindUI:Notify({
+                setclipboard("https://discord.gg/JEpRMHSkpq")              WindUI:Notify({
                     Title = "Discord",
                     Content = "Link Copied",
                     Duration = 3,
@@ -107,100 +105,5 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
-    end
-})
-
-PlayerTab:Toggle({
-    Title = "Toggle",
-    Value = false,
-    Callback = function(state)
-        PlayerTab.__enabled = state
-
-        if not state then
-            if PlayerTab.__conn then
-                PlayerTab.__conn:Disconnect()
-                PlayerTab.__conn = nil
-            end
-            local char = game.Players.LocalPlayer.Character
-            if char and char:FindFirstChild("Humanoid") then
-                char.Humanoid.WalkSpeed = 16
-                char.Humanoid.JumpPower = 50
-            end
-            workspace.Gravity = 196.2
-            return
-        end
-
-        PlayerTab.__conn = game:GetService("RunService").RenderStepped:Connect(function(dt)
-            if not PlayerTab.__enabled then return end
-
-            local char = game.Players.LocalPlayer.Character
-            if not char then return end
-
-            local hrp = char:FindFirstChild("HumanoidRootPart")
-            local hum = char:FindFirstChild("Humanoid")
-
-            if hrp then
-                hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -(PlayerTab.__cframeSpeed or 0) * dt)
-            end
-
-            if hum then
-                hum.WalkSpeed = PlayerTab.__walkSpeed or 16
-                hum.JumpPower = PlayerTab.__jumpPower or 50
-            end
-
-            workspace.Gravity = PlayerTab.__gravity or 196.2
-        end)
-    end
-})
-
-PlayerTab:Slider({
-    Title = "CFrame Speed",
-    Step = 0.1,
-    Value = {
-        Min = 0,
-        Max = 200,
-        Default = 0,
-    },
-    Callback = function(value)
-        PlayerTab.__cframeSpeed = value
-    end
-})
-
-PlayerTab:Slider({
-    Title = "WalkSpeed",
-    Step = 0.1,
-    Value = {
-        Min = 0,
-        Max = 200,
-        Default = 16,
-    },
-    Callback = function(value)
-        PlayerTab.__walkSpeed = value
-    end
-})
-
-PlayerTab:Slider({
-    Title = "JumpPower",
-    Step = 0.1,
-    Value = {
-        Min = 0,
-        Max = 200,
-        Default = 50,
-    },
-    Callback = function(value)
-        PlayerTab.__jumpPower = value
-    end
-})
-
-PlayerTab:Slider({
-    Title = "Gravity",
-    Step = 0.1,
-    Value = {
-        Min = 0,
-        Max = 300,
-        Default = 196.2,
-    },
-    Callback = function(value)
-        PlayerTab.__gravity = value
     end
 })
