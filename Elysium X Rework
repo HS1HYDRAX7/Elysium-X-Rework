@@ -141,6 +141,154 @@ OthersTab:Button({
 })
 
 OthersTab:Toggle({
+    Title = "Flashlight",
+    Value = false,
+    Callback = function(state)
+
+        if not getgenv().__FlashlightData then
+            getgenv().__FlashlightData = {}
+        end
+
+        local data = getgenv().__FlashlightData
+
+        if state then
+
+            if data.Initialized then
+                data.Enabled = true
+                if data.ButtonFrame then
+                    data.ButtonFrame.Visible = true
+                end
+                return
+            end
+
+            data.Enabled = true
+            data.Initialized = true
+            data.LightOn = false
+
+            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
+            data.SausageHolder = sausageHolder
+            data.OriginalSize = sausageHolder.Size.X.Offset
+            data.ExpandedSize = UDim2.new(0, data.OriginalSize + 48, 0, sausageHolder.Size.Y.Offset)
+
+            local buttonFrame = Instance.new("Frame", sausageHolder)
+            buttonFrame.Size = UDim2.new(0, 48, 0, 44)
+            buttonFrame.BackgroundTransparency = 1
+            buttonFrame.BorderSizePixel = 0
+            buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+
+            local imageButton = Instance.new("ImageButton", buttonFrame)
+            imageButton.BackgroundTransparency = 1
+            imageButton.BorderSizePixel = 0
+            imageButton.Size = UDim2.new(0, 36, 0, 36)
+            imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
+            imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+            imageButton.Image = "http://www.roblox.com/asset/?id=100286985600444"
+
+            data.ButtonFrame = buttonFrame
+
+            local player = game:GetService("Players").LocalPlayer
+            local runService = game:GetService("RunService")
+
+            local function createLight()
+                local character = player.Character or player.CharacterAdded:Wait()
+                local head = character:WaitForChild("Head")
+
+                if data.Flashlight then
+                    data.Flashlight:Destroy()
+                end
+
+                local lightPart = Instance.new("Part")
+                lightPart.Name = "FlashlightPart"
+                lightPart.Anchored = true
+                lightPart.CanCollide = false
+                lightPart.Transparency = 1
+                lightPart.Size = Vector3.new(0.2,0.2,0.2)
+                lightPart.Parent = workspace
+
+                local spot = Instance.new("SpotLight")
+                spot.Angle = 80
+                spot.Brightness = 8
+                spot.Range = 120
+                spot.Shadows = true
+                spot.Face = Enum.NormalId.Front
+                spot.Parent = lightPart
+
+                data.Flashlight = lightPart
+                data.Spot = spot
+
+                if data.RenderConnection then
+                    data.RenderConnection:Disconnect()
+                end
+
+                data.RenderConnection = runService.RenderStepped:Connect(function()
+                    if data.LightOn and character and head then
+                        lightPart.CFrame = head.CFrame
+                    end
+                end)
+            end
+
+            local function toggleLight()
+                if not data.Enabled then return end
+
+                if not data.Flashlight then
+                    createLight()
+                end
+
+                data.LightOn = not data.LightOn
+
+                if data.Spot then
+                    data.Spot.Enabled = data.LightOn
+                end
+            end
+
+            imageButton.Activated:Connect(function()
+                toggleLight()
+            end)
+
+            task.spawn(function()
+                while data.Initialized do
+                    task.wait()
+                    if data.Enabled then
+                        sausageHolder.Size = data.ExpandedSize
+                        buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+                    end
+                end
+            end)
+
+        else
+
+            data.Enabled = false
+            data.LightOn = false
+
+            if data.Spot then
+                data.Spot.Enabled = false
+            end
+
+            if data.RenderConnection then
+                data.RenderConnection:Disconnect()
+                data.RenderConnection = nil
+            end
+
+            if data.Flashlight then
+                data.Flashlight:Destroy()
+                data.Flashlight = nil
+            end
+
+            if data.ButtonFrame then
+                data.ButtonFrame:Destroy()
+                data.ButtonFrame = nil
+            end
+
+            if data.SausageHolder and data.OriginalSize then
+                data.SausageHolder.Size = UDim2.new(0, data.OriginalSize, 0, data.SausageHolder.Size.Y.Offset)
+            end
+
+            data.Initialized = false
+        end
+    end
+})
+
+OthersTab:Toggle({
     Title = "FrontFlip",
     Value = false,
     Callback = function(state)
