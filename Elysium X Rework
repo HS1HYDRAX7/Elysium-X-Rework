@@ -87,6 +87,27 @@ MainTab:Dropdown({
     end
 })
 
+MainTab:Dropdown({
+    Title = "Font",
+    Values = { "Standard","Audiowide","Caesar Dressing","Faster One","Silkscreen","Teko" },
+    Value = "Standard",
+    Callback = function(option)
+        if option == "Standard" then
+            WindUI:SetFont("rbxasset://fonts/families/SourceSansPro.json")
+        elseif option == "Audiowide" then
+            WindUI:SetFont("rbxassetid://12187360881")
+        elseif option == "Caesar Dressing" then
+            WindUI:SetFont("rbxassetid://12187368843")
+        elseif option == "Faster One" then
+            WindUI:SetFont("rbxassetid://12187370928")
+        elseif option == "Silkscreen" then
+            WindUI:SetFont("rbxassetid://12187371840")
+        elseif option == "Teko" then
+            WindUI:SetFont("rbxassetid://12187376174")
+        end
+    end
+})
+
 MainTab:Toggle({
     Title = "Transparent",
     Icon = "palette",
