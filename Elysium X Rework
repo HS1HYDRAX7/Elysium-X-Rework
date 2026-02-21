@@ -116,3 +116,65 @@ MainTab:Toggle({
         Window:ToggleTransparency(state)
     end
 })
+
+local ConfigSec = SettingsTab:Section({
+    Title = "Manual Settings",
+    Desc = "Manage your configs",
+    Icon = "folder",
+    Opened = true,
+    Box = true,
+    BoxBorder = true,
+})
+
+local currentConfig = ""
+local configList = {}
+
+local function RefreshConfigs()
+    configList = WindUI:GetConfigs()
+    ConfigDropdown:SetValues(configList)
+end
+
+ConfigSec:Input({
+    Title = "Config Name",
+    Callback = function(name)
+        currentConfig = name
+    end
+})
+
+ConfigSec:Button({
+    Title = "Save Config",
+    Callback = function()
+        if currentConfig ~= "" then
+            WindUI:SaveConfig(currentConfig)
+            RefreshConfigs()
+        end
+    end
+})
+
+ConfigDropdown = ConfigSec:Dropdown({
+    Title = "Select Config",
+    Values = {},
+    Callback = function(selected)
+        currentConfig = selected
+        WindUI:LoadConfig(selected)
+    end
+})
+
+ConfigSec:Button({
+    Title = "Delete Config",
+    Callback = function()
+        if currentConfig ~= "" then
+            WindUI:DeleteConfig(currentConfig)
+            RefreshConfigs()
+        end
+    end
+})
+
+ConfigSec:Button({
+    Title = "Refresh List",
+    Callback = function()
+        RefreshConfigs()
+    end
+})
+
+RefreshConfigs()
