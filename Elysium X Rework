@@ -123,15 +123,28 @@ local ConfigSec = SettingsTab:Section({
     Icon = "folder",
     Opened = true,
     Box = true,
-    BoxBorder = true,
 })
 
 local currentConfig = ""
-local configList = {}
+local ConfigDropdown
 
-local function RefreshConfigs()
-    configList = WindUI:GetConfigs()
-    ConfigDropdown:SetValues(configList)
+local function GetConfigs()
+    return WindUI:GetConfigs() or {}
+end
+
+local function CreateDropdown()
+    if ConfigDropdown then
+        ConfigDropdown:Destroy()
+    end
+
+    ConfigDropdown = ConfigSec:Dropdown({
+        Title = "Select Config",
+        Values = GetConfigs(),
+        Callback = function(selected)
+            currentConfig = selected
+            WindUI:LoadConfig(selected)
+        end
+    })
 end
 
 ConfigSec:Input({
@@ -146,17 +159,8 @@ ConfigSec:Button({
     Callback = function()
         if currentConfig ~= "" then
             WindUI:SaveConfig(currentConfig)
-            RefreshConfigs()
+            CreateDropdown()
         end
-    end
-})
-
-ConfigDropdown = ConfigSec:Dropdown({
-    Title = "Select Config",
-    Values = {},
-    Callback = function(selected)
-        currentConfig = selected
-        WindUI:LoadConfig(selected)
     end
 })
 
@@ -165,7 +169,8 @@ ConfigSec:Button({
     Callback = function()
         if currentConfig ~= "" then
             WindUI:DeleteConfig(currentConfig)
-            RefreshConfigs()
+            currentConfig = ""
+            CreateDropdown()
         end
     end
 })
@@ -173,8 +178,8 @@ ConfigSec:Button({
 ConfigSec:Button({
     Title = "Refresh List",
     Callback = function()
-        RefreshConfigs()
+        CreateDropdown()
     end
 })
 
-RefreshConfigs()
+CreateDropdown()
