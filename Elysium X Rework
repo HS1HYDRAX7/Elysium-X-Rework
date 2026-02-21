@@ -51,12 +51,12 @@ MainTab:Paragraph({
     Buttons = {
         {
             Icon = "link",
-            Title = "TikTok",
+            Title = "Website",
             Callback = function()
-                setclipboard("@mrnexus000")
+                setclipboard("https://hs1hydrax7.github.io/Site/")
                 WindUI:Notify({
-                    Title = "TikTok",
-                    Content = "Username Copied",
+                    Title = "Website",
+                    Content = "Link Copied!",
                     Duration = 3,
                     Icon = "external-link",
                 })
@@ -64,11 +64,11 @@ MainTab:Paragraph({
         },
         {
             Icon = "link",
-            Title = "YouTube",
+            Title = "TikTok",
             Callback = function()
-                setclipboard("@Atlas_Scripts")
+                setclipboard("@mrnexus000")
                 WindUI:Notify({
-                    Title = "YouTube",
+                    Title = "TikTok",
                     Content = "Username Copied",
                     Duration = 3,
                     Icon = "external-link",
