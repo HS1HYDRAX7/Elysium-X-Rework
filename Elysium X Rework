@@ -130,3 +130,21 @@ OthersTab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end
 })
+
+OthersTab:Button({
+    Title = "Browser V2",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Main/refs/heads/main/Browser%20V2"))()
+    end
+})
+
+OthersTab:Button({
+    Title = "ScriptBlox",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Main/refs/heads/main/Scriptblox"))()
+    end
+})
