@@ -93,7 +93,7 @@ MainTab:Dropdown({
     Value = "Standard",
     Callback = function(option)
         if option == "Standard" then
-            WindUI:SetFont("rbxasset://fonts/families/SourceSansPro.json")
+            WindUI:SetFont("rbxassetid://12187365364")
         elseif option == "Audiowide" then
             WindUI:SetFont("rbxassetid://12187360881")
         elseif option == "Caesar Dressing" then
@@ -107,79 +107,3 @@ MainTab:Dropdown({
         end
     end
 })
-
-MainTab:Toggle({
-    Title = "Transparent",
-    Icon = "palette",
-    Value = true,
-    Callback = function(state)
-        Window:ToggleTransparency(state)
-    end
-})
-
-local ConfigSec = SettingsTab:Section({
-    Title = "Manual Settings",
-    Desc = "Manage your configs",
-    Icon = "folder",
-    Opened = true,
-    Box = true,
-})
-
-local currentConfig = ""
-local ConfigDropdown
-
-local function GetConfigs()
-    return WindUI:GetConfigs() or {}
-end
-
-local function CreateDropdown()
-    if ConfigDropdown then
-        ConfigDropdown:Destroy()
-    end
-
-    ConfigDropdown = ConfigSec:Dropdown({
-        Title = "Select Config",
-        Values = GetConfigs(),
-        Callback = function(selected)
-            currentConfig = selected
-            WindUI:LoadConfig(selected)
-        end
-    })
-end
-
-ConfigSec:Input({
-    Title = "Config Name",
-    Callback = function(name)
-        currentConfig = name
-    end
-})
-
-ConfigSec:Button({
-    Title = "Save Config",
-    Callback = function()
-        if currentConfig ~= "" then
-            WindUI:SaveConfig(currentConfig)
-            CreateDropdown()
-        end
-    end
-})
-
-ConfigSec:Button({
-    Title = "Delete Config",
-    Callback = function()
-        if currentConfig ~= "" then
-            WindUI:DeleteConfig(currentConfig)
-            currentConfig = ""
-            CreateDropdown()
-        end
-    end
-})
-
-ConfigSec:Button({
-    Title = "Refresh List",
-    Callback = function()
-        CreateDropdown()
-    end
-})
-
-CreateDropdown()
