@@ -80,6 +80,7 @@ MainTab:Paragraph({
 
 MainTab:Dropdown({
     Title = "Theme",
+    Flag = "Theme", 
     Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
     Value = "Crimson",
     Callback = function(option)
@@ -89,6 +90,7 @@ MainTab:Dropdown({
 
 MainTab:Dropdown({
     Title = "Font",
+    Flag = "Font", 
     Values = { "Standard","Audiowide","Caesar Dressing","Faster One","Silkscreen","Teko" },
     Value = "Standard",
     Callback = function(option)
@@ -105,5 +107,15 @@ MainTab:Dropdown({
         elseif option == "Teko" then
             WindUI:SetFont("rbxassetid://12187376174")
         end
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparent",
+    Flag = "Transparent", 
+    Icon = "palette",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleTransparency(state)
     end
 })
