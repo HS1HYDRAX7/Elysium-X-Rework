@@ -39,6 +39,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local ForsakenTab = Window:Tab({ Title = "Forsaken", Icon = "sword", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
@@ -110,6 +111,182 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+ForsakenTab:Toggle({
+    Title = "FrontFlip",
+    Value = false,
+    Callback = function(state)
+
+        if not getgenv().__FrontFlipData then
+            getgenv().__FrontFlipData = {}
+        end
+
+        local data = getgenv().__FrontFlipData
+
+        if state then
+
+            if data.Initialized then
+                data.Enabled = true
+                if data.ButtonFrame then
+                    data.ButtonFrame.Visible = true
+                end
+                return
+            end
+
+            data.Enabled = true
+            data.Key = data.Key or Enum.KeyCode.F
+            data.Cooldown = false
+            data.Initialized = true
+
+            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
+            data.SausageHolder = sausageHolder
+            data.OriginalSize = sausageHolder.Size.X.Offset
+            data.ExpandedSize = UDim2.new(0, data.OriginalSize + 48, 0, sausageHolder.Size.Y.Offset)
+
+            local buttonFrame = Instance.new("Frame", sausageHolder)
+            buttonFrame.Size = UDim2.new(0, 48, 0, 44)
+            buttonFrame.BackgroundTransparency = 1
+            buttonFrame.BorderSizePixel = 0
+            buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+
+            local imageButton = Instance.new("ImageButton", buttonFrame)
+            imageButton.BackgroundTransparency = 1
+            imageButton.BorderSizePixel = 0
+            imageButton.Size = UDim2.new(0, 36, 0, 36)
+            imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
+            imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+            imageButton.Image = "http://www.roblox.com/asset/?id=119710348299399"
+
+            data.ButtonFrame = buttonFrame
+
+            function data.Flip()
+                if not data.Enabled then return end
+                if data.Cooldown then return end
+
+                data.Cooldown = true
+
+                local character = game:GetService("Players").LocalPlayer.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
+
+                if not hrp or not humanoid then
+                    data.Cooldown = false
+                    return
+                end
+
+                local savedTracks = {}
+
+                if animator then
+                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                        table.insert(savedTracks, {track = track, time = track.TimePosition})
+                        track:Stop(0)
+                    end
+                end
+
+                humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+
+                local duration = 0.45
+                local steps = 120
+                local startCFrame = hrp.CFrame
+                local forwardVector = startCFrame.LookVector
+                local upVector = Vector3.new(0, 1, 0)
+
+                task.spawn(function()
+                    local startTime = tick()
+
+                    for i = 1, steps do
+                        local t = i / steps
+                        local height = 4 * (t - t ^ 2) * 10
+                        local nextPos = startCFrame.Position + forwardVector * (35 * t) + upVector * height
+                        local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
+
+                        hrp.CFrame = CFrame.new(nextPos) * rotation
+
+                        local elapsedTime = tick() - startTime
+                        local expectedTime = (duration / steps) * i
+                        local waitTime = expectedTime - elapsedTime
+                        if waitTime > 0 then
+                            task.wait(waitTime)
+                        end
+                    end
+
+                    hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector * 35) * startCFrame.Rotation
+
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
+                    humanoid:ChangeState(Enum.HumanoidStateType.Running)
+
+                    if animator then
+                        for _, dataTrack in ipairs(savedTracks) do
+                            dataTrack.track:Play()
+                            dataTrack.track.TimePosition = dataTrack.time
+                        end
+                    end
+
+                    task.wait(0.25)
+                    data.Cooldown = false
+                end)
+            end
+
+            imageButton.Activated:Connect(function()
+                data.Flip()
+            end)
+
+            if not data.InputConnection then
+                data.InputConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, busy)
+                    if input.KeyCode == data.Key and not busy then
+                        data.Flip()
+                    end
+                end)
+            end
+
+            task.spawn(function()
+                while data.Initialized do
+                    task.wait()
+                    if data.Enabled then
+                        sausageHolder.Size = data.ExpandedSize
+                        buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+                    end
+                end
+            end)
+
+        else
+
+            data.Enabled = false
+
+            if data.ButtonFrame then
+                data.ButtonFrame:Destroy()
+                data.ButtonFrame = nil
+            end
+
+            if data.SausageHolder and data.OriginalSize then
+                data.SausageHolder.Size = UDim2.new(0, data.OriginalSize, 0, data.SausageHolder.Size.Y.Offset)
+            end
+
+            data.Initialized = false
+        end
+    end
+})
+
+ForsakenTab:Keybind({
+    Title = "FrontFlip Key",
+    Value = "F",
+    Callback = function(v)
+        if not getgenv().__FrontFlipData then
+            getgenv().__FrontFlipData = {}
+        end
+        getgenv().__FrontFlipData.Key = Enum.KeyCode[v]
     end
 })
 
