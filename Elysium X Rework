@@ -89,7 +89,7 @@ MainTab:Dropdown({
 
 MainTab:Dropdown({
     Title = "Font",
-    Values = { "Standard","Audiowide","Caesar Dressing","Faster One","Silkscreen","Teko" },
+    Values = { "Standard","Audiowide","Caesar Dressing","Teko" },
     Value = "Standard",
     Callback = function(option)
         if option == "Standard" then
@@ -98,10 +98,6 @@ MainTab:Dropdown({
             WindUI:SetFont("rbxassetid://12187360881")
         elseif option == "Caesar Dressing" then
             WindUI:SetFont("rbxassetid://12187368843")
-        elseif option == "Faster One" then
-            WindUI:SetFont("rbxassetid://12187370928")
-        elseif option == "Silkscreen" then
-            WindUI:SetFont("rbxassetid://12187371840")
         elseif option == "Teko" then
             WindUI:SetFont("rbxassetid://12187376174")
         end
