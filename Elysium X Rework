@@ -136,7 +136,7 @@ ForsakenTab:Toggle({
             end
 
             data.Enabled = true
-            data.Key = data.Key or Enum.KeyCode.F
+            data.Key = Enum.KeyCode.F
             data.Cooldown = false
             data.Initialized = true
 
@@ -245,7 +245,7 @@ ForsakenTab:Toggle({
 
             if not data.InputConnection then
                 data.InputConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, busy)
-                    if input.KeyCode == data.Key and not busy then
+                    if input.KeyCode == Enum.KeyCode.F and not busy then
                         data.Flip()
                     end
                 end)
@@ -276,17 +276,6 @@ ForsakenTab:Toggle({
 
             data.Initialized = false
         end
-    end
-})
-
-ForsakenTab:Keybind({
-    Title = "FrontFlip Key",
-    Value = "F",
-    Callback = function(v)
-        if not getgenv().__FrontFlipData then
-            getgenv().__FrontFlipData = {}
-        end
-        getgenv().__FrontFlipData.Key = Enum.KeyCode[v]
     end
 })
 
