@@ -39,7 +39,6 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local ForsakenTab = Window:Tab({ Title = "Forsaken", Icon = "sword", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
@@ -114,73 +113,34 @@ MainTab:Toggle({
     end
 })
 
-ForsakenTab:Toggle({
-    Title = "Infinite Stamina",
-    Value = false,
-    Callback = function(state)
-
-        if not getgenv().__StaminaData then
-            getgenv().__StaminaData = {}
-        end
-
-        local data = getgenv().__StaminaData
-
-        local rs = cloneref(game:GetService("ReplicatedStorage"))
-        local sprint = rs.Systems.Character.Game.Sprinting
-        local m = require(sprint)
-
-        if state then
-
-            if data.Enabled then return end
-
-            data.Enabled = true
-            data.MaxStamina = data.MaxStamina or 100
-            data.Module = m
-            data.OriginalStamina = m.Stamina
-
-            m.Stamina = data.MaxStamina
-
-            task.spawn(function()
-                while data.Enabled do
-                    task.wait(0.1)
-                    if m.Stamina < data.MaxStamina then
-                        m.Stamina = data.MaxStamina
-                    end
-                end
-            end)
-
-        else
-
-            data.Enabled = false
-
-            if data.Module and data.OriginalStamina then
-                data.Module.Stamina = data.OriginalStamina
-            end
-        end
+OthersTab:Button({
+    Title = "Infinite Yield",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
     end
 })
 
-ForsakenTab:Slider({
-    Title = "Max Stamina",
-    Min = 1,
-    Max = 5000,
-    Value = 100,
-    Callback = function(value)
-
-        if not getgenv().__StaminaData then
-            getgenv().__StaminaData = {}
-        end
-
-        local data = getgenv().__StaminaData
-        data.MaxStamina = value
-
-        if data.Enabled and data.Module then
-            data.Module.Stamina = value
-        end
+OthersTab:Button({
+    Title = "Dex Explorer",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end
 })
 
-ForsakenTab:Toggle({
+OthersTab:Button({
+    Title = "ScriptBlox",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Main/refs/heads/main/Scriptblox"))()
+    end
+})
+
+OthersTab:Toggle({
     Title = "FrontFlip",
     Value = false,
     Callback = function(state)
@@ -342,32 +302,5 @@ ForsakenTab:Toggle({
 
             data.Initialized = false
         end
-    end
-})
-
-OthersTab:Button({
-    Title = "Infinite Yield",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-    end
-})
-
-OthersTab:Button({
-    Title = "Dex Explorer",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-    end
-})
-
-OthersTab:Button({
-    Title = "ScriptBlox",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Main/refs/heads/main/Scriptblox"))()
     end
 })
