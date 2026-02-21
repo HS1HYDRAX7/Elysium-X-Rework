@@ -80,7 +80,6 @@ MainTab:Paragraph({
 
 MainTab:Dropdown({
     Title = "Theme",
-    Flag = "Theme", 
     Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
     Value = "Crimson",
     Callback = function(option)
@@ -90,7 +89,6 @@ MainTab:Dropdown({
 
 MainTab:Dropdown({
     Title = "Font",
-    Flag = "Font", 
     Values = { "Standard","Audiowide","Caesar Dressing","Faster One","Silkscreen","Teko" },
     Value = "Standard",
     Callback = function(option)
@@ -112,10 +110,25 @@ MainTab:Dropdown({
 
 MainTab:Toggle({
     Title = "Transparent",
-    Flag = "Transparent", 
     Icon = "palette",
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+SettingsTab:Button({
+    Title = "Infinite Yield",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+SettingsTab:Button({
+    Title = "Dex Explorer",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end
 })
