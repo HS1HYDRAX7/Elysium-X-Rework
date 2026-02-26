@@ -3,7 +3,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
     Icon = "award",
-    Author = "By Atlas ONE",
+    Author = "By Atlas",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
@@ -44,7 +44,7 @@ local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false
 
 MainTab:Paragraph({
     Title = "Credits",
-    Desc = "By Atlas and deky",
+    Desc = "By Atlas",
     Color = "Red",
     Image = "rbxassetid://18631102886",
     ImageSize = 50,
@@ -85,23 +85,6 @@ MainTab:Dropdown({
     Value = "Crimson",
     Callback = function(option)
         WindUI:SetTheme(option)
-    end
-})
-
-MainTab:Dropdown({
-    Title = "Font",
-    Values = { "Standard","Audiowide","Caesar Dressing","Teko" },
-    Value = "Standard",
-    Callback = function(option)
-        if option == "Standard" then
-            WindUI:SetFont("rbxassetid://12187365364")
-        elseif option == "Audiowide" then
-            WindUI:SetFont("rbxassetid://12187360881")
-        elseif option == "Caesar Dressing" then
-            WindUI:SetFont("rbxassetid://12187368843")
-        elseif option == "Teko" then
-            WindUI:SetFont("rbxassetid://12187376174")
-        end
     end
 })
 
