@@ -120,7 +120,7 @@ OthersTab:Button({
     Icon = "file",
     Locked = false,
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Main/refs/heads/main/Scriptblox"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/main/Scriptblox"))()
     end
 })
 
