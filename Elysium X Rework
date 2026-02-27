@@ -108,15 +108,6 @@ OthersTab:Button({
     end
 })
 
-OthersTab:Button({
-    Title = "ScriptBlox",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/main/Scriptblox"))()
-    end
-})
-
 OthersTab:Toggle({
     Title = "FrontFlip",
     Value = false,
