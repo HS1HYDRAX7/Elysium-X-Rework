@@ -139,6 +139,7 @@ OthersTab:Toggle({
             local TweenService = game:GetService("TweenService")
             local Players = game:GetService("Players")
             local Lighting = game:GetService("Lighting")
+            local RunService = game:GetService("RunService")
             local LocalPlayer = Players.LocalPlayer
             local Camera = workspace.CurrentCamera
 
@@ -171,45 +172,33 @@ OthersTab:Toggle({
             screenGui.Parent = game.CoreGui
 
             local mainFrame = Instance.new("Frame", screenGui)
-            mainFrame.Size = UDim2.new(0, 420, 0, 260)
-            mainFrame.Position = UDim2.new(0.5, -210, 1.2, 0)
-            mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-            mainFrame.BackgroundColor3 = Color3.fromRGB(20,20,25)
+            mainFrame.Size = UDim2.new(1,0,1,0)
+            mainFrame.Position = UDim2.new(0,0,1,0)
+            mainFrame.BackgroundColor3 = Color3.fromRGB(5,5,8)
             mainFrame.BorderSizePixel = 0
-            mainFrame.Name = "Main"
-            mainFrame.ClipsDescendants = true
-            mainFrame.BackgroundTransparency = 0
-
-            local corner = Instance.new("UICorner", mainFrame)
-            corner.CornerRadius = UDim.new(0,20)
-
-            local cameraView = Instance.new("ViewportFrame", mainFrame)
-            cameraView.Size = UDim2.new(0.75, -10, 1, -20)
-            cameraView.Position = UDim2.new(0,10,0,10)
-            cameraView.BackgroundColor3 = Color3.fromRGB(10,10,15)
-            cameraView.BorderSizePixel = 0
-
-            local camCorner = Instance.new("UICorner", cameraView)
-            camCorner.CornerRadius = UDim.new(0,16)
 
             local sideFrame = Instance.new("Frame", mainFrame)
-            sideFrame.Size = UDim2.new(0.25, -10, 1, -20)
-            sideFrame.Position = UDim2.new(0.75,0,0,10)
-            sideFrame.BackgroundTransparency = 1
+            sideFrame.Size = UDim2.new(0,90,0,260)
+            sideFrame.Position = UDim2.new(1,-110,0.5,-130)
+            sideFrame.BackgroundColor3 = Color3.fromRGB(15,15,20)
+            sideFrame.BorderSizePixel = 0
+
+            local sideCorner = Instance.new("UICorner", sideFrame)
+            sideCorner.CornerRadius = UDim.new(0,18)
 
             local layout = Instance.new("UIListLayout", sideFrame)
-            layout.Padding = UDim.new(0,10)
+            layout.Padding = UDim.new(0,15)
             layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
             layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
             local function createButton(icon)
                 local btn = Instance.new("ImageButton")
-                btn.Size = UDim2.new(0,50,0,50)
-                btn.BackgroundColor3 = Color3.fromRGB(30,30,40)
+                btn.Size = UDim2.new(0,60,0,60)
+                btn.BackgroundColor3 = Color3.fromRGB(25,25,35)
                 btn.BorderSizePixel = 0
                 btn.Image = icon
                 local c = Instance.new("UICorner", btn)
-                c.CornerRadius = UDim.new(0,14)
+                c.CornerRadius = UDim.new(0,16)
                 btn.Parent = sideFrame
                 return btn
             end
@@ -219,11 +208,27 @@ OthersTab:Toggle({
             local flashlightBtn = createButton("rbxassetid://79780362871740")
             local nightBtn = createButton("rbxassetid://132239189859305")
 
-            local originalBrightness = Lighting.Brightness
-            local originalClock = Lighting.ClockTime
-            local originalAmbient = Lighting.Ambient
+            local static = Instance.new("ImageLabel", mainFrame)
+            static.Size = UDim2.new(1,0,1,0)
+            static.BackgroundTransparency = 1
+            static.Image = "rbxassetid://2151741365"
+            static.ImageTransparency = 0.85
+
+            local blur = Instance.new("BlurEffect", Lighting)
+            blur.Size = 0
+
+            local colorCorrection = Instance.new("ColorCorrectionEffect", Lighting)
+            colorCorrection.Enabled = false
+
+            local original = {
+                Brightness = Lighting.Brightness,
+                ClockTime = Lighting.ClockTime,
+                Ambient = Lighting.Ambient,
+                OutdoorAmbient = Lighting.OutdoorAmbient
+            }
 
             local light
+            local attach
 
             local function updateZoom()
                 Camera.FieldOfView = data.Zoom
@@ -235,17 +240,17 @@ OthersTab:Toggle({
                     flashlightBtn.Image = "rbxassetid://100286985600444"
                     local char = LocalPlayer.Character
                     if char and char:FindFirstChild("Head") then
-                        light = Instance.new("SpotLight", char.Head)
-                        light.Range = 25
-                        light.Angle = 60
-                        light.Brightness = 3
+                        attach = Instance.new("Attachment", char.Head)
+                        light = Instance.new("SpotLight", attach)
+                        light.Range = 60
+                        light.Angle = 80
+                        light.Brightness = 8
+                        light.Shadows = true
                     end
                 else
                     flashlightBtn.Image = "rbxassetid://79780362871740"
-                    if light then
-                        light:Destroy()
-                        light = nil
-                    end
+                    if light then light:Destroy() end
+                    if attach then attach:Destroy() end
                 end
             end
 
@@ -253,14 +258,22 @@ OthersTab:Toggle({
                 data.NightVision = not data.NightVision
                 if data.NightVision then
                     nightBtn.Image = "rbxassetid://107587444636945"
-                    Lighting.Brightness = 3
+                    Lighting.Brightness = 4
                     Lighting.ClockTime = 14
-                    Lighting.Ambient = Color3.fromRGB(180,255,180)
+                    Lighting.Ambient = Color3.fromRGB(0,255,0)
+                    Lighting.OutdoorAmbient = Color3.fromRGB(0,255,0)
+                    colorCorrection.Enabled = true
+                    colorCorrection.TintColor = Color3.fromRGB(120,255,120)
+                    colorCorrection.Contrast = 0.3
+                    blur.Size = 4
                 else
                     nightBtn.Image = "rbxassetid://132239189859305"
-                    Lighting.Brightness = originalBrightness
-                    Lighting.ClockTime = originalClock
-                    Lighting.Ambient = originalAmbient
+                    Lighting.Brightness = original.Brightness
+                    Lighting.ClockTime = original.ClockTime
+                    Lighting.Ambient = original.Ambient
+                    Lighting.OutdoorAmbient = original.OutdoorAmbient
+                    colorCorrection.Enabled = false
+                    blur.Size = 0
                 end
             end
 
@@ -277,23 +290,29 @@ OthersTab:Toggle({
             flashlightBtn.MouseButton1Click:Connect(toggleFlashlight)
             nightBtn.MouseButton1Click:Connect(toggleNight)
 
+            RunService.RenderStepped:Connect(function()
+                if data.GuiOpen then
+                    static.ImageRectOffset = Vector2.new(math.random(0,100), math.random(0,100))
+                end
+            end)
+
             local function openGui()
                 data.GuiOpen = true
                 screenGui.Enabled = true
                 imageButton.Image = "rbxassetid://81057636835256"
                 updateZoom()
-                TweenService:Create(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Position = UDim2.new(0.5,-210,0.5,0)
+                TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Position = UDim2.new(0,0,0,0)
                 }):Play()
             end
 
             local function closeGui()
                 data.GuiOpen = false
                 imageButton.Image = "rbxassetid://79950339943067"
-                TweenService:Create(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                    Position = UDim2.new(0.5,-210,1.2,0)
+                TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    Position = UDim2.new(0,0,1,0)
                 }):Play()
-                task.wait(0.35)
+                task.wait(0.4)
                 screenGui.Enabled = false
                 Camera.FieldOfView = 70
                 if data.Flashlight then toggleFlashlight() end
@@ -322,9 +341,7 @@ OthersTab:Toggle({
 
             data.Enabled = false
 
-            if data.GuiOpen then
-                workspace.CurrentCamera.FieldOfView = 70
-            end
+            workspace.CurrentCamera.FieldOfView = 70
 
             if data.ButtonFrame then
                 data.ButtonFrame:Destroy()
