@@ -39,7 +39,7 @@ local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false
 
 MainTab:Paragraph({
     Title = "Links",
-    Image = "rbxassetid://116592854241448",
+    Image = "rbxassetid://127485747227189",
     ImageSize = 50,
     Locked = false,
     Buttons = {
