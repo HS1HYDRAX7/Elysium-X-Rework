@@ -109,15 +109,15 @@ OthersTab:Button({
 })
 
 OthersTab:Toggle({
-    Title = "Camera",
+    Title = "Utility Camera",
     Value = false,
     Callback = function(state)
 
-        if not getgenv().__TopCameraData then
-            getgenv().__TopCameraData = {}
+        if not getgenv().__UtilityCameraData then
+            getgenv().__UtilityCameraData = {}
         end
 
-        local data = getgenv().__TopCameraData
+        local data = getgenv().__UtilityCameraData
 
         if state then
 
@@ -132,17 +132,15 @@ OthersTab:Toggle({
             data.Enabled = true
             data.Initialized = true
             data.Zoom = 70
-            data.MinZoom = 30
-            data.MaxZoom = 90
-            data.CameraOpen = false
-            data.FlashlightOn = false
-            data.NightOn = false
+            data.Flashlight = false
+            data.NightVision = false
+            data.GuiOpen = false
 
             local TweenService = game:GetService("TweenService")
-            local Lighting = game:GetService("Lighting")
             local Players = game:GetService("Players")
-            local player = Players.LocalPlayer
-            local camera = workspace.CurrentCamera
+            local Lighting = game:GetService("Lighting")
+            local LocalPlayer = Players.LocalPlayer
+            local Camera = workspace.CurrentCamera
 
             local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
             data.SausageHolder = sausageHolder
@@ -167,183 +165,146 @@ OthersTab:Toggle({
             data.ImageButton = imageButton
 
             local screenGui = Instance.new("ScreenGui")
-            screenGui.Name = "TopCameraGui"
+            screenGui.Name = "UtilityCameraGui"
             screenGui.ResetOnSpawn = false
-            screenGui.Parent = game.CoreGui
             screenGui.Enabled = false
-            data.Gui = screenGui
+            screenGui.Parent = game.CoreGui
 
-            local main = Instance.new("Frame", screenGui)
-            main.Size = UDim2.new(0, 420, 0, 260)
-            main.Position = UDim2.new(0.5, -210, 0.5, -130)
-            main.BackgroundColor3 = Color3.fromRGB(20,20,25)
-            main.BorderSizePixel = 0
-            main.BackgroundTransparency = 0.1
-            main.Visible = false
-            main.AnchorPoint = Vector2.new(0.5,0.5)
-            main.Size = UDim2.new(0,0,0,0)
-            main.Position = UDim2.new(0.5,0,0.5,0)
-            main.ClipsDescendants = true
-            main.Parent = screenGui
-            main:SetAttribute("OpenSizeX",420)
-            main:SetAttribute("OpenSizeY",260)
-            Instance.new("UICorner",main).CornerRadius = UDim.new(0,18)
+            local mainFrame = Instance.new("Frame", screenGui)
+            mainFrame.Size = UDim2.new(0, 420, 0, 260)
+            mainFrame.Position = UDim2.new(0.5, -210, 1.2, 0)
+            mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+            mainFrame.BackgroundColor3 = Color3.fromRGB(20,20,25)
+            mainFrame.BorderSizePixel = 0
+            mainFrame.Name = "Main"
+            mainFrame.ClipsDescendants = true
+            mainFrame.BackgroundTransparency = 0
 
-            local cameraFrame = Instance.new("Frame", main)
-            cameraFrame.Size = UDim2.new(1,-70,1,-20)
-            cameraFrame.Position = UDim2.new(0,10,0,10)
-            cameraFrame.BackgroundColor3 = Color3.fromRGB(10,10,15)
-            cameraFrame.BorderSizePixel = 0
-            Instance.new("UICorner",cameraFrame).CornerRadius = UDim.new(0,14)
+            local corner = Instance.new("UICorner", mainFrame)
+            corner.CornerRadius = UDim.new(0,20)
 
-            local stroke = Instance.new("UIStroke",cameraFrame)
-            stroke.Color = Color3.fromRGB(60,60,80)
-            stroke.Thickness = 1
+            local cameraView = Instance.new("ViewportFrame", mainFrame)
+            cameraView.Size = UDim2.new(0.75, -10, 1, -20)
+            cameraView.Position = UDim2.new(0,10,0,10)
+            cameraView.BackgroundColor3 = Color3.fromRGB(10,10,15)
+            cameraView.BorderSizePixel = 0
 
-            local side = Instance.new("Frame", main)
-            side.Size = UDim2.new(0,50,1,-20)
-            side.Position = UDim2.new(1,-60,0,10)
-            side.BackgroundTransparency = 1
+            local camCorner = Instance.new("UICorner", cameraView)
+            camCorner.CornerRadius = UDim.new(0,16)
 
-            local layout = Instance.new("UIListLayout", side)
-            layout.Padding = UDim.new(0,8)
+            local sideFrame = Instance.new("Frame", mainFrame)
+            sideFrame.Size = UDim2.new(0.25, -10, 1, -20)
+            sideFrame.Position = UDim2.new(0.75,0,0,10)
+            sideFrame.BackgroundTransparency = 1
+
+            local layout = Instance.new("UIListLayout", sideFrame)
+            layout.Padding = UDim.new(0,10)
             layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-            layout.VerticalAlignment = Enum.VerticalAlignment.Top
+            layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
-            local function createButton(img)
+            local function createButton(icon)
                 local btn = Instance.new("ImageButton")
-                btn.Size = UDim2.new(0,42,0,42)
-                btn.BackgroundColor3 = Color3.fromRGB(25,25,35)
+                btn.Size = UDim2.new(0,50,0,50)
+                btn.BackgroundColor3 = Color3.fromRGB(30,30,40)
                 btn.BorderSizePixel = 0
-                btn.Image = img
-                btn.AutoButtonColor = false
-                Instance.new("UICorner",btn).CornerRadius = UDim.new(1,0)
-                local s = Instance.new("UIStroke",btn)
-                s.Color = Color3.fromRGB(70,70,90)
-                s.Thickness = 1
-                btn.Parent = side
+                btn.Image = icon
+                local c = Instance.new("UICorner", btn)
+                c.CornerRadius = UDim.new(0,14)
+                btn.Parent = sideFrame
                 return btn
             end
 
-            local plus = createButton("rbxassetid://111774323017047")
-            local minus = createButton("rbxassetid://118026365011536")
-            local flash = createButton("rbxassetid://79780362871740")
-            local night = createButton("rbxassetid://13223918985930")
+            local zoomIn = createButton("rbxassetid://111774323017047")
+            local zoomOut = createButton("rbxassetid://118026365011536")
+            local flashlightBtn = createButton("rbxassetid://79780362871740")
+            local nightBtn = createButton("rbxassetid://132239189859305")
 
-            local flashlight
+            local originalBrightness = Lighting.Brightness
+            local originalClock = Lighting.ClockTime
+            local originalAmbient = Lighting.Ambient
+
+            local light
 
             local function updateZoom()
-                camera.FieldOfView = data.Zoom
+                Camera.FieldOfView = data.Zoom
             end
 
-            plus.MouseButton1Click:Connect(function()
-                data.Zoom -= 5
-                if data.Zoom < data.MinZoom then
-                    data.Zoom = data.MinZoom
-                end
-                updateZoom()
-            end)
-
-            minus.MouseButton1Click:Connect(function()
-                data.Zoom += 5
-                if data.Zoom > data.MaxZoom then
-                    data.Zoom = data.MaxZoom
-                end
-                updateZoom()
-            end)
-
-            flash.MouseButton1Click:Connect(function()
-                data.FlashlightOn = not data.FlashlightOn
-                if data.FlashlightOn then
-                    flash.Image = "rbxassetid://100286985600444"
-                    local char = player.Character
-                    if char then
-                        local hrp = char:FindFirstChild("HumanoidRootPart")
-                        if hrp then
-                            flashlight = Instance.new("SpotLight", hrp)
-                            flashlight.Brightness = 3
-                            flashlight.Range = 40
-                            flashlight.Angle = 60
-                        end
+            local function toggleFlashlight()
+                data.Flashlight = not data.Flashlight
+                if data.Flashlight then
+                    flashlightBtn.Image = "rbxassetid://100286985600444"
+                    local char = LocalPlayer.Character
+                    if char and char:FindFirstChild("Head") then
+                        light = Instance.new("SpotLight", char.Head)
+                        light.Range = 25
+                        light.Angle = 60
+                        light.Brightness = 3
                     end
                 else
-                    flash.Image = "rbxassetid://79780362871740"
-                    if flashlight then
-                        flashlight:Destroy()
-                        flashlight = nil
+                    flashlightBtn.Image = "rbxassetid://79780362871740"
+                    if light then
+                        light:Destroy()
+                        light = nil
                     end
                 end
-            end)
+            end
 
-            local oldBrightness, oldClock
-
-            night.MouseButton1Click:Connect(function()
-                data.NightOn = not data.NightOn
-                if data.NightOn then
-                    night.Image = "rbxassetid://107587444636945"
-                    oldBrightness = Lighting.Brightness
-                    oldClock = Lighting.ClockTime
+            local function toggleNight()
+                data.NightVision = not data.NightVision
+                if data.NightVision then
+                    nightBtn.Image = "rbxassetid://107587444636945"
                     Lighting.Brightness = 3
                     Lighting.ClockTime = 14
+                    Lighting.Ambient = Color3.fromRGB(180,255,180)
                 else
-                    night.Image = "rbxassetid://13223918985930"
-                    if oldBrightness then
-                        Lighting.Brightness = oldBrightness
-                        Lighting.ClockTime = oldClock
-                    end
+                    nightBtn.Image = "rbxassetid://132239189859305"
+                    Lighting.Brightness = originalBrightness
+                    Lighting.ClockTime = originalClock
+                    Lighting.Ambient = originalAmbient
                 end
+            end
+
+            zoomIn.MouseButton1Click:Connect(function()
+                data.Zoom = math.clamp(data.Zoom - 5, 20, 120)
+                updateZoom()
             end)
 
-            function data.OpenCamera()
-                if data.CameraOpen then return end
-                data.CameraOpen = true
-                screenGui.Enabled = true
-                main.Visible = true
-                imageButton.Image = "rbxassetid://81057636835256"
-                data.Zoom = 70
+            zoomOut.MouseButton1Click:Connect(function()
+                data.Zoom = math.clamp(data.Zoom + 5, 20, 120)
                 updateZoom()
-                TweenService:Create(main,TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
-                    Size = UDim2.new(0,main:GetAttribute("OpenSizeX"),0,main:GetAttribute("OpenSizeY")),
-                    Position = UDim2.new(0.5,-main:GetAttribute("OpenSizeX")/2,0.5,-main:GetAttribute("OpenSizeY")/2)
+            end)
+
+            flashlightBtn.MouseButton1Click:Connect(toggleFlashlight)
+            nightBtn.MouseButton1Click:Connect(toggleNight)
+
+            local function openGui()
+                data.GuiOpen = true
+                screenGui.Enabled = true
+                imageButton.Image = "rbxassetid://81057636835256"
+                updateZoom()
+                TweenService:Create(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Position = UDim2.new(0.5,-210,0.5,0)
                 }):Play()
             end
 
-            function data.CloseCamera()
-                if not data.CameraOpen then return end
-                data.CameraOpen = false
+            local function closeGui()
+                data.GuiOpen = false
                 imageButton.Image = "rbxassetid://79950339943067"
-
-                data.FlashlightOn = false
-                flash.Image = "rbxassetid://79780362871740"
-                if flashlight then
-                    flashlight:Destroy()
-                    flashlight = nil
-                end
-
-                data.NightOn = false
-                night.Image = "rbxassetid://13223918985930"
-                if oldBrightness then
-                    Lighting.Brightness = oldBrightness
-                    Lighting.ClockTime = oldClock
-                end
-
-                camera.FieldOfView = 70
-
-                local tween = TweenService:Create(main,TweenInfo.new(0.2,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{
-                    Size = UDim2.new(0,0,0,0),
-                    Position = UDim2.new(0.5,0,0.5,0)
-                })
-                tween:Play()
-                tween.Completed:Wait()
-                main.Visible = false
+                TweenService:Create(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    Position = UDim2.new(0.5,-210,1.2,0)
+                }):Play()
+                task.wait(0.35)
                 screenGui.Enabled = false
+                Camera.FieldOfView = 70
+                if data.Flashlight then toggleFlashlight() end
+                if data.NightVision then toggleNight() end
             end
 
-            imageButton.Activated:Connect(function()
-                if data.CameraOpen then
-                    data.CloseCamera()
+            imageButton.MouseButton1Click:Connect(function()
+                if data.GuiOpen then
+                    closeGui()
                 else
-                    data.OpenCamera()
+                    openGui()
                 end
             end)
 
@@ -361,179 +322,9 @@ OthersTab:Toggle({
 
             data.Enabled = false
 
-            if data.CameraOpen then
-                data.CloseCamera()
+            if data.GuiOpen then
+                workspace.CurrentCamera.FieldOfView = 70
             end
-
-            if data.ButtonFrame then
-                data.ButtonFrame:Destroy()
-                data.ButtonFrame = nil
-            end
-
-            if data.Gui then
-                data.Gui:Destroy()
-                data.Gui = nil
-            end
-
-            if data.SausageHolder and data.OriginalSize then
-                data.SausageHolder.Size = UDim2.new(0, data.OriginalSize, 0, data.SausageHolder.Size.Y.Offset)
-            end
-
-            data.Initialized = false
-        end
-    end
-})
-
-OthersTab:Toggle({
-    Title = "FrontFlip",
-    Value = false,
-    Callback = function(state)
-
-        if not getgenv().__FrontFlipData then
-            getgenv().__FrontFlipData = {}
-        end
-
-        local data = getgenv().__FrontFlipData
-
-        if state then
-
-            if data.Initialized then
-                data.Enabled = true
-                if data.ButtonFrame then
-                    data.ButtonFrame.Visible = true
-                end
-                return
-            end
-
-            data.Enabled = true
-            data.Key = Enum.KeyCode.F
-            data.Cooldown = false
-            data.Initialized = true
-
-            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
-            data.SausageHolder = sausageHolder
-            data.OriginalSize = sausageHolder.Size.X.Offset
-            data.ExpandedSize = UDim2.new(0, data.OriginalSize + 48, 0, sausageHolder.Size.Y.Offset)
-
-            local buttonFrame = Instance.new("Frame", sausageHolder)
-            buttonFrame.Size = UDim2.new(0, 48, 0, 44)
-            buttonFrame.BackgroundTransparency = 1
-            buttonFrame.BorderSizePixel = 0
-            buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
-
-            local imageButton = Instance.new("ImageButton", buttonFrame)
-            imageButton.BackgroundTransparency = 1
-            imageButton.BorderSizePixel = 0
-            imageButton.Size = UDim2.new(0, 36, 0, 36)
-            imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
-            imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
-            imageButton.Image = "http://www.roblox.com/asset/?id=119710348299399"
-
-            data.ButtonFrame = buttonFrame
-
-            function data.Flip()
-                if not data.Enabled then return end
-                if data.Cooldown then return end
-
-                data.Cooldown = true
-
-                local character = game:GetService("Players").LocalPlayer.Character
-                local hrp = character and character:FindFirstChild("HumanoidRootPart")
-                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
-
-                if not hrp or not humanoid then
-                    data.Cooldown = false
-                    return
-                end
-
-                local savedTracks = {}
-
-                if animator then
-                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                        table.insert(savedTracks, {track = track, time = track.TimePosition})
-                        track:Stop(0)
-                    end
-                end
-
-                humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-                humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-                humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
-                humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
-                humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-                humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
-
-                local duration = 0.45
-                local steps = 120
-                local startCFrame = hrp.CFrame
-                local forwardVector = startCFrame.LookVector
-                local upVector = Vector3.new(0, 1, 0)
-
-                task.spawn(function()
-                    local startTime = tick()
-
-                    for i = 1, steps do
-                        local t = i / steps
-                        local height = 4 * (t - t ^ 2) * 10
-                        local nextPos = startCFrame.Position + forwardVector * (35 * t) + upVector * height
-                        local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
-
-                        hrp.CFrame = CFrame.new(nextPos) * rotation
-
-                        local elapsedTime = tick() - startTime
-                        local expectedTime = (duration / steps) * i
-                        local waitTime = expectedTime - elapsedTime
-                        if waitTime > 0 then
-                            task.wait(waitTime)
-                        end
-                    end
-
-                    hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector * 35) * startCFrame.Rotation
-
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
-                    humanoid:ChangeState(Enum.HumanoidStateType.Running)
-
-                    if animator then
-                        for _, dataTrack in ipairs(savedTracks) do
-                            dataTrack.track:Play()
-                            dataTrack.track.TimePosition = dataTrack.time
-                        end
-                    end
-
-                    task.wait(0.25)
-                    data.Cooldown = false
-                end)
-            end
-
-            imageButton.Activated:Connect(function()
-                data.Flip()
-            end)
-
-            if not data.InputConnection then
-                data.InputConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, busy)
-                    if input.KeyCode == Enum.KeyCode.F and not busy then
-                        data.Flip()
-                    end
-                end)
-            end
-
-            task.spawn(function()
-                while data.Initialized do
-                    task.wait()
-                    if data.Enabled then
-                        sausageHolder.Size = data.ExpandedSize
-                        buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
-                    end
-                end
-            end)
-
-        else
-
-            data.Enabled = false
 
             if data.ButtonFrame then
                 data.ButtonFrame:Destroy()
