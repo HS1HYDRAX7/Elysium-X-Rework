@@ -90,6 +90,127 @@ MainTab:Toggle({
     end
 })
 
+PressureTab:Toggle({
+    Title = "Monster ESP",
+    Value = false,
+    Callback = function(state)
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("BillboardGui") and v.Name == "MonsterESP_Tag" then
+                v:Destroy()
+            end
+        end
+        if state then
+            local folder = workspace:FindFirstChild("Monsters")
+            if folder then
+                for _, monster in pairs(folder:GetChildren()) do
+                    if monster:IsA("Model") and monster:FindFirstChild("HumanoidRootPart") then
+                        local bb = Instance.new("BillboardGui")
+                        bb.Name = "MonsterESP_Tag"
+                        bb.Size = UDim2.new(0,200,0,50)
+                        bb.AlwaysOnTop = true
+                        bb.Adornee = monster.HumanoidRootPart
+                        bb.Parent = monster
+
+                        local frame = Instance.new("Frame", bb)
+                        frame.Size = UDim2.new(1,0,1,0)
+                        frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
+                        frame.BackgroundTransparency = 0.2
+                        frame.BorderSizePixel = 0
+
+                        local corner = Instance.new("UICorner", frame)
+                        corner.CornerRadius = UDim.new(0,12)
+
+                        local txt = Instance.new("TextLabel", frame)
+                        txt.Size = UDim2.new(1,0,1,0)
+                        txt.BackgroundTransparency = 1
+                        txt.Text = monster.Name
+                        txt.TextColor3 = Color3.fromRGB(255,255,255)
+                        txt.TextScaled = true
+                        txt.FontFace = Font.new("rbxassetid://12187360881")
+                        txt.TextStrokeTransparency = 0
+                    end
+                end
+            end
+        end
+    end
+})
+
+PressureTab:Toggle({
+    Title = "Doors ESP",
+    Value = false,
+    Callback = function(state)
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Highlight") and v.Name == "DoorESP_Highlight" then
+                v:Destroy()
+            end
+        end
+        if state then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj.Name == "NormalDoor" and obj:FindFirstChild("Door") then
+                    local hl = Instance.new("Highlight")
+                    hl.Name = "DoorESP_Highlight"
+                    hl.FillColor = Color3.fromRGB(0,255,0)
+                    hl.OutlineColor = Color3.fromRGB(0,255,0)
+                    hl.FillTransparency = 0.5
+                    hl.OutlineTransparency = 0
+                    hl.Adornee = obj
+                    hl.Parent = obj
+                end
+            end
+        end
+    end
+})
+
+PressureTab:Toggle({
+    Title = "KeyCard ESP",
+    Value = false,
+    Callback = function(state)
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Highlight") and v.Name == "KeyCardESP_Highlight" then
+                v:Destroy()
+            end
+        end
+        if state then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj.Name == "NormalKeyCard" then
+                    local hl = Instance.new("Highlight")
+                    hl.Name = "KeyCardESP_Highlight"
+                    hl.FillColor = Color3.fromRGB(0,0,139)
+                    hl.OutlineColor = Color3.fromRGB(0,0,139)
+                    hl.FillTransparency = 0.5
+                    hl.OutlineTransparency = 0
+                    hl.Adornee = obj
+                    hl.Parent = obj
+                end
+            end
+        end
+    end
+})
+
+PressureTab:Toggle({
+    Title = "Monster Alert",
+    Value = false,
+    Callback = function(state)
+        if state then
+            local folder = workspace:FindFirstChild("Monsters")
+            if folder then
+                folder.ChildAdded:Connect(function(child)
+                    local icon = "circle-alert"
+                    if child.Name == "Pandemonium" then
+                        icon = "triangle-alert"
+                    end
+                    WindUI:Notify({
+                        Title = child.Name,
+                        Content = child.Name .. " spawned hide in closets or rooms",
+                        Duration = 3,
+                        Icon = icon,
+                    })
+                end)
+            end
+        end
+    end
+})
+
 OthersTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
