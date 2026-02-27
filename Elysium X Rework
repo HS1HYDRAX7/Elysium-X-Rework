@@ -109,6 +109,282 @@ OthersTab:Button({
 })
 
 OthersTab:Toggle({
+    Title = "Camera",
+    Value = false,
+    Callback = function(state)
+
+        if not getgenv().__TopCameraData then
+            getgenv().__TopCameraData = {}
+        end
+
+        local data = getgenv().__TopCameraData
+
+        if state then
+
+            if data.Initialized then
+                data.Enabled = true
+                if data.ButtonFrame then
+                    data.ButtonFrame.Visible = true
+                end
+                return
+            end
+
+            data.Enabled = true
+            data.Initialized = true
+            data.Zoom = 70
+            data.MinZoom = 30
+            data.MaxZoom = 90
+            data.CameraOpen = false
+            data.FlashlightOn = false
+            data.NightOn = false
+
+            local TweenService = game:GetService("TweenService")
+            local Lighting = game:GetService("Lighting")
+            local Players = game:GetService("Players")
+            local player = Players.LocalPlayer
+            local camera = workspace.CurrentCamera
+
+            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
+            data.SausageHolder = sausageHolder
+            data.OriginalSize = sausageHolder.Size.X.Offset
+            data.ExpandedSize = UDim2.new(0, data.OriginalSize + 48, 0, sausageHolder.Size.Y.Offset)
+
+            local buttonFrame = Instance.new("Frame", sausageHolder)
+            buttonFrame.Size = UDim2.new(0, 48, 0, 44)
+            buttonFrame.BackgroundTransparency = 1
+            buttonFrame.BorderSizePixel = 0
+            buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+
+            local imageButton = Instance.new("ImageButton", buttonFrame)
+            imageButton.BackgroundTransparency = 1
+            imageButton.BorderSizePixel = 0
+            imageButton.Size = UDim2.new(0, 36, 0, 36)
+            imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
+            imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+            imageButton.Image = "rbxassetid://79950339943067"
+
+            data.ButtonFrame = buttonFrame
+            data.ImageButton = imageButton
+
+            local screenGui = Instance.new("ScreenGui")
+            screenGui.Name = "TopCameraGui"
+            screenGui.ResetOnSpawn = false
+            screenGui.Parent = game.CoreGui
+            screenGui.Enabled = false
+            data.Gui = screenGui
+
+            local main = Instance.new("Frame", screenGui)
+            main.Size = UDim2.new(0, 420, 0, 260)
+            main.Position = UDim2.new(0.5, -210, 0.5, -130)
+            main.BackgroundColor3 = Color3.fromRGB(20,20,25)
+            main.BorderSizePixel = 0
+            main.BackgroundTransparency = 0.1
+            main.Visible = false
+            main.AnchorPoint = Vector2.new(0.5,0.5)
+            main.Size = UDim2.new(0,0,0,0)
+            main.Position = UDim2.new(0.5,0,0.5,0)
+            main.ClipsDescendants = true
+            main.Parent = screenGui
+            main:SetAttribute("OpenSizeX",420)
+            main:SetAttribute("OpenSizeY",260)
+            Instance.new("UICorner",main).CornerRadius = UDim.new(0,18)
+
+            local cameraFrame = Instance.new("Frame", main)
+            cameraFrame.Size = UDim2.new(1,-70,1,-20)
+            cameraFrame.Position = UDim2.new(0,10,0,10)
+            cameraFrame.BackgroundColor3 = Color3.fromRGB(10,10,15)
+            cameraFrame.BorderSizePixel = 0
+            Instance.new("UICorner",cameraFrame).CornerRadius = UDim.new(0,14)
+
+            local stroke = Instance.new("UIStroke",cameraFrame)
+            stroke.Color = Color3.fromRGB(60,60,80)
+            stroke.Thickness = 1
+
+            local side = Instance.new("Frame", main)
+            side.Size = UDim2.new(0,50,1,-20)
+            side.Position = UDim2.new(1,-60,0,10)
+            side.BackgroundTransparency = 1
+
+            local layout = Instance.new("UIListLayout", side)
+            layout.Padding = UDim.new(0,8)
+            layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            layout.VerticalAlignment = Enum.VerticalAlignment.Top
+
+            local function createButton(img)
+                local btn = Instance.new("ImageButton")
+                btn.Size = UDim2.new(0,42,0,42)
+                btn.BackgroundColor3 = Color3.fromRGB(25,25,35)
+                btn.BorderSizePixel = 0
+                btn.Image = img
+                btn.AutoButtonColor = false
+                Instance.new("UICorner",btn).CornerRadius = UDim.new(1,0)
+                local s = Instance.new("UIStroke",btn)
+                s.Color = Color3.fromRGB(70,70,90)
+                s.Thickness = 1
+                btn.Parent = side
+                return btn
+            end
+
+            local plus = createButton("rbxassetid://111774323017047")
+            local minus = createButton("rbxassetid://118026365011536")
+            local flash = createButton("rbxassetid://79780362871740")
+            local night = createButton("rbxassetid://13223918985930")
+
+            local flashlight
+
+            local function updateZoom()
+                camera.FieldOfView = data.Zoom
+            end
+
+            plus.MouseButton1Click:Connect(function()
+                data.Zoom -= 5
+                if data.Zoom < data.MinZoom then
+                    data.Zoom = data.MinZoom
+                end
+                updateZoom()
+            end)
+
+            minus.MouseButton1Click:Connect(function()
+                data.Zoom += 5
+                if data.Zoom > data.MaxZoom then
+                    data.Zoom = data.MaxZoom
+                end
+                updateZoom()
+            end)
+
+            flash.MouseButton1Click:Connect(function()
+                data.FlashlightOn = not data.FlashlightOn
+                if data.FlashlightOn then
+                    flash.Image = "rbxassetid://100286985600444"
+                    local char = player.Character
+                    if char then
+                        local hrp = char:FindFirstChild("HumanoidRootPart")
+                        if hrp then
+                            flashlight = Instance.new("SpotLight", hrp)
+                            flashlight.Brightness = 3
+                            flashlight.Range = 40
+                            flashlight.Angle = 60
+                        end
+                    end
+                else
+                    flash.Image = "rbxassetid://79780362871740"
+                    if flashlight then
+                        flashlight:Destroy()
+                        flashlight = nil
+                    end
+                end
+            end)
+
+            local oldBrightness, oldClock
+
+            night.MouseButton1Click:Connect(function()
+                data.NightOn = not data.NightOn
+                if data.NightOn then
+                    night.Image = "rbxassetid://107587444636945"
+                    oldBrightness = Lighting.Brightness
+                    oldClock = Lighting.ClockTime
+                    Lighting.Brightness = 3
+                    Lighting.ClockTime = 14
+                else
+                    night.Image = "rbxassetid://13223918985930"
+                    if oldBrightness then
+                        Lighting.Brightness = oldBrightness
+                        Lighting.ClockTime = oldClock
+                    end
+                end
+            end)
+
+            function data.OpenCamera()
+                if data.CameraOpen then return end
+                data.CameraOpen = true
+                screenGui.Enabled = true
+                main.Visible = true
+                imageButton.Image = "rbxassetid://81057636835256"
+                data.Zoom = 70
+                updateZoom()
+                TweenService:Create(main,TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
+                    Size = UDim2.new(0,main:GetAttribute("OpenSizeX"),0,main:GetAttribute("OpenSizeY")),
+                    Position = UDim2.new(0.5,-main:GetAttribute("OpenSizeX")/2,0.5,-main:GetAttribute("OpenSizeY")/2)
+                }):Play()
+            end
+
+            function data.CloseCamera()
+                if not data.CameraOpen then return end
+                data.CameraOpen = false
+                imageButton.Image = "rbxassetid://79950339943067"
+
+                data.FlashlightOn = false
+                flash.Image = "rbxassetid://79780362871740"
+                if flashlight then
+                    flashlight:Destroy()
+                    flashlight = nil
+                end
+
+                data.NightOn = false
+                night.Image = "rbxassetid://13223918985930"
+                if oldBrightness then
+                    Lighting.Brightness = oldBrightness
+                    Lighting.ClockTime = oldClock
+                end
+
+                camera.FieldOfView = 70
+
+                local tween = TweenService:Create(main,TweenInfo.new(0.2,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{
+                    Size = UDim2.new(0,0,0,0),
+                    Position = UDim2.new(0.5,0,0.5,0)
+                })
+                tween:Play()
+                tween.Completed:Wait()
+                main.Visible = false
+                screenGui.Enabled = false
+            end
+
+            imageButton.Activated:Connect(function()
+                if data.CameraOpen then
+                    data.CloseCamera()
+                else
+                    data.OpenCamera()
+                end
+            end)
+
+            task.spawn(function()
+                while data.Initialized do
+                    task.wait()
+                    if data.Enabled then
+                        sausageHolder.Size = data.ExpandedSize
+                        buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+                    end
+                end
+            end)
+
+        else
+
+            data.Enabled = false
+
+            if data.CameraOpen then
+                data.CloseCamera()
+            end
+
+            if data.ButtonFrame then
+                data.ButtonFrame:Destroy()
+                data.ButtonFrame = nil
+            end
+
+            if data.Gui then
+                data.Gui:Destroy()
+                data.Gui = nil
+            end
+
+            if data.SausageHolder and data.OriginalSize then
+                data.SausageHolder.Size = UDim2.new(0, data.OriginalSize, 0, data.SausageHolder.Size.Y.Offset)
+            end
+
+            data.Initialized = false
+        end
+    end
+})
+
+OthersTab:Toggle({
     Title = "FrontFlip",
     Value = false,
     Callback = function(state)
