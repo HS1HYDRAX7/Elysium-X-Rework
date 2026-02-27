@@ -1,9 +1,9 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-    Title = "Elysium X Rework",
+    Title = "Elysium X Rework",
     Icon = "award",
-    Author = "By Atlas ",
+    Author = "By Atlas",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
@@ -40,8 +40,8 @@ local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false
 MainTab:Paragraph({
     Title = "Credits",
     Desc = "By Atlas",
-    Color = "Red",
-    Image = "rbxassetid://18631102886",
+    Color = "Grey",
+    Image = "rbxassetid://139889258009020",
     ImageSize = 50,
     Locked = false,
     Buttons = {
