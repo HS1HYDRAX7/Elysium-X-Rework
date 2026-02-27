@@ -1,7 +1,7 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-    Title = "Elysium X Rework",
+    Title = "Elysium X Rework ",
     Icon = "award",
     Author = "By Atlas",
     Folder = "Elysium X Rework",
