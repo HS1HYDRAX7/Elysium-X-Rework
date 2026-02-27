@@ -10,10 +10,6 @@ local Window = WindUI:CreateWindow({
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true,
-
-    KeySystem = {
-        Key = { "260126" },
-        Note = "Still under development expect bugs",
     },
 })
 
