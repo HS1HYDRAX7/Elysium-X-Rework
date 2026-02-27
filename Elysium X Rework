@@ -38,14 +38,13 @@ local PressureTab = Window:Tab({ Title = "Pressure", Icon = "layout-grid", Locke
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Credits",
-    Desc = "By Atlas",
-    Image = "rbxassetid://139889258009020",
+    Title = "Links",
+    Image = "rbxassetid://116592854241448",
     ImageSize = 50,
     Locked = false,
     Buttons = {
         {
-            Icon = "link",
+            Icon = "file-symlink",
             Title = "Website",
             Callback = function()
                 setclipboard("https://hs1hydrax7.github.io/Site/")
@@ -53,12 +52,12 @@ MainTab:Paragraph({
                     Title = "Website",
                     Content = "Link Copied!",
                     Duration = 3,
-                    Icon = "external-link",
+                    Icon = "link-2",
                 })
             end,
         },
         {
-            Icon = "link",
+            Icon = "file-symlink",
             Title = "TikTok",
             Callback = function()
                 setclipboard("@mrnexus000")
@@ -66,7 +65,7 @@ MainTab:Paragraph({
                     Title = "TikTok",
                     Content = "Username Copied",
                     Duration = 3,
-                    Icon = "external-link",
+                    Icon = "link-2",
                 })
             end,
         },
