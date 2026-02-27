@@ -20,7 +20,7 @@ Window:Tag({
 })
 
 Window:EditOpenButton({
-    Title = "Open Elysium",
+    Title = "Elysium X ",
     Icon = "monitor",
     CornerRadius = UDim.new(0,50),
     StrokeThickness = 2,
@@ -40,7 +40,6 @@ local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false
 MainTab:Paragraph({
     Title = "Credits",
     Desc = "By Atlas",
-    Color = "Grey",
     Image = "rbxassetid://139889258009020",
     ImageSize = 50,
     Locked = false,
