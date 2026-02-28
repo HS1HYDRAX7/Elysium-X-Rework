@@ -81,10 +81,8 @@ ToggleButton.BackgroundColor3=Colors.Primary
 ToggleButton.Image="rbxassetid://10154713810"
 ToggleButton.ScaleType=Enum.ScaleType.Fit
 ToggleButton.Parent=ScreenGui
-Corner(ToggleButton,32)
-Stroke(ToggleButton,Colors.PrimaryLight,2)
 
-local UIS = game:GetService("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 
 local dragging = false
 local dragInput
@@ -93,7 +91,7 @@ local startPos
 
 local function update(input)
 	local delta = input.Position - dragStart
-	OpenButton.Position = UDim2.new(
+	ToggleButton.Position = UDim2.new(
 		startPos.X.Scale,
 		startPos.X.Offset + delta.X,
 		startPos.Y.Scale,
@@ -101,11 +99,11 @@ local function update(input)
 	)
 end
 
-OpenButton.InputBegan:Connect(function(input)
+ToggleButton.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
 		dragStart = input.Position
-		startPos = OpenButton.Position
+		startPos = ToggleButton.Position
 
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
@@ -115,13 +113,13 @@ OpenButton.InputBegan:Connect(function(input)
 	end
 end)
 
-OpenButton.InputChanged:Connect(function(input)
+ToggleButton.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 		dragInput = input
 	end
 end)
 
-UIS.InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		update(input)
 	end
