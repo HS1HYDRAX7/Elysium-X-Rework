@@ -99,11 +99,12 @@ PressureTab:Toggle({
                 v:Destroy()
             end
         end
+
         if state then
             local folder = workspace:FindFirstChild("Monsters")
             if folder then
-                for _, monster in pairs(folder:GetChildren()) do
-                    if monster:IsA("Model") and monster:FindFirstChild("HumanoidRootPart") then
+                local function apply(monster)
+                    if monster:IsA("Model") and monster:FindFirstChild("HumanoidRootPart") and not monster:FindFirstChild("MonsterESP_Tag") then
                         local bb = Instance.new("BillboardGui")
                         bb.Name = "MonsterESP_Tag"
                         bb.Size = UDim2.new(0,200,0,50)
@@ -130,6 +131,14 @@ PressureTab:Toggle({
                         txt.TextStrokeTransparency = 0
                     end
                 end
+
+                for _, m in pairs(folder:GetChildren()) do
+                    apply(m)
+                end
+
+                folder.ChildAdded:Connect(function(child)
+                    apply(child)
+                end)
             end
         end
     end
@@ -144,9 +153,10 @@ PressureTab:Toggle({
                 v:Destroy()
             end
         end
+
         if state then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj.Name == "NormalDoor" and obj:FindFirstChild("Door") then
+            local function apply(obj)
+                if obj.Name == "NormalDoor" and obj:FindFirstChild("Door") and not obj:FindFirstChild("DoorESP_Highlight") then
                     local hl = Instance.new("Highlight")
                     hl.Name = "DoorESP_Highlight"
                     hl.FillColor = Color3.fromRGB(0,255,0)
@@ -157,6 +167,14 @@ PressureTab:Toggle({
                     hl.Parent = obj
                 end
             end
+
+            for _, obj in pairs(workspace:GetDescendants()) do
+                apply(obj)
+            end
+
+            workspace.DescendantAdded:Connect(function(obj)
+                apply(obj)
+            end)
         end
     end
 })
@@ -170,19 +188,28 @@ PressureTab:Toggle({
                 v:Destroy()
             end
         end
+
         if state then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj.Name == "NormalKeyCard" then
+            local function apply(obj)
+                if obj.Name == "NormalKeyCard" and not obj:FindFirstChild("KeyCardESP_Highlight") then
                     local hl = Instance.new("Highlight")
                     hl.Name = "KeyCardESP_Highlight"
-                    hl.FillColor = Color3.fromRGB(0,0,139)
-                    hl.OutlineColor = Color3.fromRGB(0,0,139)
+                    hl.FillColor = Color3.fromRGB(173,216,230)
+                    hl.OutlineColor = Color3.fromRGB(173,216,230)
                     hl.FillTransparency = 0.5
                     hl.OutlineTransparency = 0
                     hl.Adornee = obj
                     hl.Parent = obj
                 end
             end
+
+            for _, obj in pairs(workspace:GetDescendants()) do
+                apply(obj)
+            end
+
+            workspace.DescendantAdded:Connect(function(obj)
+                apply(obj)
+            end)
         end
     end
 })
