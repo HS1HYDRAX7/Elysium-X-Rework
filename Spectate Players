@@ -45,7 +45,7 @@ local function Tween(o,d,p,s,e)
 end
 
 local ScreenGui=Instance.new("ScreenGui")
-ScreenGui.Name="SpectatorUIRedElite"
+ScreenGui.Name="SpectatorUI"
 ScreenGui.ResetOnSpawn=false
 ScreenGui.IgnoreGuiInset=true
 ScreenGui.Parent=LocalPlayer:WaitForChild("PlayerGui")
@@ -81,6 +81,8 @@ ToggleButton.BackgroundColor3=Colors.Primary
 ToggleButton.Image="rbxassetid://10154713810"
 ToggleButton.ScaleType=Enum.ScaleType.Fit
 ToggleButton.Parent=ScreenGui
+Corner(ToggleButton,32)
+Stroke(ToggleButton,Colors.PrimaryLight,2)
 
 local UserInputService = game:GetService("UserInputService")
 
