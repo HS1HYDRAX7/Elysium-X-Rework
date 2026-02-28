@@ -88,6 +88,39 @@ MainTab:Toggle({
     end
 })
 
+APKTab:Button({
+    Title = "Codex (2.708.880)",
+    Icon = "download",
+    Locked = false,
+    Callback = function()
+        local apkName = string.gsub(script.Parent.Title, " APK$", ".apk")
+        local mediafireUrl = "https://www.mediafire.com/file/r4amuil7pd7bebv/Codex+V2.708.880.apk/file"
+        
+        pcall(function()
+            local http = game:GetService("HttpService")
+            local apkData = http:GetAsync(mediafireUrl, true)
+            
+            if apkData and #apkData > 10000 then
+                writefile("Downloads/" .. apkName, apkData)
+                
+                WindUI:Notify({
+                    Title = "Apk Downloader",
+                    Content = "Download Completed (" .. apkName .. ")",
+                    Duration = 3,
+                    Icon = "file-box",
+                })
+            else
+                WindUI:Notify({
+                    Title = "Apk Downloader",
+                    Content = "Failed to download APK",
+                    Duration = 4,
+                    Icon = "alert-triangle",
+                })
+            end
+        end)
+    end
+})
+
 OthersTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
