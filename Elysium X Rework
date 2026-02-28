@@ -34,17 +34,14 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local PressureTab = Window:Tab({ Title = "Pressure", Icon = "layout-grid", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Links",
-    Image = "rbxassetid://127485747227189",
-    ImageSize = 50,
+    Title = "Made By Atlas ",
     Locked = false,
     Buttons = {
         {
-            Icon = "file-symlink",
+            Icon = "link",
             Title = "Website",
             Callback = function()
                 setclipboard("https://hs1hydrax7.github.io/Site/")
@@ -57,7 +54,7 @@ MainTab:Paragraph({
             end,
         },
         {
-            Icon = "file-symlink",
+            Icon = "link",
             Title = "TikTok",
             Callback = function()
                 setclipboard("@mrnexus000")
@@ -87,154 +84,6 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
-    end
-})
-
-PressureTab:Toggle({
-    Title = "Monster ESP",
-    Value = false,
-    Callback = function(state)
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BillboardGui") and v.Name == "MonsterESP_Tag" then
-                v:Destroy()
-            end
-        end
-
-        if state then
-            local folder = workspace:FindFirstChild("Monsters")
-            if folder then
-                local function apply(monster)
-                    if monster:IsA("Model") and monster:FindFirstChild("HumanoidRootPart") and not monster:FindFirstChild("MonsterESP_Tag") then
-                        local bb = Instance.new("BillboardGui")
-                        bb.Name = "MonsterESP_Tag"
-                        bb.Size = UDim2.new(0,200,0,50)
-                        bb.AlwaysOnTop = true
-                        bb.Adornee = monster.HumanoidRootPart
-                        bb.Parent = monster
-
-                        local frame = Instance.new("Frame", bb)
-                        frame.Size = UDim2.new(1,0,1,0)
-                        frame.BackgroundColor3 = Color3.fromRGB(255,0,0)
-                        frame.BackgroundTransparency = 0.2
-                        frame.BorderSizePixel = 0
-
-                        local corner = Instance.new("UICorner", frame)
-                        corner.CornerRadius = UDim.new(0,12)
-
-                        local txt = Instance.new("TextLabel", frame)
-                        txt.Size = UDim2.new(1,0,1,0)
-                        txt.BackgroundTransparency = 1
-                        txt.Text = monster.Name
-                        txt.TextColor3 = Color3.fromRGB(255,255,255)
-                        txt.TextScaled = true
-                        txt.FontFace = Font.new("rbxassetid://12187360881")
-                        txt.TextStrokeTransparency = 0
-                    end
-                end
-
-                for _, m in pairs(folder:GetChildren()) do
-                    apply(m)
-                end
-
-                folder.ChildAdded:Connect(function(child)
-                    apply(child)
-                end)
-            end
-        end
-    end
-})
-
-PressureTab:Toggle({
-    Title = "Doors ESP",
-    Value = false,
-    Callback = function(state)
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("Highlight") and v.Name == "DoorESP_Highlight" then
-                v:Destroy()
-            end
-        end
-
-        if state then
-            local function apply(obj)
-                if obj.Name == "NormalDoor" and obj:FindFirstChild("Door") and not obj:FindFirstChild("DoorESP_Highlight") then
-                    local hl = Instance.new("Highlight")
-                    hl.Name = "DoorESP_Highlight"
-                    hl.FillColor = Color3.fromRGB(0,255,0)
-                    hl.OutlineColor = Color3.fromRGB(0,255,0)
-                    hl.FillTransparency = 0.5
-                    hl.OutlineTransparency = 0
-                    hl.Adornee = obj
-                    hl.Parent = obj
-                end
-            end
-
-            for _, obj in pairs(workspace:GetDescendants()) do
-                apply(obj)
-            end
-
-            workspace.DescendantAdded:Connect(function(obj)
-                apply(obj)
-            end)
-        end
-    end
-})
-
-PressureTab:Toggle({
-    Title = "KeyCard ESP",
-    Value = false,
-    Callback = function(state)
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("Highlight") and v.Name == "KeyCardESP_Highlight" then
-                v:Destroy()
-            end
-        end
-
-        if state then
-            local function apply(obj)
-                if obj.Name == "NormalKeyCard" and not obj:FindFirstChild("KeyCardESP_Highlight") then
-                    local hl = Instance.new("Highlight")
-                    hl.Name = "KeyCardESP_Highlight"
-                    hl.FillColor = Color3.fromRGB(173,216,230)
-                    hl.OutlineColor = Color3.fromRGB(173,216,230)
-                    hl.FillTransparency = 0.5
-                    hl.OutlineTransparency = 0
-                    hl.Adornee = obj
-                    hl.Parent = obj
-                end
-            end
-
-            for _, obj in pairs(workspace:GetDescendants()) do
-                apply(obj)
-            end
-
-            workspace.DescendantAdded:Connect(function(obj)
-                apply(obj)
-            end)
-        end
-    end
-})
-
-PressureTab:Toggle({
-    Title = "Monster Alert",
-    Value = false,
-    Callback = function(state)
-        if state then
-            local folder = workspace:FindFirstChild("Monsters")
-            if folder then
-                folder.ChildAdded:Connect(function(child)
-                    local icon = "circle-alert"
-                    if child.Name == "Pandemonium" then
-                        icon = "triangle-alert"
-                    end
-                    WindUI:Notify({
-                        Title = child.Name,
-                        Content = child.Name .. " spawned hide in closets or rooms",
-                        Duration = 3,
-                        Icon = icon,
-                    })
-                end)
-            end
-        end
     end
 })
 
