@@ -34,7 +34,6 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local ObfuscatorTab = Window:Tab({ Title = "Obfuscator", Icon = "folder-lock", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
@@ -89,39 +88,6 @@ MainTab:Toggle({
     end
 })
 
-ObfuscatorTab:Input({
-    Title = "Obfuscator",
-    Value = "",
-    InputIcon = "code",
-    Type = "Textarea",
-    Placeholder = "Place the script you want to obfuscate here",
-    Callback = function() end
-})
-
-ObfuscatorTab:Button({
-    Title = "Obfuscate",
-    Locked = false,
-    Callback = function()
-        local inputObject = ObfuscatorTab.Flags and ObfuscatorTab.Flags["Obfuscator"]
-        if not inputObject or not inputObject.Value then
-            return
-        end
-
-        local original = inputObject.Value
-        if original == "" then
-            return
-        end
-
-        local bytes = {}
-        for i = 1, #original do
-            bytes[#bytes + 1] = string.byte(original, i)
-        end
-
-        local obfuscated = "local _={" .. table.concat(bytes, ",") .. "} local s=\"\" for i=1,#_ do s=s..string.char(_[i]) end loadstring(s)()"
-        inputObject:Set(obfuscated)
-    end
-})
-
 OthersTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
@@ -141,10 +107,10 @@ OthersTab:Button({
 })
 
 OthersTab:Button({
-    Title = "7yd7 Emotes",
+    Title = "Spectate Players",
     Icon = "file",
     Locked = false,
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/panchooo677/Btbt/refs/heads/main/README.md"))()
     end
 })
