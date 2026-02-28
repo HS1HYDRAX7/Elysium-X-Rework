@@ -1,0 +1,317 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+local Camera = workspace.CurrentCamera
+
+local LocalPlayer = Players.LocalPlayer
+local CurrentTarget = nil
+local TargetIndex = 1
+local SpectatingActive = false
+local OriginalCameraSubject = nil
+local PlayerList = {}
+local CharacterConnection = nil
+
+local SoundFolder = Instance.new("Folder")
+SoundFolder.Name = "SpectatorSounds"
+SoundFolder.Parent = SoundService
+
+local function CreateSound(id,v,p)
+	local s=Instance.new("Sound")
+	s.SoundId=id
+	s.Volume=v
+	s.PlaybackSpeed=p
+	s.Parent=SoundFolder
+	return s
+end
+
+local ClickSound=CreateSound("rbxassetid://876939830",0.3,1.5)
+local ToggleOnSound=CreateSound("rbxassetid://876939830",0.4,1.2)
+local ToggleOffSound=CreateSound("rbxassetid://876939830",0.4,0.9)
+local SwitchSound=CreateSound("rbxassetid://876939830",0.35,1.6)
+
+local function PlaySound(s)
+	if s then
+		local c=s:Clone()
+		c.Parent=SoundFolder
+		c:Play()
+		c.Ended:Connect(function() c:Destroy() end)
+	end
+end
+
+local function Tween(o,d,p,s,e)
+	local t=TweenService:Create(o,TweenInfo.new(d,s or Enum.EasingStyle.Quint,e or Enum.EasingDirection.Out),p)
+	t:Play()
+	return t
+end
+
+local ScreenGui=Instance.new("ScreenGui")
+ScreenGui.Name="SpectatorUIRedElite"
+ScreenGui.ResetOnSpawn=false
+ScreenGui.IgnoreGuiInset=true
+ScreenGui.Parent=LocalPlayer:WaitForChild("PlayerGui")
+
+local Colors={
+	Primary=Color3.fromRGB(185,28,28),
+	PrimaryDark=Color3.fromRGB(120,20,20),
+	PrimaryLight=Color3.fromRGB(239,68,68),
+	Background=Color3.fromRGB(15,0,0),
+	Surface=Color3.fromRGB(35,5,5),
+	Text=Color3.fromRGB(255,230,230),
+	Muted=Color3.fromRGB(200,150,150),
+	Success=Color3.fromRGB(34,197,94)
+}
+
+local function Corner(o,r)
+	local c=Instance.new("UICorner")
+	c.CornerRadius=UDim.new(0,r or 12)
+	c.Parent=o
+end
+
+local function Stroke(o,col,t)
+	local s=Instance.new("UIStroke")
+	s.Color=col
+	s.Thickness=t or 1.5
+	s.Parent=o
+end
+
+local ToggleButton=Instance.new("ImageButton")
+ToggleButton.Size=UDim2.new(0,65,0,65)
+ToggleButton.Position=UDim2.new(1,-85,0.5,-32)
+ToggleButton.BackgroundColor3=Colors.Primary
+ToggleButton.Image="rbxassetid://10154713810"
+ToggleButton.ScaleType=Enum.ScaleType.Fit
+ToggleButton.Parent=ScreenGui
+Corner(ToggleButton,32)
+Stroke(ToggleButton,Colors.PrimaryLight,2)
+
+local UIS = game:GetService("UserInputService")
+
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	OpenButton.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+OpenButton.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = OpenButton.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+OpenButton.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+local MainPanel=Instance.new("Frame")
+MainPanel.Size=UDim2.new(0,360,0,170)
+MainPanel.Position=UDim2.new(0.5,-180,1,250)
+MainPanel.BackgroundColor3=Colors.Background
+MainPanel.Visible=false
+MainPanel.Parent=ScreenGui
+Corner(MainPanel,16)
+Stroke(MainPanel,Colors.PrimaryLight,2)
+
+local Gradient=Instance.new("UIGradient")
+Gradient.Color=ColorSequence.new(Colors.PrimaryDark,Colors.Background)
+Gradient.Rotation=90
+Gradient.Parent=MainPanel
+
+local Title=Instance.new("TextLabel")
+Title.Size=UDim2.new(1,0,0,45)
+Title.BackgroundTransparency=1
+Title.Text="Spectating"
+Title.Font=Enum.Font.GothamBold
+Title.TextSize=20
+Title.TextColor3=Colors.PrimaryLight
+Title.Parent=MainPanel
+
+local PlayerName=Instance.new("TextLabel")
+PlayerName.Size=UDim2.new(1,-20,0,35)
+PlayerName.Position=UDim2.new(0,10,0,50)
+PlayerName.BackgroundTransparency=1
+PlayerName.Text="No Player"
+PlayerName.Font=Enum.Font.GothamSemibold
+PlayerName.TextSize=18
+PlayerName.TextColor3=Colors.Text
+PlayerName.Parent=MainPanel
+
+local Counter=Instance.new("TextLabel")
+Counter.Size=UDim2.new(1,-20,0,25)
+Counter.Position=UDim2.new(0,10,0,85)
+Counter.BackgroundTransparency=1
+Counter.Text="0/0"
+Counter.Font=Enum.Font.Gotham
+Counter.TextSize=14
+Counter.TextColor3=Colors.Muted
+Counter.Parent=MainPanel
+
+local Prev=Instance.new("TextButton")
+Prev.Size=UDim2.new(0.45,-5,0,40)
+Prev.Position=UDim2.new(0,10,1,-50)
+Prev.Text="◀ PREV"
+Prev.Font=Enum.Font.GothamBold
+Prev.TextSize=14
+Prev.BackgroundColor3=Colors.Surface
+Prev.TextColor3=Colors.Text
+Prev.Parent=MainPanel
+Corner(Prev,10)
+
+local Next=Instance.new("TextButton")
+Next.Size=UDim2.new(0.45,-5,0,40)
+Next.Position=UDim2.new(0.55,-5,1,-50)
+Next.Text="NEXT ▶"
+Next.Font=Enum.Font.GothamBold
+Next.TextSize=14
+Next.BackgroundColor3=Colors.Surface
+Next.TextColor3=Colors.Text
+Next.Parent=MainPanel
+Corner(Next,10)
+
+local function GetPlayers()
+	local t={}
+	for _,p in ipairs(Players:GetPlayers()) do
+		if p~=LocalPlayer then
+			table.insert(t,p)
+		end
+	end
+	return t
+end
+
+local function BindCamera(player)
+	if CharacterConnection then
+		CharacterConnection:Disconnect()
+	end
+	if not player then return end
+	local function attach(c)
+		local h=c:WaitForChild("Humanoid",5)
+		if h and SpectatingActive and CurrentTarget==player then
+			Camera.CameraSubject=h
+		end
+	end
+	CharacterConnection=player.CharacterAdded:Connect(function(c)
+		task.wait(0.1)
+		attach(c)
+	end)
+	if player.Character then
+		attach(player.Character)
+	end
+end
+
+local function UpdateInfo(player)
+	if not player then
+		PlayerName.Text="No Players"
+		Counter.Text="0/0"
+		return
+	end
+	PlayerName.Text=player.DisplayName
+	PlayerList=GetPlayers()
+	for i,p in ipairs(PlayerList) do
+		if p==player then TargetIndex=i end
+	end
+	Counter.Text=TargetIndex.."/"..#PlayerList
+end
+
+local function SetTarget(player)
+	CurrentTarget=player
+	UpdateInfo(player)
+	BindCamera(player)
+end
+
+local function NextPlayer()
+	PlayerList=GetPlayers()
+	if #PlayerList==0 then return end
+	TargetIndex=TargetIndex%#PlayerList+1
+	PlaySound(SwitchSound)
+	SetTarget(PlayerList[TargetIndex])
+end
+
+local function PrevPlayer()
+	PlayerList=GetPlayers()
+	if #PlayerList==0 then return end
+	TargetIndex=((TargetIndex-2)%#PlayerList)+1
+	PlaySound(SwitchSound)
+	SetTarget(PlayerList[TargetIndex])
+end
+
+local function ShowPanel()
+	MainPanel.Visible=true
+	MainPanel.Position=UDim2.new(0.5,-180,1,250)
+	Tween(MainPanel,0.6,{Position=UDim2.new(0.5,-180,1,-190)},Enum.EasingStyle.Back)
+end
+
+local function HidePanel()
+	Tween(MainPanel,0.4,{Position=UDim2.new(0.5,-180,1,250)})
+	task.delay(0.4,function() MainPanel.Visible=false end)
+end
+
+local function Activate()
+	SpectatingActive=true
+	OriginalCameraSubject=Camera.CameraSubject
+	PlaySound(ToggleOnSound)
+	PlayerList=GetPlayers()
+	if #PlayerList>0 then
+		SetTarget(PlayerList[1])
+	end
+	ShowPanel()
+	Tween(ToggleButton,0.3,{BackgroundColor3=Colors.Success})
+end
+
+local function Deactivate()
+	SpectatingActive=false
+	if CharacterConnection then CharacterConnection:Disconnect() end
+	if OriginalCameraSubject and OriginalCameraSubject.Parent then
+		Camera.CameraSubject=OriginalCameraSubject
+	end
+	HidePanel()
+	PlaySound(ToggleOffSound)
+	Tween(ToggleButton,0.3,{BackgroundColor3=Colors.Primary})
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+	PlaySound(ClickSound)
+	if SpectatingActive then
+		Deactivate()
+	else
+		Activate()
+	end
+end)
+
+Next.MouseButton1Click:Connect(function()
+	if SpectatingActive then NextPlayer() end
+end)
+
+Prev.MouseButton1Click:Connect(function()
+	if SpectatingActive then PrevPlayer() end
+end)
+
+Players.PlayerRemoving:Connect(function(p)
+	if SpectatingActive and CurrentTarget==p then
+		task.wait(0.1)
+		NextPlayer()
+	end
+end)
