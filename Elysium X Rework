@@ -39,6 +39,8 @@ local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false
 MainTab:Paragraph({
     Title = "Elysium X Team ",
     Desc = "Links below",
+    Image = "rbxassetid://10154713810",
+    ImageSize = 40,
     Locked = false,
     Buttons = {
         {
@@ -103,14 +105,5 @@ OthersTab:Button({
     Locked = false,
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-    end
-})
-
-OthersTab:Button({
-    Title = "Spectate Players",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/panchooo677/Btbt/refs/heads/main/README.md"))()
     end
 })
