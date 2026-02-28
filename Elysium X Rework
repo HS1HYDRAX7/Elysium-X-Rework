@@ -23,7 +23,7 @@ Window:EditOpenButton({
     Title = "Elysium X ",
     Icon = "file-code-corner",
     CornerRadius = UDim.new(0,50),
-    StrokeThickness = 2,
+    StrokeThickness = 1,
     Color = ColorSequence.new(
         Color3.fromHex("FF0000"),
         Color3.fromHex("000080")
@@ -34,7 +34,6 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local APKsTab = Window:Tab({ Title = "APKs", Icon = "folder", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
@@ -86,39 +85,6 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
-    end
-})
-
-APKsTab:Button({
-    Title = "Codex (2.708.880)",
-    Icon = "download",
-    Locked = false,
-    Callback = function()
-        local apkName = string.gsub(script.Parent.Title, " APK$", ".apk")
-        local mediafireUrl = "https://www.mediafire.com/file/r4amuil7pd7bebv/Codex+V2.708.880.apk/file"
-        
-        pcall(function()
-            local http = game:GetService("HttpService")
-            local apkData = http:GetAsync(mediafireUrl, true)
-            
-            if apkData and #apkData > 10000 then
-                writefile("Downloads/" .. apkName, apkData)
-                
-                WindUI:Notify({
-                    Title = "Apk Downloader",
-                    Content = "Download Completed (" .. apkName .. ")",
-                    Duration = 3,
-                    Icon = "file-box",
-                })
-            else
-                WindUI:Notify({
-                    Title = "Apk Downloader",
-                    Content = "Failed to download APK",
-                    Duration = 4,
-                    Icon = "alert-triangle",
-                })
-            end
-        end)
     end
 })
 
