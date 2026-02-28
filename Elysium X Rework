@@ -37,7 +37,8 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Made By Atlas ",
+    Title = "Elysium X Team ",
+    Desc = "Links below",
     Locked = false,
     Buttons = {
         {
@@ -102,5 +103,84 @@ OthersTab:Button({
     Locked = false,
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+OthersTab:Button({
+    Title = "7yd7 Emotes",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua
+    end
+})
+
+OthersTab:Dropdown({
+    Title = "Aim Part",
+    Values = { "Head", "Torso" },
+    Value = "Head",
+    Callback = function(selectedPart)
+        getgenv().__currentAimPart = selectedPart
+    end
+})
+
+OthersTab:Toggle({
+    Title = "Players Aimbot",
+    Default = false,
+    Callback = function(enabled)
+        if not enabled then
+            return
+        end
+
+        task.spawn(function()
+            local RunService = game:GetService("RunService")
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+            local Camera = workspace.CurrentCamera
+
+            local SMOOTH_FACTOR = 0.18
+            local currentAimPart = getgenv().__currentAimPart or "Head"
+
+            local function getTargetPart(target)
+                if not target or not target.Character then return nil end
+                local char = target.Character
+                if currentAimPart == "Torso" then
+                    return char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+                else
+                    return char:FindFirstChild("Head")
+                end
+            end
+
+            while enabled and task.wait() do
+                currentAimPart = getgenv().__currentAimPart or "Head"
+
+                local closest = nil
+                local closestDist = math.huge
+                local mousePos = Camera.ViewportSize / 2
+
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player == LocalPlayer or not player.Character then continue end
+
+                    local part = getTargetPart(player)
+                    if not part then continue end
+
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+                    if not onScreen then continue end
+
+                    local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                    if dist < closestDist then
+                        closestDist = dist
+                        closest = part
+                    end
+                end
+
+                if closest then
+                    local currentCFrame = Camera.CFrame
+                    local targetCFrame = CFrame.new(currentCFrame.Position, closest.Position)
+                    local newCFrame = currentCFrame:Lerp(targetCFrame, SMOOTH_FACTOR)
+                    Camera.CFrame = newCFrame
+                end
+            end
+        end)
     end
 })
