@@ -107,3 +107,12 @@ OthersTab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end
 })
+
+OthersTab:Button({
+    Title = "Elysium Mobile KeyBoard",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
+    end
+})
