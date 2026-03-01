@@ -116,23 +116,3 @@ OthersTab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
     end
 })
-
-OthersTab:Toggle({
-    Title = "Auto Load",
-    Value = false,
-    Callback = function(state)
-        if state then
-            _G.AutoLoadElysium = true
-            task.spawn(function()
-                while _G.AutoLoadElysium do
-                    pcall(function()
-                        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Elysium%20X%20Rework"))()
-                    end)
-                    task.wait(5)
-                end
-            end)
-        else
-            _G.AutoLoadElysium = false
-        end
-    end
-})
