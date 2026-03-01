@@ -37,7 +37,7 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Elysium X Team ",
+    Title = "Elysium X Team",
     Desc = "Links below",
     Image = "rbxassetid://10154713810",
     ImageSize = 60,
