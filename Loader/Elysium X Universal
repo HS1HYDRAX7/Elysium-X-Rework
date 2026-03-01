@@ -1,0 +1,109 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "award",
+    Author = "By Atlas",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    Resizable = true,
+    HideSearchBar = false,
+    ScrollBarEnabled = true
+})
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
+})
+
+Window:EditOpenButton({
+    Title = "Elysium X ",
+    Icon = "file-code-corner",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
+
+MainTab:Paragraph({
+    Title = "Elysium X Team ",
+    Desc = "Links below",
+    Image = "rbxassetid://10154713810",
+    ImageSize = 60,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "link",
+            Title = "Website",
+            Callback = function()
+                setclipboard("https://hs1hydrax7.github.io/Site/")
+                WindUI:Notify({
+                    Title = "Website",
+                    Content = "Link Copied!",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+        {
+            Icon = "link",
+            Title = "TikTok",
+            Callback = function()
+                setclipboard("@mrnexus000")
+                WindUI:Notify({
+                    Title = "TikTok",
+                    Content = "Username Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+    }
+})
+
+MainTab:Dropdown({
+    Title = "Theme",
+    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Value = "Crimson",
+    Callback = function(option)
+        WindUI:SetTheme(option)
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparent",
+    Icon = "palette",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleTransparency(state)
+    end
+})
+
+OthersTab:Button({
+    Title = "Infinite Yield",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+OthersTab:Button({
+    Title = "Dex Explorer",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
