@@ -85,7 +85,7 @@ Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 3)
 Instance.new("UICorner", barBackground).CornerRadius = UDim.new(0, 3)
 
 local selectedScript = nil
-local gameName = "Universal"
+local gameName = "Unknown"
 
 if getgenv().gamechecker then
     for _, gameData in pairs(getgenv().gamesConfig) do
@@ -127,7 +127,7 @@ task.spawn(function()
     TweenService:Create(barFill, infoIn, {BackgroundTransparency = 0}):Play()
     
     task.wait(0.5)
-    updateLoader("Game Found: " .. gameName, 30)
+    updateLoader("Detected: " .. gameName, 30)
     task.wait(0.8)
     updateLoader("Loading " .. getgenv().ScriptName, 70)
     task.wait(0.8)
