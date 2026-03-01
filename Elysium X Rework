@@ -3,7 +3,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
     Icon = "award",
-    Author = "© Elysium X Team",
+    Author = "By Atlas",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
@@ -40,7 +40,7 @@ MainTab:Paragraph({
     Title = "Elysium X Team ",
     Desc = "Links below",
     Image = "rbxassetid://10154713810",
-    ImageSize = 40,
+    ImageSize = 60,
     Locked = false,
     Buttons = {
         {
