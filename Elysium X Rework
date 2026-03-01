@@ -2,111 +2,96 @@ getgenv().gamesConfig = {
     {  
         gameName = "Pressure",  
         placeId = 12411473842,  
-        ImageId = "rbxassetid://85325844434890",  
-        ConfigScript = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Pressure"))()
-        ]]  
+        ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Pressure"))() ]]  
     },  
 }  
 
 getgenv().gamechecker = true  
 getgenv().ScriptName = "Elysium X Rework"  
-getgenv().UniversalScript = [[
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Universal"))()
-]]  
+getgenv().UniversalScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Universal"))() ]]  
+
+local CONFIG = {
+    ContainerWidth = 380,
+    ContainerHeight = 100,
+    BarHeight = 8,
+    BarPaddingX = 32,
+    BarLerpSpeed = 0.4,
+    FadeInSpeed = 0.4,
+    FadeOutSpeed = 0.3,
+}
 
 local TweenService = game:GetService("TweenService")
 local player = game:GetService("Players").LocalPlayer
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ElysiumLoader"
-screenGui.IgnoreGuiInset = true
+screenGui.Name = "ElysiumGraphiteLoader"
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
 
-local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-bg.BackgroundTransparency = 0.3
-bg.Parent = screenGui
-
-local layout = Instance.new("UIListLayout")
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0,15)
-layout.Parent = bg
-
-local function separator()
-    local line = Instance.new("Frame")
-    line.Size = UDim2.new(0.6,0,0,2)
-    line.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    line.BorderSizePixel = 0
-    return line
+local success_gui = pcall(function()
+    screenGui.Parent = game:GetService("CoreGui")
+end)
+if not success_gui then
+    screenGui.Parent = player:WaitForChild("PlayerGui")
 end
 
-local topSep = separator()
-topSep.Parent = bg
+local container = Instance.new("Frame")
+container.Name = "LoaderContainer"
+container.Size = UDim2.new(0, CONFIG.ContainerWidth, 0, CONFIG.ContainerHeight)
+container.Position = UDim2.new(0.5, 0, 0.5, 0)
+container.AnchorPoint = Vector2.new(0.5, 0.5)
+container.BackgroundColor3 = Color3.fromRGB(38, 38, 42)
+container.BorderSizePixel = 0
+container.BackgroundTransparency = 1
+container.Parent = screenGui
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0.6,0,0,50)
-title.BackgroundTransparency = 1
-title.Text = "Elysium X Rework"
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 32
-title.Parent = bg
+local containerCorner = Instance.new("UICorner")
+containerCorner.CornerRadius = UDim.new(0, 12)
+containerCorner.Parent = container
 
-local midSep1 = separator()
-midSep1.Parent = bg
+local containerStroke = Instance.new("UIStroke")
+containerStroke.Color = Color3.fromRGB(68, 68, 72)
+containerStroke.Thickness = 1
+containerStroke.Transparency = 1
+containerStroke.Parent = container
 
-local image = Instance.new("ImageLabel")
-image.Size = UDim2.new(0,180,0,180)
-image.BackgroundColor3 = Color3.fromRGB(25,25,25)
-image.Parent = bg
-Instance.new("UICorner",image).CornerRadius = UDim.new(0,25)
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "StatusLabel"
+statusLabel.Size = UDim2.new(1, -CONFIG.BarPaddingX * 2, 0, 20)
+statusLabel.Position = UDim2.new(0, CONFIG.BarPaddingX, 0, 28)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Checking Game..."
+statusLabel.TextColor3 = Color3.fromRGB(176, 176, 176)
+statusLabel.TextSize = 14
+statusLabel.Font = Enum.Font.GothamMedium
+statusLabel.TextTransparency = 1
+statusLabel.Parent = container
 
-local midSep2 = separator()
-midSep2.Parent = bg
+local barBackground = Instance.new("Frame")
+barBackground.Name = "BarBackground"
+barBackground.Size = UDim2.new(1, -CONFIG.BarPaddingX * 2, 0, CONFIG.BarHeight)
+barBackground.Position = UDim2.new(0, CONFIG.BarPaddingX, 0, 60)
+barBackground.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
+barBackground.BackgroundTransparency = 1
+barBackground.Parent = container
 
-local barBG = Instance.new("Frame")
-barBG.Size = UDim2.new(0.6,0,0,25)
-barBG.BackgroundColor3 = Color3.fromRGB(40,40,40)
-barBG.BorderSizePixel = 0
-barBG.Parent = bg
-Instance.new("UICorner",barBG).CornerRadius = UDim.new(1,0)
-
-local bar = Instance.new("Frame")
-bar.Size = UDim2.new(0,0,1,0)
-bar.BackgroundColor3 = Color3.fromRGB(255,0,0)
-bar.BorderSizePixel = 0
-bar.Parent = barBG
-Instance.new("UICorner",bar).CornerRadius = UDim.new(1,0)
-
-local midSep3 = separator()
-midSep3.Parent = bg
-
-local output = Instance.new("TextLabel")
-output.Size = UDim2.new(0.6,0,0,60)
-output.BackgroundTransparency = 1
-output.TextColor3 = Color3.new(1,1,1)
-output.Font = Enum.Font.Code
-output.TextSize = 16
-output.TextWrapped = true
-output.Text = "Checking game..."
-output.Parent = bg
-
-local bottomSep = separator()
-bottomSep.Parent = bg
+local barFill = Instance.new("Frame")
+barFill.Name = "BarFill"
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+barFill.BackgroundTransparency = 1
+barFill.Parent = barBackground
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 3)
+Instance.new("UICorner", barBackground).CornerRadius = UDim.new(0, 3)
 
 local selectedScript = nil
-local selectedImage = "rbxassetid://0"
+local gameName = "Universal"
 
 if getgenv().gamechecker then
-    for _,gameData in pairs(getgenv().gamesConfig) do
+    for _, gameData in pairs(getgenv().gamesConfig) do
         if game.PlaceId == gameData.placeId then
             selectedScript = gameData.ConfigScript
-            selectedImage = gameData.ImageId
-            output.Text = "Game detected: "..gameData.gameName
+            gameName = gameData.gameName
             break
         end
     end
@@ -114,72 +99,46 @@ end
 
 if not selectedScript then
     selectedScript = getgenv().UniversalScript
-    output.Text = "Loading Universal..."
 end
 
-image.Image = selectedImage
-
-local function notify(iconId,titleText,desc)
-    local notif = Instance.new("Frame")
-    notif.Size = UDim2.new(0,0,0,70)
-    notif.Position = UDim2.new(1,-20,1,-100)
-    notif.AnchorPoint = Vector2.new(1,1)
-    notif.BackgroundColor3 = Color3.fromRGB(20,20,20)
-    notif.Parent = screenGui
-    Instance.new("UICorner",notif).CornerRadius = UDim.new(0,20)
-
-    local icon = Instance.new("ImageLabel")
-    icon.Size = UDim2.new(0,40,0,40)
-    icon.Position = UDim2.new(0,15,0.5,-20)
-    icon.BackgroundTransparency = 1
-    icon.Image = iconId
-    icon.Parent = notif
-
-    local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(1,-70,0,25)
-    titleLbl.Position = UDim2.new(0,60,0,10)
-    titleLbl.BackgroundTransparency = 1
-    titleLbl.TextColor3 = Color3.new(1,1,1)
-    titleLbl.Font = Enum.Font.GothamBold
-    titleLbl.TextSize = 16
-    titleLbl.Text = titleText
-    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
-    titleLbl.Parent = notif
-
-    local descLbl = Instance.new("TextLabel")
-    descLbl.Size = UDim2.new(1,-70,0,25)
-    descLbl.Position = UDim2.new(0,60,0,35)
-    descLbl.BackgroundTransparency = 1
-    descLbl.TextColor3 = Color3.fromRGB(200,200,200)
-    descLbl.Font = Enum.Font.Gotham
-    descLbl.TextSize = 14
-    descLbl.Text = desc
-    descLbl.TextXAlignment = Enum.TextXAlignment.Left
-    descLbl.Parent = notif
-
-    TweenService:Create(notif,TweenInfo.new(0.4,Enum.EasingStyle.Quad),{Size=UDim2.new(0,350,0,70)}):Play()
-    task.wait(3)
-    TweenService:Create(notif,TweenInfo.new(0.4,Enum.EasingStyle.Quad),{Size=UDim2.new(0,0,0,70)}):Play()
-    task.wait(0.4)
-    notif:Destroy()
+local function updateLoader(status, progress)
+    statusLabel.Text = status
+    local targetSize = UDim2.new(progress / 100, 0, 1, 0)
+    TweenService:Create(barFill, TweenInfo.new(CONFIG.BarLerpSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetSize}):Play()
 end
 
-for i = 1,100 do
-    TweenService:Create(bar,TweenInfo.new(0.05,Enum.EasingStyle.Linear),{Size=UDim2.new(i/100,0,1,0)}):Play()
-    task.wait(0.02)
+local function removeLoader()
+    local info = TweenInfo.new(CONFIG.FadeOutSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    TweenService:Create(container, info, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(containerStroke, info, {Transparency = 1}):Play()
+    TweenService:Create(statusLabel, info, {TextTransparency = 1}):Play()
+    TweenService:Create(barBackground, info, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(barFill, info, {BackgroundTransparency = 1}):Play()
+    task.wait(CONFIG.FadeOutSpeed)
+    screenGui:Destroy()
 end
 
-output.Text = "Executing..."
-
-local success,err = pcall(function()
-    loadstring(selectedScript)()
+task.spawn(function()
+    local infoIn = TweenInfo.new(CONFIG.FadeInSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(container, infoIn, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(containerStroke, infoIn, {Transparency = 0}):Play()
+    TweenService:Create(statusLabel, infoIn, {TextTransparency = 0}):Play()
+    TweenService:Create(barBackground, infoIn, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(barFill, infoIn, {BackgroundTransparency = 0}):Play()
+    
+    task.wait(0.5)
+    updateLoader("Game Found: " .. gameName, 30)
+    task.wait(0.8)
+    updateLoader("Loading " .. getgenv().ScriptName, 70)
+    task.wait(0.8)
+    updateLoader("Finalizing Execution", 100)
+    task.wait(0.5)
+    
+    task.spawn(function()
+        pcall(function()
+            loadstring(selectedScript)()
+        end)
+    end)
+    
+    removeLoader()
 end)
-
-if success then
-    notify("rbxassetid://76078495178149","Loader","Elysium X Rework loaded successfully ✅")
-else
-    notify("rbxassetid://101829200081951","Loader","Error Elysium X Rework cannot be loaded")
-end
-
-task.wait(1)
-screenGui:Destroy()
