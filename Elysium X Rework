@@ -1,109 +1,185 @@
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+getgenv().gamesConfig = {  
+    {  
+        gameName = "Pressure",  
+        placeId = 12411473842,  
+        ImageId = "rbxassetid://85325844434890",  
+        ConfigScript = [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Pressure"))()
+        ]]  
+    },  
+}  
 
-local Window = WindUI:CreateWindow({
-    Title = "Elysium X Rework",
-    Icon = "award",
-    Author = "By Atlas",
-    Folder = "Elysium X Rework",
-    Transparent = true,
-    Theme = "Crimson",
-    Resizable = true,
-    HideSearchBar = false,
-    ScrollBarEnabled = true
-})
+getgenv().gamechecker = true  
+getgenv().ScriptName = "Elysium X Rework"  
+getgenv().UniversalScript = [[
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Universal"))()
+]]  
 
-Window:Tag({
-    Title = "Rework In Progress",
-    Icon = "book-plus",
-    Color = Color3.fromHex("#000080"),
-    Radius = 13,
-})
+local TweenService = game:GetService("TweenService")
+local player = game:GetService("Players").LocalPlayer
 
-Window:EditOpenButton({
-    Title = "Elysium X ",
-    Icon = "file-code-corner",
-    CornerRadius = UDim.new(0,50),
-    StrokeThickness = 1,
-    Color = ColorSequence.new(
-        Color3.fromHex("FF0000"),
-        Color3.fromHex("000080")
-    ),
-    OnlyMobile = false,
-    Enabled = true,
-    Draggable = true,
-})
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ElysiumLoader"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
 
-local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+bg.BackgroundTransparency = 0.3
+bg.Parent = screenGui
 
-MainTab:Paragraph({
-    Title = "Elysium X Team ",
-    Desc = "Links below",
-    Image = "rbxassetid://10154713810",
-    ImageSize = 60,
-    Locked = false,
-    Buttons = {
-        {
-            Icon = "link",
-            Title = "Website",
-            Callback = function()
-                setclipboard("https://hs1hydrax7.github.io/Site/")
-                WindUI:Notify({
-                    Title = "Website",
-                    Content = "Link Copied!",
-                    Duration = 3,
-                    Icon = "link-2",
-                })
-            end,
-        },
-        {
-            Icon = "link",
-            Title = "TikTok",
-            Callback = function()
-                setclipboard("@mrnexus000")
-                WindUI:Notify({
-                    Title = "TikTok",
-                    Content = "Username Copied",
-                    Duration = 3,
-                    Icon = "link-2",
-                })
-            end,
-        },
-    }
-})
+local layout = Instance.new("UIListLayout")
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Padding = UDim.new(0,15)
+layout.Parent = bg
 
-MainTab:Dropdown({
-    Title = "Theme",
-    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
-    Value = "Crimson",
-    Callback = function(option)
-        WindUI:SetTheme(option)
+local function separator()
+    local line = Instance.new("Frame")
+    line.Size = UDim2.new(0.6,0,0,2)
+    line.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    line.BorderSizePixel = 0
+    return line
+end
+
+local topSep = separator()
+topSep.Parent = bg
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0.6,0,0,50)
+title.BackgroundTransparency = 1
+title.Text = "Elysium X Rework"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 32
+title.Parent = bg
+
+local midSep1 = separator()
+midSep1.Parent = bg
+
+local image = Instance.new("ImageLabel")
+image.Size = UDim2.new(0,180,0,180)
+image.BackgroundColor3 = Color3.fromRGB(25,25,25)
+image.Parent = bg
+Instance.new("UICorner",image).CornerRadius = UDim.new(0,25)
+
+local midSep2 = separator()
+midSep2.Parent = bg
+
+local barBG = Instance.new("Frame")
+barBG.Size = UDim2.new(0.6,0,0,25)
+barBG.BackgroundColor3 = Color3.fromRGB(40,40,40)
+barBG.BorderSizePixel = 0
+barBG.Parent = bg
+Instance.new("UICorner",barBG).CornerRadius = UDim.new(1,0)
+
+local bar = Instance.new("Frame")
+bar.Size = UDim2.new(0,0,1,0)
+bar.BackgroundColor3 = Color3.fromRGB(255,0,0)
+bar.BorderSizePixel = 0
+bar.Parent = barBG
+Instance.new("UICorner",bar).CornerRadius = UDim.new(1,0)
+
+local midSep3 = separator()
+midSep3.Parent = bg
+
+local output = Instance.new("TextLabel")
+output.Size = UDim2.new(0.6,0,0,60)
+output.BackgroundTransparency = 1
+output.TextColor3 = Color3.new(1,1,1)
+output.Font = Enum.Font.Code
+output.TextSize = 16
+output.TextWrapped = true
+output.Text = "Checking game..."
+output.Parent = bg
+
+local bottomSep = separator()
+bottomSep.Parent = bg
+
+local selectedScript = nil
+local selectedImage = "rbxassetid://0"
+
+if getgenv().gamechecker then
+    for _,gameData in pairs(getgenv().gamesConfig) do
+        if game.PlaceId == gameData.placeId then
+            selectedScript = gameData.ConfigScript
+            selectedImage = gameData.ImageId
+            output.Text = "Game detected: "..gameData.gameName
+            break
+        end
     end
-})
+end
 
-MainTab:Toggle({
-    Title = "Transparent",
-    Icon = "palette",
-    Value = true,
-    Callback = function(state)
-        Window:ToggleTransparency(state)
-    end
-})
+if not selectedScript then
+    selectedScript = getgenv().UniversalScript
+    output.Text = "Loading Universal..."
+end
 
-OthersTab:Button({
-    Title = "Infinite Yield",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-    end
-})
+image.Image = selectedImage
 
-OthersTab:Button({
-    Title = "Dex Explorer",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-    end
-})
+local function notify(iconId,titleText,desc)
+    local notif = Instance.new("Frame")
+    notif.Size = UDim2.new(0,0,0,70)
+    notif.Position = UDim2.new(1,-20,1,-100)
+    notif.AnchorPoint = Vector2.new(1,1)
+    notif.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    notif.Parent = screenGui
+    Instance.new("UICorner",notif).CornerRadius = UDim.new(0,20)
+
+    local icon = Instance.new("ImageLabel")
+    icon.Size = UDim2.new(0,40,0,40)
+    icon.Position = UDim2.new(0,15,0.5,-20)
+    icon.BackgroundTransparency = 1
+    icon.Image = iconId
+    icon.Parent = notif
+
+    local titleLbl = Instance.new("TextLabel")
+    titleLbl.Size = UDim2.new(1,-70,0,25)
+    titleLbl.Position = UDim2.new(0,60,0,10)
+    titleLbl.BackgroundTransparency = 1
+    titleLbl.TextColor3 = Color3.new(1,1,1)
+    titleLbl.Font = Enum.Font.GothamBold
+    titleLbl.TextSize = 16
+    titleLbl.Text = titleText
+    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+    titleLbl.Parent = notif
+
+    local descLbl = Instance.new("TextLabel")
+    descLbl.Size = UDim2.new(1,-70,0,25)
+    descLbl.Position = UDim2.new(0,60,0,35)
+    descLbl.BackgroundTransparency = 1
+    descLbl.TextColor3 = Color3.fromRGB(200,200,200)
+    descLbl.Font = Enum.Font.Gotham
+    descLbl.TextSize = 14
+    descLbl.Text = desc
+    descLbl.TextXAlignment = Enum.TextXAlignment.Left
+    descLbl.Parent = notif
+
+    TweenService:Create(notif,TweenInfo.new(0.4,Enum.EasingStyle.Quad),{Size=UDim2.new(0,350,0,70)}):Play()
+    task.wait(3)
+    TweenService:Create(notif,TweenInfo.new(0.4,Enum.EasingStyle.Quad),{Size=UDim2.new(0,0,0,70)}):Play()
+    task.wait(0.4)
+    notif:Destroy()
+end
+
+for i = 1,100 do
+    TweenService:Create(bar,TweenInfo.new(0.05,Enum.EasingStyle.Linear),{Size=UDim2.new(i/100,0,1,0)}):Play()
+    task.wait(0.02)
+end
+
+output.Text = "Executing..."
+
+local success,err = pcall(function()
+    loadstring(selectedScript)()
+end)
+
+if success then
+    notify("rbxassetid://76078495178149","Loader","Elysium X Rework loaded successfully ✅")
+else
+    notify("rbxassetid://101829200081951","Loader","Error Elysium X Rework cannot be loaded")
+end
+
+task.wait(1)
+screenGui:Destroy()
