@@ -1,0 +1,243 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "award",
+    Author = "By Atlas",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    Resizable = true,
+    HideSearchBar = false,
+    ScrollBarEnabled = true
+})
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
+})
+
+Window:EditOpenButton({
+    Title = "Elysium X",
+    Icon = "file-code-corner",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "crosshair", Locked = false })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
+
+local circle = Drawing.new("Circle")
+circle.Color = Color3.fromRGB(255,255,255)
+circle.Filled = false
+circle.Thickness = 3
+circle.NumSides = 64
+circle.Radius = 150
+circle.Transparency = 1
+circle.Visible = false
+circle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    circle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+end)
+
+MainTab:Toggle({
+    Title = "Silent Aim",
+    Icon = "crosshair",
+    Value = false,
+    Callback = function(state)
+        circle.Visible = state
+    end
+})
+
+MainTab:Slider({
+    Title = "FOV Size",
+    Icon = "circle",
+    Step = 1,
+    Value = { Min = 50, Max = 800, Default = 150 },
+    Callback = function(val)
+        circle.Radius = val
+    end
+})
+
+task.spawn(function()
+    local hooked = false
+    while not hooked do
+        task.wait(0.1)
+        local LocalPlayer = game.Players.LocalPlayer
+        if not LocalPlayer.Team or LocalPlayer.Team.Name \~= "Play" then continue end
+        
+        for _, v in ipairs(getgc(true)) do
+            if type(v) \~= "function" then continue end
+            local info = getinfo(v)
+            if not info or not info.source or not info.source:find("GunFramework") then continue end
+            if info.name \~= "castProjectile" then continue end
+            
+            for up = 1, info.nups do
+                local upvalueName, upvalue = debug.getupvalue(v, up)
+                if type(upvalueName) == "table" and upvalueName.Fire then
+                    local oldFire = upvalueName.Fire
+                    upvalueName.Fire = function(data)
+                        if circle.Visible then
+                            local target = nil
+                            local closestDist = math.huge
+                            local center = circle.Position
+                            local origin = workspace.CurrentCamera.CFrame.Position
+                            
+                            for _, plr in ipairs(game.Players:GetPlayers()) do
+                                if plr == LocalPlayer or not plr.Character then continue end
+                                local head = plr.Character:FindFirstChild("Head")
+                                if not head then continue end
+                                local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+                                if not hrp then continue end
+                                local screen, onScreen = workspace.CurrentCamera:WorldToViewportPoint(hrp.Position)
+                                if not onScreen then continue end
+                                local dist = (Vector2.new(screen.X, screen.Y) - center).Magnitude
+                                if dist <= circle.Radius and dist < closestDist then
+                                    target = plr
+                                    closestDist = dist
+                                end
+                            end
+                            
+                            if target and target.Character and target.Character:FindFirstChild("Head") then
+                                local headPos = target.Character.Head.Position
+                                if data and data.Origin then
+                                    data.Direction = (headPos - data.Origin).Unit
+                                end
+                            end
+                        end
+                        return oldFire(data)
+                    end
+                    hooked = true
+                    break
+                end
+            end
+            if hooked then break end
+        end
+    end
+end)
+
+local BOXESP = {}
+
+game.Players.PlayerAdded:Connect(function(plr)
+    if plr == game.Players.LocalPlayer then return end
+    local sq = Drawing.new("Square")
+    sq.Filled = false
+    sq.Thickness = 1.5
+    sq.Color = Color3.fromRGB(255,255,255)
+    sq.Transparency = 1
+    sq.Visible = false
+    BOXESP[plr] = sq
+end)
+
+game.Players.PlayerRemoving:Connect(function(plr)
+    if BOXESP[plr] then
+        BOXESP[plr]:Remove()
+        BOXESP[plr] = nil
+    end
+end)
+
+for _, plr in ipairs(game.Players:GetPlayers()) do
+    if plr \~= game.Players.LocalPlayer then
+        local sq = Drawing.new("Square")
+        sq.Filled = false
+        sq.Thickness = 1.5
+        sq.Color = Color3.fromRGB(255,255,255)
+        sq.Transparency = 1
+        sq.Visible = false
+        BOXESP[plr] = sq
+    end
+end
+
+VisualsTab:Toggle({
+    Title = "Box ESP",
+    Icon = "square",
+    Value = false,
+    Callback = function(state)
+        if not state then
+            for _, box in pairs(BOXESP) do
+                box.Visible = false
+            end
+        end
+    end
+})
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local toggle = VisualsTab.Toggles and VisualsTab.Toggles["Box ESP"]
+    if not toggle or not toggle.Value then return end
+    
+    local cam = workspace.CurrentCamera
+    for plr, box in pairs(BOXESP) do
+        local char = plr.Character
+        if not char then box.Visible = false continue end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local head = char:FindFirstChild("Head")
+        if not hrp or not head then box.Visible = false continue end
+        local rootPos, onScreen = cam:WorldToViewportPoint(hrp.Position)
+        if not onScreen then box.Visible = false continue end
+        local headPos = cam:WorldToViewportPoint(head.Position + Vector3.new(0,0.5,0))
+        local height = math.abs(headPos.Y - rootPos.Y) * 2
+        local width = height / 2
+        box.Size = Vector2.new(width, height)
+        box.Position = Vector2.new(rootPos.X - width/2, rootPos.Y - height/2)
+        box.Visible = true
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local hbToggle = MainTab.Toggles and MainTab.Toggles["Hitbox Expander"]
+    local hbSizeSlider = MainTab.Sliders and MainTab.Sliders["Hitbox Size"]
+    local hbTranspSlider = MainTab.Sliders and MainTab.Sliders["Hitbox Transparency"]
+    
+    local enabled = hbToggle and hbToggle.Value
+    local size = hbSizeSlider and hbSizeSlider.Value or 6
+    local transp = hbTranspSlider and hbTranspSlider.Value or 1
+    
+    for _, plr in ipairs(game.Players:GetPlayers()) do
+        if plr == game.Players.LocalPlayer then continue end
+        local char = plr.Character
+        if not char or not char:FindFirstChild("Head") then continue end
+        local head = char.Head
+        if enabled then
+            head.Size = Vector3.new(size, size, size)
+            head.Transparency = transp
+            head.CanCollide = false
+        else
+            head.Size = Vector3.new(2,2,1)
+            head.Transparency = 0
+            head.CanCollide = true
+        end
+    end
+end)
+
+MainTab:Section({ Title = "Hitbox Expander" })
+
+MainTab:Toggle({
+    Title = "Hitbox Expander",
+    Icon = "expand",
+    Value = false,
+    Callback = function() end
+})
+
+MainTab:Slider({
+    Title = "Hitbox Size",
+    Step = 0.1,
+    Value = { Min = 1, Max = 12, Default = 6 },
+    Callback = function() end
+})
+
+MainTab:Slider({
+    Title = "Hitbox Transparency",
+    Step = 0.05,
+    Value = { Min = 0, Max = 1, Default = 1 },
+    Callback = function() end
+})
