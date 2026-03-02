@@ -116,3 +116,93 @@ OthersTab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
     end
 })
+
+OthersTab:Toggle({
+    Title = "Aimbot",
+    Value = false,
+    Callback = function(enabled)
+        local RunService = game:GetService("RunService")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local Camera = workspace.CurrentCamera
+
+        getgenv().AIM_PART = getgenv().AIM_PART or "Head"
+        getgenv().SELECTED_PLAYERS = getgenv().SELECTED_PLAYERS or {}
+        getgenv().AIM_CONNECTION = getgenv().AIM_CONNECTION or nil
+
+        if enabled then
+            getgenv().AIM_CONNECTION = RunService.RenderStepped:Connect(function()
+                if not LocalPlayer.Character
+                or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                or #getgenv().SELECTED_PLAYERS == 0 then
+                    return
+                end
+
+                local closest, closestDist = nil, math.huge
+                local myPos = LocalPlayer.Character.HumanoidRootPart.Position
+
+                for _, name in ipairs(getgenv().SELECTED_PLAYERS) do
+                    local plr = Players:FindFirstChild(name)
+                    if not plr or not plr.Character or not plr.Character:FindFirstChild(getgenv().AIM_PART) then continue end
+
+                    local hum = plr.Character:FindFirstChild("Humanoid")
+                    if hum and hum.Health <= 0 then continue end
+                    if plr == LocalPlayer then continue end
+
+                    local targetPos = plr.Character[getgenv().AIM_PART].Position
+                    local dist = (myPos - targetPos).Magnitude
+
+                    if dist < closestDist then
+                        closestDist = dist
+                        closest = targetPos
+                    end
+                end
+
+                if closest then
+                    local current = Camera.CFrame
+                    local target = CFrame.new(current.Position, closest)
+                    local smoothness = 0.12 + math.random(-5, 5) / 100
+                    Camera.CFrame = current:Lerp(target, smoothness)
+                end
+            end)
+        else
+            if getgenv().AIM_CONNECTION then
+                getgenv().AIM_CONNECTION:Disconnect()
+                getgenv().AIM_CONNECTION = nil
+            end
+        end
+    end
+})
+
+OthersTab:Dropdown({
+    Title = "Aim Part",
+    Values = {"Head", "Torso"},
+    Value = {"Head"},
+    Multi = false,
+    AllowNone = false,
+    Callback = function(val)
+        getgenv().AIM_PART = val[1] or "Head"
+    end
+})
+
+OthersTab:Dropdown({
+    Title = "Players",
+    Values = (function()
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local names = {}
+        for _, p in Players:GetPlayers() do
+            if p ~= LocalPlayer and p.Character then
+                table.insert(names, p.Name)
+            end
+        end
+        table.sort(names)
+        return names
+    end)(),
+    Value = {},
+    Multi = true,
+    AllowNone = true,
+    Callback = function(selected)
+        getgenv().SELECTED_PLAYERS = selected
+    end
+})
