@@ -109,15 +109,6 @@ OthersTab:Button({
 })
 
 OthersTab:Button({
-    Title = "Coordinate viewer",
-    Icon = "file",
-    Locked = false,
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Coordinate%20viewer"))()
-    end
-})
-
-OthersTab:Button({
     Title = "Elysium Mobile KeyBoard",
     Icon = "file",
     Locked = false,
