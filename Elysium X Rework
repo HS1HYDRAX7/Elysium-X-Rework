@@ -3,12 +3,7 @@ getgenv().gamesConfig = {
         gameName = "Pressure",  
         placeId = 12411473842,  
         ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Pressure"))() ]]  
-    },
-    {  
-        gameName = "Flick",  
-        placeId = 136801880565837,  
-        ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Flick"))() ]]  
-    },
+    },  
 }  
 
 getgenv().gamechecker = true  
