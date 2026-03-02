@@ -13,7 +13,7 @@ ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.fromOffset(280,170)
+Main.Size = UDim2.fromOffset(280,180)
 Main.Position = UDim2.new(0.5,-140,0.5,-85)
 Main.BackgroundColor3 = Color3.fromRGB(20,20,25)
 Main.BorderSizePixel = 0
@@ -199,6 +199,7 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 local dragging = false
+local dragInput
 local dragStart
 local startPos
 
@@ -207,18 +208,25 @@ Main.InputBegan:Connect(function(input)
 		dragging = true
 		dragStart = input.Position
 		startPos = Main.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
 end)
 
-Main.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
+Main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
 	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
+		
 		Main.Position = UDim2.new(
 			startPos.X.Scale,
 			startPos.X.Offset + delta.X,
