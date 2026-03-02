@@ -1,0 +1,229 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CoordinatesGui"
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.fromOffset(280,170)
+Main.Position = UDim2.new(0.5,-140,0.5,-85)
+Main.BackgroundColor3 = Color3.fromRGB(20,20,25)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+Main.Active = true
+
+local MainCorner = Instance.new("UICorner", Main)
+MainCorner.CornerRadius = UDim.new(0,20)
+
+local MainStroke = Instance.new("UIStroke", Main)
+MainStroke.Color = Color3.fromRGB(60,60,70)
+MainStroke.Thickness = 1.2
+MainStroke.Transparency = 0.2
+
+local Gradient = Instance.new("UIGradient", Main)
+Gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(28,28,35)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,22))
+}
+Gradient.Rotation = 90
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1,0,0,38)
+TopBar.BackgroundTransparency = 1
+TopBar.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,-100,1,0)
+Title.Position = UDim2.new(0,15,0,0)
+Title.BackgroundTransparency = 1
+Title.Text = "Coordinates"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 17
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+local ButtonsHolder = Instance.new("Frame")
+ButtonsHolder.Size = UDim2.fromOffset(70,26)
+ButtonsHolder.Position = UDim2.new(1,-85,0.5,-13)
+ButtonsHolder.BackgroundTransparency = 1
+ButtonsHolder.Parent = TopBar
+
+local UIListLayoutButtons = Instance.new("UIListLayout", ButtonsHolder)
+UIListLayoutButtons.FillDirection = Enum.FillDirection.Horizontal
+UIListLayoutButtons.Padding = UDim.new(0,8)
+UIListLayoutButtons.HorizontalAlignment = Enum.HorizontalAlignment.Right
+UIListLayoutButtons.VerticalAlignment = Enum.VerticalAlignment.Center
+
+local function createIconButton(imageId)
+	local Button = Instance.new("ImageButton")
+	Button.Size = UDim2.fromOffset(26,26)
+	Button.BackgroundColor3 = Color3.fromRGB(35,35,45)
+	Button.Image = imageId
+	Button.Parent = ButtonsHolder
+	
+	local Corner = Instance.new("UICorner", Button)
+	Corner.CornerRadius = UDim.new(1,0)
+	
+	local Stroke = Instance.new("UIStroke", Button)
+	Stroke.Color = Color3.fromRGB(80,80,95)
+	Stroke.Thickness = 1
+	Stroke.Transparency = 0.3
+	
+	return Button
+end
+
+local CopyButton = createIconButton("rbxassetid://90434151822042")
+local CloseButton = createIconButton("rbxassetid://76821953846248")
+
+local Container = Instance.new("Frame")
+Container.Size = UDim2.new(1,-20,1,-50)
+Container.Position = UDim2.new(0,10,0,45)
+Container.BackgroundTransparency = 1
+Container.Parent = Main
+
+local UIListLayout = Instance.new("UIListLayout", Container)
+UIListLayout.Padding = UDim.new(0,10)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+
+local function createCoordLabel(text)
+	local Label = Instance.new("Frame")
+	Label.Size = UDim2.new(1,0,0,34)
+	Label.BackgroundColor3 = Color3.fromRGB(32,32,40)
+	Label.BorderSizePixel = 0
+	Label.Parent = Container
+	
+	local corner = Instance.new("UICorner", Label)
+	corner.CornerRadius = UDim.new(0,14)
+	
+	local stroke = Instance.new("UIStroke", Label)
+	stroke.Color = Color3.fromRGB(70,70,85)
+	stroke.Transparency = 0.4
+	stroke.Thickness = 1
+	
+	local gradient = Instance.new("UIGradient", Label)
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(40,40,55)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(28,28,38))
+	}
+	gradient.Rotation = 90
+	
+	local Text = Instance.new("TextLabel")
+	Text.Size = UDim2.new(1,-15,1,0)
+	Text.Position = UDim2.new(0,12,0,0)
+	Text.BackgroundTransparency = 1
+	Text.Text = text
+	Text.Font = Enum.Font.Gotham
+	Text.TextSize = 14
+	Text.TextColor3 = Color3.fromRGB(210,210,220)
+	Text.TextXAlignment = Enum.TextXAlignment.Left
+	Text.Parent = Label
+	
+	return Text
+end
+
+local XLabel = createCoordLabel("X: 0")
+local YLabel = createCoordLabel("Y: 0")
+local ZLabel = createCoordLabel("Z: 0")
+
+local function animateLabel(label)
+	local tween1 = TweenService:Create(label, TweenInfo.new(0.12), {TextColor3 = Color3.fromRGB(0,170,255)})
+	local tween2 = TweenService:Create(label, TweenInfo.new(0.12), {TextColor3 = Color3.fromRGB(210,210,220)})
+	tween1:Play()
+	tween1.Completed:Wait()
+	tween2:Play()
+end
+
+local lastPosition = Vector3.new()
+
+RunService.RenderStepped:Connect(function()
+	if not humanoidRootPart.Parent then
+		character = player.Character or player.CharacterAdded:Wait()
+		humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+	end
+	
+	local pos = humanoidRootPart.Position
+	
+	local x = math.floor(pos.X)
+	local y = math.floor(pos.Y)
+	local z = math.floor(pos.Z)
+	
+	if lastPosition.X ~= x then
+		XLabel.Text = "X: "..x
+		animateLabel(XLabel)
+	end
+	
+	if lastPosition.Y ~= y then
+		YLabel.Text = "Y: "..y
+		animateLabel(YLabel)
+	end
+	
+	if lastPosition.Z ~= z then
+		ZLabel.Text = "Z: "..z
+		animateLabel(ZLabel)
+	end
+	
+	lastPosition = Vector3.new(x,y,z)
+end)
+
+CopyButton.MouseButton1Click:Connect(function()
+	local text = string.format("X: %d | Y: %d | Z: %d", lastPosition.X, lastPosition.Y, lastPosition.Z)
+	if setclipboard then
+		setclipboard(text)
+	end
+	
+	local tween1 = TweenService:Create(CopyButton, TweenInfo.new(0.08), {Size = UDim2.fromOffset(22,22)})
+	local tween2 = TweenService:Create(CopyButton, TweenInfo.new(0.08), {Size = UDim2.fromOffset(26,26)})
+	tween1:Play()
+	tween1.Completed:Wait()
+	tween2:Play()
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+	local tween = TweenService:Create(Main, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+		Size = UDim2.fromOffset(0,0),
+		Position = UDim2.new(0.5,0,0.5,0)
+	})
+	tween:Play()
+	tween.Completed:Wait()
+	ScreenGui:Destroy()
+end)
+
+local dragging = false
+local dragStart
+local startPos
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+	end
+end)
+
+Main.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
