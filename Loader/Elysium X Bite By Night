@@ -1,0 +1,200 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "box",
+    Author = "By Atlas",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    Resizable = true,
+    HideSearchBar = false,
+    ScrollBarEnabled = true
+})
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
+})
+
+Window:EditOpenButton({
+    Title = "Elysium X",
+    Icon = "shield-cog-corner",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
+local CombatTab = Window:Tab({ Title = "Combat", Icon = "swords", Locked = false })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "scan-eye", Locked = false })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
+
+MainTab:Paragraph({
+    Title = "Elysium X Team",
+    Desc = "! Links ¡",
+    Image = "rbxassetid://10154713810",
+    ImageSize = 60,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "link",
+            Title = "Website",
+            Callback = function()
+                setclipboard("https://hs1hydrax7.github.io/Site/")
+                WindUI:Notify({
+                    Title = "Website",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+        {
+            Icon = "link",
+            Title = "TikTok",
+            Callback = function()
+                setclipboard("@mrnexus000")
+                WindUI:Notify({
+                    Title = "TikTok",
+                    Content = "Username Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+    }
+})
+
+MainTab:Dropdown({
+    Title = "Theme",
+    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Value = "Crimson",
+    Callback = function(option)
+        WindUI:SetTheme(option)
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparent",
+    Icon = "palette",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleTransparency(state)
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Inf stamina",
+    Desc = "",
+    Value = false,
+    Callback = (function()
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local player = Players.LocalPlayer
+
+        local connection = nil
+        local enabled = false
+
+        local function setupCharacter(char)
+            if not char then return end
+
+            if char:GetAttribute("Running") == nil then
+                char:SetAttribute("Running", true)
+            end
+
+            if char:GetAttribute("Stamina") == nil then
+                char:SetAttribute("Stamina", 100)
+            end
+        end
+
+        local function start()
+            if enabled then return end
+            enabled = true
+
+            if player.Character then
+                setupCharacter(player.Character)
+            end
+
+            connection = RunService.Heartbeat:Connect(function()
+                local char = player.Character
+                if not char then return end
+
+                if char:GetAttribute("Stamina") ~= math.huge then
+                    char:SetAttribute("Stamina", math.huge)
+                end
+
+                if char:GetAttribute("Running") ~= true then
+                    char:SetAttribute("Running", true)
+                end
+            end)
+        end
+
+        local function stop()
+            if not enabled then return end
+            enabled = false
+
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+
+            local char = player.Character
+            if char then
+                char:SetAttribute("Stamina", 100)
+                char:SetAttribute("Running", false)
+            end
+        end
+
+        player.CharacterAdded:Connect(function(char)
+            if enabled then
+                setupCharacter(char)
+            end
+        end)
+
+        return function(state)
+            if state then
+                start()
+            else
+                stop()
+            end
+        end
+    end)()
+})
+
+MiscTab:Button({
+    Title = "Infinite Yield",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Dex Explorer",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Elysium Mobile KeyBoard",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
+    end
+})
