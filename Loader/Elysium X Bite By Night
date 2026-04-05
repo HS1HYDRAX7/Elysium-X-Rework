@@ -180,38 +180,59 @@ VisualsTab:Toggle({
         if not getgenv()._SurvivorsESP then
             getgenv()._SurvivorsESP = {
                 Enabled = false,
-                Color = Color3.fromRGB(0,100,0)
+                Color = Color3.fromRGB(0,100,0),
+                Connections = {}
             }
 
-            task.spawn(function()
-                while true do
-                    task.wait(1)
-                    local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("ALIVE")
-                    if folder then
-                        for _, v in ipairs(folder:GetChildren()) do
-                            if v:IsA("Model") then
-                                local h = v:FindFirstChild("ESPHighlight")
-                                if getgenv()._SurvivorsESP.Enabled then
-                                    if not h then
-                                        h = Instance.new("Highlight")
-                                        h.Name = "ESPHighlight"
-                                        h.FillTransparency = 0.5
-                                        h.OutlineTransparency = 0
-                                        h.Parent = v
-                                    end
-                                    h.FillColor = getgenv()._SurvivorsESP.Color
-                                    h.OutlineColor = getgenv()._SurvivorsESP.Color
-                                else
-                                    if h then h:Destroy() end
-                                end
-                            end
-                        end
+            local function apply(obj)
+                if not obj:IsA("Model") then return end
+                local h = obj:FindFirstChild("ESPHighlight")
+
+                if getgenv()._SurvivorsESP.Enabled then
+                    if not h then
+                        h = Instance.new("Highlight")
+                        h.Name = "ESPHighlight"
+                        h.FillTransparency = 0.5
+                        h.OutlineTransparency = 0
+                        h.Parent = obj
                     end
+                    h.FillColor = getgenv()._SurvivorsESP.Color
+                    h.OutlineColor = getgenv()._SurvivorsESP.Color
+                else
+                    if h then h:Destroy() end
                 end
-            end)
+            end
+
+            local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("ALIVE")
+
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    apply(v)
+                end
+
+                table.insert(getgenv()._SurvivorsESP.Connections, folder.ChildAdded:Connect(apply))
+            end
         end
 
         getgenv()._SurvivorsESP.Enabled = state
+
+        local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("ALIVE")
+        if folder then
+            for _, v in ipairs(folder:GetChildren()) do
+                local h = v:FindFirstChild("ESPHighlight")
+                if not state and h then
+                    h:Destroy()
+                elseif state then
+                    local h2 = h or Instance.new("Highlight")
+                    h2.Name = "ESPHighlight"
+                    h2.FillTransparency = 0.5
+                    h2.OutlineTransparency = 0
+                    h2.FillColor = getgenv()._SurvivorsESP.Color
+                    h2.OutlineColor = getgenv()._SurvivorsESP.Color
+                    h2.Parent = v
+                end
+            end
+        end
     end
 })
 
@@ -224,6 +245,17 @@ VisualsTab:Colorpicker({
     Callback = function(color)
         if getgenv()._SurvivorsESP then
             getgenv()._SurvivorsESP.Color = color
+
+            local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("ALIVE")
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    local h = v:FindFirstChild("ESPHighlight")
+                    if h then
+                        h.FillColor = color
+                        h.OutlineColor = color
+                    end
+                end
+            end
         end
     end
 })
@@ -236,38 +268,59 @@ VisualsTab:Toggle({
         if not getgenv()._KillersESP then
             getgenv()._KillersESP = {
                 Enabled = false,
-                Color = Color3.fromRGB(255,0,0)
+                Color = Color3.fromRGB(255,0,0),
+                Connections = {}
             }
 
-            task.spawn(function()
-                while true do
-                    task.wait(1)
-                    local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("KILLER")
-                    if folder then
-                        for _, v in ipairs(folder:GetChildren()) do
-                            if v:IsA("Model") then
-                                local h = v:FindFirstChild("ESPHighlight")
-                                if getgenv()._KillersESP.Enabled then
-                                    if not h then
-                                        h = Instance.new("Highlight")
-                                        h.Name = "ESPHighlight"
-                                        h.FillTransparency = 0.5
-                                        h.OutlineTransparency = 0
-                                        h.Parent = v
-                                    end
-                                    h.FillColor = getgenv()._KillersESP.Color
-                                    h.OutlineColor = getgenv()._KillersESP.Color
-                                else
-                                    if h then h:Destroy() end
-                                end
-                            end
-                        end
+            local function apply(obj)
+                if not obj:IsA("Model") then return end
+                local h = obj:FindFirstChild("ESPHighlight")
+
+                if getgenv()._KillersESP.Enabled then
+                    if not h then
+                        h = Instance.new("Highlight")
+                        h.Name = "ESPHighlight"
+                        h.FillTransparency = 0.5
+                        h.OutlineTransparency = 0
+                        h.Parent = obj
                     end
+                    h.FillColor = getgenv()._KillersESP.Color
+                    h.OutlineColor = getgenv()._KillersESP.Color
+                else
+                    if h then h:Destroy() end
                 end
-            end)
+            end
+
+            local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("KILLER")
+
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    apply(v)
+                end
+
+                table.insert(getgenv()._KillersESP.Connections, folder.ChildAdded:Connect(apply))
+            end
         end
 
         getgenv()._KillersESP.Enabled = state
+
+        local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("KILLER")
+        if folder then
+            for _, v in ipairs(folder:GetChildren()) do
+                local h = v:FindFirstChild("ESPHighlight")
+                if not state and h then
+                    h:Destroy()
+                elseif state then
+                    local h2 = h or Instance.new("Highlight")
+                    h2.Name = "ESPHighlight"
+                    h2.FillTransparency = 0.5
+                    h2.OutlineTransparency = 0
+                    h2.FillColor = getgenv()._KillersESP.Color
+                    h2.OutlineColor = getgenv()._KillersESP.Color
+                    h2.Parent = v
+                end
+            end
+        end
     end
 })
 
@@ -280,6 +333,17 @@ VisualsTab:Colorpicker({
     Callback = function(color)
         if getgenv()._KillersESP then
             getgenv()._KillersESP.Color = color
+
+            local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("KILLER")
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    local h = v:FindFirstChild("ESPHighlight")
+                    if h then
+                        h.FillColor = color
+                        h.OutlineColor = color
+                    end
+                end
+            end
         end
     end
 })
@@ -292,38 +356,59 @@ VisualsTab:Toggle({
         if not getgenv()._GeneratorsESP then
             getgenv()._GeneratorsESP = {
                 Enabled = false,
-                Color = Color3.fromRGB(255,255,255)
+                Color = Color3.fromRGB(255,255,255),
+                Connections = {}
             }
 
-            task.spawn(function()
-                while true do
-                    task.wait(1)
-                    local folder = workspace:FindFirstChild("MAPS") and workspace.MAPS:FindFirstChild("GAME MAP") and workspace.MAPS["GAME MAP"]:FindFirstChild("Generators")
-                    if folder then
-                        for _, v in ipairs(folder:GetChildren()) do
-                            if v:IsA("Model") then
-                                local h = v:FindFirstChild("ESPHighlight")
-                                if getgenv()._GeneratorsESP.Enabled then
-                                    if not h then
-                                        h = Instance.new("Highlight")
-                                        h.Name = "ESPHighlight"
-                                        h.FillTransparency = 0.5
-                                        h.OutlineTransparency = 0
-                                        h.Parent = v
-                                    end
-                                    h.FillColor = getgenv()._GeneratorsESP.Color
-                                    h.OutlineColor = getgenv()._GeneratorsESP.Color
-                                else
-                                    if h then h:Destroy() end
-                                end
-                            end
-                        end
+            local function apply(obj)
+                if not obj:IsA("Model") then return end
+                local h = obj:FindFirstChild("ESPHighlight")
+
+                if getgenv()._GeneratorsESP.Enabled then
+                    if not h then
+                        h = Instance.new("Highlight")
+                        h.Name = "ESPHighlight"
+                        h.FillTransparency = 0.5
+                        h.OutlineTransparency = 0
+                        h.Parent = obj
                     end
+                    h.FillColor = getgenv()._GeneratorsESP.Color
+                    h.OutlineColor = getgenv()._GeneratorsESP.Color
+                else
+                    if h then h:Destroy() end
                 end
-            end)
+            end
+
+            local folder = workspace:FindFirstChild("MAPS") and workspace.MAPS:FindFirstChild("GAME MAP") and workspace.MAPS["GAME MAP"]:FindFirstChild("Generators")
+
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    apply(v)
+                end
+
+                table.insert(getgenv()._GeneratorsESP.Connections, folder.ChildAdded:Connect(apply))
+            end
         end
 
         getgenv()._GeneratorsESP.Enabled = state
+
+        local folder = workspace:FindFirstChild("MAPS") and workspace.MAPS:FindFirstChild("GAME MAP") and workspace.MAPS["GAME MAP"]:FindFirstChild("Generators")
+        if folder then
+            for _, v in ipairs(folder:GetChildren()) do
+                local h = v:FindFirstChild("ESPHighlight")
+                if not state and h then
+                    h:Destroy()
+                elseif state then
+                    local h2 = h or Instance.new("Highlight")
+                    h2.Name = "ESPHighlight"
+                    h2.FillTransparency = 0.5
+                    h2.OutlineTransparency = 0
+                    h2.FillColor = getgenv()._GeneratorsESP.Color
+                    h2.OutlineColor = getgenv()._GeneratorsESP.Color
+                    h2.Parent = v
+                end
+            end
+        end
     end
 })
 
@@ -336,6 +421,17 @@ VisualsTab:Colorpicker({
     Callback = function(color)
         if getgenv()._GeneratorsESP then
             getgenv()._GeneratorsESP.Color = color
+
+            local folder = workspace:FindFirstChild("MAPS") and workspace.MAPS:FindFirstChild("GAME MAP") and workspace.MAPS["GAME MAP"]:FindFirstChild("Generators")
+            if folder then
+                for _, v in ipairs(folder:GetChildren()) do
+                    local h = v:FindFirstChild("ESPHighlight")
+                    if h then
+                        h.FillColor = color
+                        h.OutlineColor = color
+                    end
+                end
+            end
         end
     end
 })
