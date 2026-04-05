@@ -172,6 +172,174 @@ PlayerTab:Toggle({
     end)()
 })
 
+VisualsTab:Toggle({
+    Title = "Survivors ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if not getgenv()._SurvivorsESP then
+            getgenv()._SurvivorsESP = {
+                Enabled = false,
+                Color = Color3.fromRGB(0,100,0)
+            }
+
+            task.spawn(function()
+                while true do
+                    task.wait(1)
+                    local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("ALIVE")
+                    if folder then
+                        for _, v in ipairs(folder:GetChildren()) do
+                            if v:IsA("Model") then
+                                local h = v:FindFirstChild("ESPHighlight")
+                                if getgenv()._SurvivorsESP.Enabled then
+                                    if not h then
+                                        h = Instance.new("Highlight")
+                                        h.Name = "ESPHighlight"
+                                        h.FillTransparency = 0.5
+                                        h.OutlineTransparency = 0
+                                        h.Parent = v
+                                    end
+                                    h.FillColor = getgenv()._SurvivorsESP.Color
+                                    h.OutlineColor = getgenv()._SurvivorsESP.Color
+                                else
+                                    if h then h:Destroy() end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        getgenv()._SurvivorsESP.Enabled = state
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(0,100,0),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+        if getgenv()._SurvivorsESP then
+            getgenv()._SurvivorsESP.Color = color
+        end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Killers ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if not getgenv()._KillersESP then
+            getgenv()._KillersESP = {
+                Enabled = false,
+                Color = Color3.fromRGB(255,0,0)
+            }
+
+            task.spawn(function()
+                while true do
+                    task.wait(1)
+                    local folder = workspace:FindFirstChild("PLAYERS") and workspace.PLAYERS:FindFirstChild("KILLER")
+                    if folder then
+                        for _, v in ipairs(folder:GetChildren()) do
+                            if v:IsA("Model") then
+                                local h = v:FindFirstChild("ESPHighlight")
+                                if getgenv()._KillersESP.Enabled then
+                                    if not h then
+                                        h = Instance.new("Highlight")
+                                        h.Name = "ESPHighlight"
+                                        h.FillTransparency = 0.5
+                                        h.OutlineTransparency = 0
+                                        h.Parent = v
+                                    end
+                                    h.FillColor = getgenv()._KillersESP.Color
+                                    h.OutlineColor = getgenv()._KillersESP.Color
+                                else
+                                    if h then h:Destroy() end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        getgenv()._KillersESP.Enabled = state
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(255,0,0),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+        if getgenv()._KillersESP then
+            getgenv()._KillersESP.Color = color
+        end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Generators ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if not getgenv()._GeneratorsESP then
+            getgenv()._GeneratorsESP = {
+                Enabled = false,
+                Color = Color3.fromRGB(255,255,255)
+            }
+
+            task.spawn(function()
+                while true do
+                    task.wait(1)
+                    local folder = workspace:FindFirstChild("MAPS") and workspace.MAPS:FindFirstChild("GAME MAP") and workspace.MAPS["GAME MAP"]:FindFirstChild("Generators")
+                    if folder then
+                        for _, v in ipairs(folder:GetChildren()) do
+                            if v:IsA("Model") then
+                                local h = v:FindFirstChild("ESPHighlight")
+                                if getgenv()._GeneratorsESP.Enabled then
+                                    if not h then
+                                        h = Instance.new("Highlight")
+                                        h.Name = "ESPHighlight"
+                                        h.FillTransparency = 0.5
+                                        h.OutlineTransparency = 0
+                                        h.Parent = v
+                                    end
+                                    h.FillColor = getgenv()._GeneratorsESP.Color
+                                    h.OutlineColor = getgenv()._GeneratorsESP.Color
+                                else
+                                    if h then h:Destroy() end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        getgenv()._GeneratorsESP.Enabled = state
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(255,255,255),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+        if getgenv()._GeneratorsESP then
+            getgenv()._GeneratorsESP.Color = color
+        end
+    end
+})
+
 MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
