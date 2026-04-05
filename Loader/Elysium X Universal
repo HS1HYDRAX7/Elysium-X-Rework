@@ -83,7 +83,7 @@ MainTab:Dropdown({
 })
 
 MainTab:Toggle({
-    Title = "Transparent",
+    Title = "Transparency",
     Icon = "palette",
     Value = true,
     Callback = function(state)
@@ -117,3 +117,112 @@ MiscTab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
     end
 })
+
+SettingsTab:Input({
+    Title = "Config Name",
+    Desc = "",
+    Value = "",
+    Placeholder = "Enter config name...",
+    Callback = function(input)
+        _cfgName = input
+        _selectedConfig = nil
+    end
+})
+
+local dropdown = SettingsTab:Dropdown({
+    Title = "Configs",
+    Desc = "",
+    Values = {},
+    Value = nil,
+    Callback = function(option)
+        _selectedConfig = option
+    end
+})
+
+SettingsTab:Button({
+    Title = "Refresh",
+    Desc = "",
+    Callback = function()
+        local ConfigManager = Window.ConfigManager
+        dropdown:Refresh(ConfigManager:AllConfigs())
+
+        WindUI:Notify({
+            Title = "Config Manager",
+            Content = "Dropdown refreshed",
+            Duration = 5,
+            Icon = "folder-sync",
+        })
+    end
+})
+
+SettingsTab:Button({
+    Title = "Load",
+    Desc = "",
+    Callback = function()
+        if _selectedConfig then
+            local ConfigManager = Window.ConfigManager
+            ConfigManager:CreateConfig(_selectedConfig):Load()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. _selectedConfig .. ") loaded",
+                Duration = 5,
+                Icon = "folder-input",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Save",
+    Desc = "",
+    Callback = function()
+        local ConfigManager = Window.ConfigManager
+        local name = nil
+
+        if _cfgName and _cfgName ~= "" then
+            name = _cfgName
+        elseif _selectedConfig then
+            name = _selectedConfig
+        end
+
+        if name then
+            ConfigManager:CreateConfig(name):Save()
+            dropdown:Refresh(ConfigManager:AllConfigs())
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") saved",
+                Duration = 5,
+                Icon = "folder-open",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Delete",
+    Desc = "",
+    Callback = function()
+        if _selectedConfig then
+            local ConfigManager = Window.ConfigManager
+            local name = _selectedConfig
+
+            ConfigManager:DeleteConfig(name)
+            _selectedConfig = nil
+            dropdown:Refresh(ConfigManager:AllConfigs())
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") deleted",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+        end
+    end
+})
+
+do
+    local ConfigManager = Window.ConfigManager
+    dropdown:Refresh(ConfigManager:AllConfigs())
+end
