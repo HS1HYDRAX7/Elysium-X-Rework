@@ -2,7 +2,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
-    Icon = "award",
+    Icon = "box",
     Author = "By Atlas",
     Folder = "Elysium X Rework",
     Transparent = true,
@@ -21,7 +21,7 @@ Window:Tag({
 
 Window:EditOpenButton({
     Title = "Elysium X",
-    Icon = "file-code-corner",
+    Icon = "shield-cog-corner",
     CornerRadius = UDim.new(0,50),
     StrokeThickness = 1,
     Color = ColorSequence.new(
@@ -34,11 +34,12 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local OthersTab = Window:Tab({ Title = "Others", Icon = "folder", Locked = false })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
 MainTab:Paragraph({
     Title = "Elysium X Team",
-    Desc = "Links below",
+    Desc = "! Links ¡",
     Image = "rbxassetid://10154713810",
     ImageSize = 60,
     Locked = false,
@@ -50,7 +51,7 @@ MainTab:Paragraph({
                 setclipboard("https://hs1hydrax7.github.io/Site/")
                 WindUI:Notify({
                     Title = "Website",
-                    Content = "Link Copied!",
+                    Content = "Link Copied",
                     Duration = 3,
                     Icon = "link-2",
                 })
@@ -90,7 +91,7 @@ MainTab:Toggle({
     end
 })
 
-OthersTab:Button({
+MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
     Locked = false,
@@ -99,7 +100,7 @@ OthersTab:Button({
     end
 })
 
-OthersTab:Button({
+MiscTab:Button({
     Title = "Dex Explorer",
     Icon = "file",
     Locked = false,
@@ -108,7 +109,7 @@ OthersTab:Button({
     end
 })
 
-OthersTab:Button({
+MiscTab:Button({
     Title = "Elysium Mobile KeyBoard",
     Icon = "file",
     Locked = false,
