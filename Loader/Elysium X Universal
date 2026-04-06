@@ -45,7 +45,7 @@ MainTab:Paragraph({
     Locked = false,
     Buttons = {
         {
-            Icon = "hexagon",
+            Icon = "message-circle",
             Title = "Discord",
             Callback = function()
                 setclipboard("https://discord.gg/TSrKJKauCE")
@@ -58,7 +58,7 @@ MainTab:Paragraph({
             end,
         },
         {
-            Icon = "hexagon",
+            Icon = "clapperboard",
             Title = "TikTok",
             Callback = function()
                 setclipboard("@atlasscriptss")
