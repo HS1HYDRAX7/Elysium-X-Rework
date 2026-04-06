@@ -3,7 +3,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
     Icon = "box",
-    Author = "By Atlas",
+    Author = "By Zenith Studios",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
@@ -38,30 +38,30 @@ local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Elysium X Team",
+    Title = "Zenith Studios",
     Desc = "! Links ¡",
     Image = "rbxassetid://10154713810",
     ImageSize = 60,
     Locked = false,
     Buttons = {
         {
-            Icon = "link",
-            Title = "Website",
+            Icon = "hexagon",
+            Title = "Discord",
             Callback = function()
-                setclipboard("https://hs1hydrax7.github.io/Site/")
+                setclipboard("https://discord.gg/TSrKJKauCE")
                 WindUI:Notify({
-                    Title = "Website",
-                    Content = "Link Copied",
+                    Title = "Discord",
+                    Content = "Invite Copied",
                     Duration = 3,
                     Icon = "link-2",
                 })
             end,
         },
         {
-            Icon = "link",
+            Icon = "hexagon",
             Title = "TikTok",
             Callback = function()
-                setclipboard("@mrnexus000")
+                setclipboard("@atlasscriptss")
                 WindUI:Notify({
                     Title = "TikTok",
                     Content = "Username Copied",
