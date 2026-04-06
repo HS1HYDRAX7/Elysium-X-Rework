@@ -94,23 +94,31 @@ MainTab:Toggle({
 })
 
 PlayerTab:Toggle({
-    Title = "Toggle",
+    Title = "Toggle CFrame Speed",
     Desc = "",
     Value = false,
     Callback = function(state)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local player = Players.LocalPlayer
+
         if state then
-            task.spawn(function()
-                while state do
-                    local player = game:GetService("Players").LocalPlayer
-                    local char = player.Character
-                    if char and char:FindFirstChild("HumanoidRootPart") then
-                        local hrp = char.HumanoidRootPart
-                        local speed = getgenv()._cfSpeed or 1
-                        hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * speed)
-                    end
-                    task.wait()
+            if _G.__cfConn then _G.__cfConn:Disconnect() end
+
+            _G.__cfConn = RunService.RenderStepped:Connect(function()
+                local char = player.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+                if hrp then
+                    local speed = _G.__cfSpeedValue or 1
+                    hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * speed)
                 end
             end)
+        else
+            if _G.__cfConn then
+                _G.__cfConn:Disconnect()
+                _G.__cfConn = nil
+            end
         end
     end
 })
@@ -125,12 +133,12 @@ PlayerTab:Slider({
         Default = 1,
     },
     Callback = function(value)
-        getgenv()._cfSpeed = value
+        _G.__cfSpeedValue = value
     end
 })
 
 PlayerTab:Toggle({
-    Title = "Toggle",
+    Title = "Toggle WalkSpeed",
     Desc = "",
     Value = false,
     Callback = function(state)
