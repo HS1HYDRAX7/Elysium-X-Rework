@@ -150,6 +150,104 @@ PlayerTab:Slider({
     end
 })
 
+PlayerTab:Toggle({
+    Title = "Toggle JumpPower",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        _G._jpEnabled = state
+
+        if state then
+            task.spawn(function()
+                while _G._jpEnabled do
+                    local player = game:GetService("Players").LocalPlayer
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+                    if hum then
+                        hum.UseJumpPower = true
+                        hum.JumpPower = (_G._jpValue or 50)
+                    end
+
+                    task.wait()
+                end
+            end)
+        else
+            local player = game:GetService("Players").LocalPlayer
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+            if hum then
+                hum.UseJumpPower = true
+                hum.JumpPower = 50
+            end
+        end
+    end
+})
+
+PlayerTab:Slider({
+    Title = "JumpPower",
+    Desc = "",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 200,
+        Default = 50,
+    },
+    Callback = function(value)
+        _G._jpValue = value
+
+        if not _G._jpEnabled then return end
+
+        local player = game:GetService("Players").LocalPlayer
+        local char = player.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = value
+        end
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Toggle Gravity",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        _G._gravEnabled = state
+
+        if state then
+            task.spawn(function()
+                while _G._gravEnabled do
+                    workspace.Gravity = (_G._gravValue or 196.2)
+                    task.wait()
+                end
+            end)
+        else
+            workspace.Gravity = 196.2
+        end
+    end
+})
+
+PlayerTab:Slider({
+    Title = "Gravity",
+    Desc = "",
+    Step = 0.1,
+    Value = {
+        Min = 0,
+        Max = 200,
+        Default = 196.2,
+    },
+    Callback = function(value)
+        _G._gravValue = value
+
+        if not _G._gravEnabled then return end
+
+        workspace.Gravity = value
+    end
+})
+
 MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
