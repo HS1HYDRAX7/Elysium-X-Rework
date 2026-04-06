@@ -45,7 +45,7 @@ MainTab:Paragraph({
     Locked = false,
     Buttons = {
         {
-            Icon = "rbxassetid://11529076255",
+            Icon = "hexagon",
             Title = "Discord",
             Callback = function()
                 setclipboard("https://discord.gg/TSrKJKauCE")
