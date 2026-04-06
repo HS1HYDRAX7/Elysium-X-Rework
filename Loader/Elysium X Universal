@@ -181,11 +181,38 @@ SettingsTab:Button({
         local ConfigManager = Window.ConfigManager
         local name = _selectedConfig
 
-        local ok = pcall(function()
+        local exists = false
+        local ok, configs = pcall(function()
+            return ConfigManager:AllConfigs()
+        end)
+
+        if ok and type(configs) == "table" then
+            for _,v in pairs(configs) do
+                if v == name then
+                    exists = true
+                    break
+                end
+            end
+        end
+
+        if not exists then
+            _selectedConfig = nil
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") doesn't exist",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+
+            return
+        end
+
+        local success = pcall(function()
             ConfigManager:CreateConfig(name):Load()
         end)
 
-        if ok then
+        if success then
             WindUI:Notify({
                 Title = "Config Manager",
                 Content = "Configuration (" .. name .. ") loaded",
