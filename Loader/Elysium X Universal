@@ -34,6 +34,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
@@ -89,6 +90,95 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Toggle",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while state do
+                    local player = game:GetService("Players").LocalPlayer
+                    local char = player.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        local hrp = char.HumanoidRootPart
+                        local speed = getgenv()._cfSpeed or 1
+                        hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * speed)
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+PlayerTab:Slider({
+    Title = "CFrame Speed",
+    Desc = "",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 200,
+        Default = 1,
+    },
+    Callback = function(value)
+        getgenv()._cfSpeed = value
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Toggle",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while state do
+                    local player = game:GetService("Players").LocalPlayer
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+                    if hum then
+                        hum.WalkSpeed = (_G._wsValue or 16)
+                    end
+
+                    task.wait()
+                end
+            end)
+        else
+            local player = game:GetService("Players").LocalPlayer
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+            if hum then
+                hum.WalkSpeed = 16
+            end
+        end
+    end
+})
+
+PlayerTab:Slider({
+    Title = "WalkSpeed",
+    Desc = "",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 200,
+        Default = 16,
+    },
+    Callback = function(value)
+        _G._wsValue = value
+
+        local player = game:GetService("Players").LocalPlayer
+        local char = player.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+        if hum then
+            hum.WalkSpeed = value
+        end
     end
 })
 
