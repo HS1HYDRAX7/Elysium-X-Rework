@@ -118,6 +118,13 @@ MiscTab:Button({
     end
 })
 
+SettingsTab:Paragraph({
+    Title = "Settings",
+    Desc = "",
+    Color = "Grey",
+    Locked = false,
+})
+
 SettingsTab:Input({
     Title = "Config Name",
     Desc = "",
@@ -218,6 +225,74 @@ SettingsTab:Button({
                 Duration = 5,
                 Icon = "folder-closed",
             })
+        end
+    end
+})
+
+SettingsTab:Paragraph({
+    Title = "Utilities",
+    Desc = "",
+    Color = "Grey",
+    Locked = false,
+})
+
+SettingsTab:Toggle({
+    Title = "Shiftlock",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local player = Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local root = character:WaitForChild("HumanoidRootPart")
+        local humanoid = character:WaitForChild("Humanoid")
+        local camera = workspace.CurrentCamera
+
+        if state then
+            if not _shiftlockConnection then
+                _shiftlockConnection = RunService.RenderStepped:Connect(function()
+                    humanoid.AutoRotate = false
+                    root.CFrame = CFrame.new(
+                        root.Position,
+                        Vector3.new(
+                            camera.CFrame.LookVector.X * 900000,
+                            root.Position.Y,
+                            camera.CFrame.LookVector.Z * 900000
+                        )
+                    )
+                    camera.CFrame = camera.CFrame * CFrame.new(1.7, 0, 0)
+                end)
+            end
+
+            if not _crosshair then
+                local gui = Instance.new("ScreenGui")
+                gui.Name = "ShiftlockCrosshair"
+                gui.Parent = player:WaitForChild("PlayerGui")
+
+                local img = Instance.new("ImageLabel")
+                img.BackgroundTransparency = 1
+                img.Size = UDim2.new(0, 30, 0, 30)
+                img.Position = UDim2.new(0.5, -15, 0.5, -15)
+                img.Image = "rbxassetid://100034559071564"
+                img.Parent = gui
+
+                _crosshair = gui
+            end
+
+        else
+            if _shiftlockConnection then
+                _shiftlockConnection:Disconnect()
+                _shiftlockConnection = nil
+            end
+
+            humanoid.AutoRotate = true
+
+            if _crosshair then
+                _crosshair:Destroy()
+                _crosshair = nil
+            end
         end
     end
 })
