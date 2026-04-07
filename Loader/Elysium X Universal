@@ -12,6 +12,8 @@ local Window = WindUI:CreateWindow({
     ScrollBarEnabled = true
 })
 
+Window:SetToggleKey(Enum.KeyCode.G)
+
 Window:Tag({
     Title = "Rework In Progress",
     Icon = "book-plus",
