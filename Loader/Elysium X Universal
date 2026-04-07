@@ -275,7 +275,17 @@ MiscTab:Button({
     end
 })
 
-SettingsTab:Input({
+local Section = PlayerTab:Section({
+    Title = "Advanced settings",
+    Box = false,
+    FontWeight = "SemiBold",
+    TextTransparency = 0.05,
+    TextXAlignment = "Left",
+    TextSize = 17,
+    Opened = true,
+})
+
+Section:Input({
     Title = "Config Name",
     Desc = "",
     Value = "",
@@ -286,7 +296,7 @@ SettingsTab:Input({
     end
 })
 
-local dropdown = SettingsTab:Dropdown({
+local dropdown = Section:Dropdown({
     Title = "Configs",
     Desc = "",
     Values = {},
@@ -313,7 +323,7 @@ local function refreshDropdown()
     end
 end
 
-SettingsTab:Button({
+Section:Button({
     Title = "Refresh",
     Desc = "",
     Callback = function()
@@ -328,7 +338,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Section:Button({
     Title = "Load",
     Desc = "",
     Callback = function()
@@ -379,7 +389,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Section:Button({
     Title = "Save",
     Desc = "",
     Callback = function()
@@ -407,7 +417,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Section:Button({
     Title = "Delete",
     Desc = "",
     Callback = function()
