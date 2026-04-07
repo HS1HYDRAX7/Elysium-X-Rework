@@ -38,10 +38,17 @@ local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
 MainTab:Paragraph({
+    Title = "Open UI IN PC",
+    Desc = "PRESS G in your keyboard to open the ui in pc if it disappears when minimizing the ui",
+    Color = "Green",
+    Locked = false,
+})
+
+MainTab:Paragraph({
     Title = "Zenith Studios",
     Desc = "! Links ¡",
     Thumbnail = "rbxassetid://140560732325016",
-    ThumbnailSize = 60,
+    ThumbnailSize = 80,
     Locked = false,
     Buttons = {
         {
