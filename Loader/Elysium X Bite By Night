@@ -107,7 +107,11 @@ MovementTab:Toggle({
     Desc = "",
     Value = false,
     Callback = function(state)
-        if state then
+        _G.InfStamina = state
+
+        if not _G.StaminaHooked then
+            _G.StaminaHooked = true
+
             local p = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
 
             game.Players.LocalPlayer.CharacterAdded:Connect(function(ch)
@@ -119,8 +123,8 @@ MovementTab:Toggle({
                 local method = getnamecallmethod()
                 local args = {...}
 
-                if not checkcaller() and p and self == p and method == "GetAttribute" and args[1] == "Stamina" then
-                    return 100
+                if not checkcaller() and _G.InfStamina and p and self == p and method == "GetAttribute" and args[1] == "Stamina" then
+                    return math.huge
                 end
 
                 return old(self, ...)
@@ -140,19 +144,28 @@ MovementTab:Toggle({
             local humanoid = char:WaitForChild("Humanoid")
             local root = char:WaitForChild("HumanoidRootPart")
 
-            player.CharacterAdded:Connect(function(c)
-                char = c
+            local conn
+            local charConn
+
+            local function setup(c)
                 humanoid = c:WaitForChild("Humanoid")
                 root = c:WaitForChild("HumanoidRootPart")
-            end)
+            end
 
-            game:GetService("RunService").Heartbeat:Connect(function()
+            charConn = player.CharacterAdded:Connect(setup)
+
+            conn = game:GetService("RunService").Heartbeat:Connect(function()
                 if humanoid and root then
                     if humanoid.MoveDirection.Magnitude == 0 then
                         root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
                     end
                 end
             end)
+
+            repeat task.wait() until not state
+
+            if conn then conn:Disconnect() end
+            if charConn then charConn:Disconnect() end
         end
     end
 })
