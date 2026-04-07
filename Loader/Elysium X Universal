@@ -49,8 +49,8 @@ MainTab:Paragraph({
 MainTab:Paragraph({
     Title = "Zenith Studios",
     Desc = "! Links ¡",
-    Thumbnail = "rbxassetid://140560732325016",
-    ThumbnailSize = 80,
+    Thumbnail = "rbxassetid://81706308103426",
+    ThumbnailSize = 85,
     Locked = false,
     Buttons = {
         {
