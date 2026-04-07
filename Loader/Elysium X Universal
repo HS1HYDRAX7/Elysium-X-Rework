@@ -40,8 +40,8 @@ local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Open or Close UI IN PC",
-    Desc = "PRESS G in your keyboard to open the ui or close the ui in pc",
+    Title = "Open or Minimize UI IN PC",
+    Desc = "PRESS G in your keyboard to open the ui or minimize the ui in pc",
     Color = "Green",
     Locked = false,
 })
