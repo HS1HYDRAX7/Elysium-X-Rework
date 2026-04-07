@@ -39,7 +39,7 @@ local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
 MainTab:Paragraph({
-    Title = "Zenith Studios",
+    Title = "Zenith Studios",
     Desc = "! Links ¡",
     Image = "rbxassetid://10154713810",
     ImageSize = 60,
@@ -275,17 +275,7 @@ MiscTab:Button({
     end
 })
 
-local Section = PlayerTab:Section({
-    Title = "Advanced settings",
-    Box = false,
-    FontWeight = "SemiBold",
-    TextTransparency = 0.05,
-    TextXAlignment = "Left",
-    TextSize = 17,
-    Opened = true,
-})
-
-Section:Input({
+SettingsTab:Input({
     Title = "Config Name",
     Desc = "",
     Value = "",
@@ -296,7 +286,7 @@ Section:Input({
     end
 })
 
-local dropdown = Section:Dropdown({
+local dropdown = SettingsTab:Dropdown({
     Title = "Configs",
     Desc = "",
     Values = {},
@@ -323,7 +313,7 @@ local function refreshDropdown()
     end
 end
 
-Section:Button({
+SettingsTab:Button({
     Title = "Refresh",
     Desc = "",
     Callback = function()
@@ -338,7 +328,7 @@ Section:Button({
     end
 })
 
-Section:Button({
+SettingsTab:Button({
     Title = "Load",
     Desc = "",
     Callback = function()
@@ -389,7 +379,7 @@ Section:Button({
     end
 })
 
-Section:Button({
+SettingsTab:Button({
     Title = "Save",
     Desc = "",
     Callback = function()
@@ -417,7 +407,7 @@ Section:Button({
     end
 })
 
-Section:Button({
+SettingsTab:Button({
     Title = "Delete",
     Desc = "",
     Callback = function()
