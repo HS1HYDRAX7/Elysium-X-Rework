@@ -40,8 +40,8 @@ local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = fals
 MainTab:Paragraph({
     Title = "Zenith Studios",
     Desc = "! Links ¡",
-    Image = "rbxassetid://10154713810",
-    ImageSize = 60,
+    Thumbnail = "rbxassetid://140560732325016",
+    ThumbnailSize = 60,
     Locked = false,
     Buttons = {
         {
