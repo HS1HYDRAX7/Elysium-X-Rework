@@ -1,0 +1,328 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "box",
+    Author = "By Zenith Studios",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    Resizable = true,
+    HideSearchBar = false,
+    ScrollBarEnabled = true
+})
+
+Window:SetToggleKey(Enum.KeyCode.G)
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
+})
+
+Window:EditOpenButton({
+    Title = "Elysium X",
+    Icon = "shield-cog-corner",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local MovementTab = Window:Tab({ Title = "Movement", Icon = "wind", Locked = false })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
+
+MainTab:Paragraph({
+    Title = "Open or Minimize UI IN PC",
+    Desc = "PRESS G in your keyboard to open the ui or minimize the ui in pc",
+    Color = "Green",
+    Locked = false,
+})
+
+MainTab:Paragraph({
+    Title = "Zenith Studios",
+    Desc = "! Links ¡",
+    Thumbnail = "rbxassetid://81706308103426",
+    ThumbnailSize = 85,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "message-circle",
+            Title = "Discord",
+            Callback = function()
+                setclipboard("https://discord.gg/TSrKJKauCE")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = "Invite Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+        {
+            Icon = "clapperboard",
+            Title = "TikTok",
+            Callback = function()
+                setclipboard("@atlasscriptss")
+                WindUI:Notify({
+                    Title = "TikTok",
+                    Content = "Username Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+    }
+})
+
+MainTab:Dropdown({
+    Title = "Theme",
+    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Value = "Crimson",
+    Callback = function(option)
+        WindUI:SetTheme(option)
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparency",
+    Icon = "palette",
+    Flag = "Transparency",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleTransparency(state)
+    end
+})
+
+MovementTab:Toggle({
+    Title = "Infinite Stamina",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            local p = game.Players.LocalPlayer.Character
+
+            game.Players.LocalPlayer.CharacterAdded:Connect(function(ch)
+                p = ch
+            end)
+
+            local old
+            old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                local args = {...}
+
+                if not checkcaller() and p and self == p and method == "GetAttribute" and args[1] == "Stamina" then
+                    return math.huge
+                end
+
+                return old(self, ...)
+            end))
+
+            getgenv()._infStaminaHook = old
+        else
+            if getgenv()._infStaminaHook then
+                hookmetamethod(game, "__namecall", getgenv()._infStaminaHook)
+                getgenv()._infStaminaHook = nil
+            end
+        end
+    end
+})
+
+MiscTab:Button({
+    Title = "Infinite Yield",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Dex Explorer",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Elysium Mobile KeyBoard",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
+    end
+})
+
+SettingsTab:Input({
+    Title = "Config Name",
+    Desc = "",
+    Value = "",
+    Placeholder = "Enter config name...",
+    Callback = function(input)
+        _cfgName = input and input:match("%S") and input or nil
+        _selectedConfig = nil
+    end
+})
+
+local dropdown = SettingsTab:Dropdown({
+    Title = "Configs",
+    Desc = "",
+    Values = {},
+    Value = nil,
+    Callback = function(option)
+        _selectedConfig = option
+        _cfgName = nil
+    end
+})
+
+local function refreshDropdown()
+    local ConfigManager = Window.ConfigManager
+    local ok, values = pcall(function()
+        return ConfigManager:AllConfigs()
+    end)
+
+    if ok and type(values) == "table" then
+        table.sort(values, function(a,b)
+            return tostring(a):lower() < tostring(b):lower()
+        end)
+        dropdown:Refresh(values)
+    else
+        dropdown:Refresh({})
+    end
+end
+
+SettingsTab:Button({
+    Title = "Refresh",
+    Desc = "",
+    Callback = function()
+        refreshDropdown()
+
+        WindUI:Notify({
+            Title = "Config Manager",
+            Content = "Dropdown refreshed",
+            Duration = 5,
+            Icon = "folder-sync",
+        })
+    end
+})
+
+SettingsTab:Button({
+    Title = "Load",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local exists = false
+        local ok, configs = pcall(function()
+            return ConfigManager:AllConfigs()
+        end)
+
+        if ok and type(configs) == "table" then
+            for _,v in pairs(configs) do
+                if v == name then
+                    exists = true
+                    break
+                end
+            end
+        end
+
+        if not exists then
+            _selectedConfig = nil
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") doesn't exist",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+
+            return
+        end
+
+        local success = pcall(function()
+            ConfigManager:CreateConfig(name):Load()
+        end)
+
+        if success then
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") loaded",
+                Duration = 5,
+                Icon = "folder-input",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Save",
+    Desc = "",
+    Callback = function()
+        local ConfigManager = Window.ConfigManager
+        local name = _cfgName or _selectedConfig
+        if not name or name == "" then return end
+
+        local ok = pcall(function()
+            ConfigManager:CreateConfig(name):Save()
+        end)
+
+        if ok then
+            _selectedConfig = name
+            _cfgName = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") saved",
+                Duration = 5,
+                Icon = "folder-open",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Delete",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local ok = pcall(function()
+            ConfigManager:DeleteConfig(name)
+        end)
+
+        if ok then
+            _selectedConfig = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") deleted",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+        end
+    end
+})
+
+do
+    refreshDropdown()
+end
