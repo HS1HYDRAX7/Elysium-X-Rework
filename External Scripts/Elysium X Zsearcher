@@ -1,159 +1,120 @@
-local TweenService = game:GetService("TweenService")
+plocal TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 local config = {
-    bgColor = Color3.fromRGB(18, 18, 24),
-    keyColor = Color3.fromRGB(35, 35, 45),
-    keyHoverColor = Color3.fromRGB(60, 60, 75),
-    textColor = Color3.fromRGB(255, 255, 255)
+    bgColor = Color3.fromRGB(18,18,24),
+    keyColor = Color3.fromRGB(35,35,45),
+    textColor = Color3.fromRGB(255,255,255)
 }
-
-local colorThemes = {
-    {
-        Color3.fromRGB(139, 0, 0),
-        Color3.fromRGB(255, 0, 0),
-        Color3.fromRGB(128, 0, 32)
-    },
-    {
-        Color3.fromRGB(173, 216, 230),
-        Color3.fromRGB(0, 120, 255),
-        Color3.fromRGB(0, 0, 139)
-    }
-}
-
-local currentTheme = 1
-local currentColorIndex = 1
-local accentColor = colorThemes[currentTheme][currentColorIndex]
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ElysiumZsearcher"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-pcall(function()
-    if gethui then
-        ScreenGui.Parent = gethui()
-    else
-        ScreenGui.Parent = game:GetService("CoreGui")
-    end
-end)
+ScreenGui.Parent = game:GetService("CoreGui")
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 720, 0, 310)
-MainFrame.Position = UDim2.new(0.5, 0, 1, 100)
-MainFrame.AnchorPoint = Vector2.new(0.5, 1)
+MainFrame.Size = UDim2.new(0,720,0,310)
+MainFrame.Position = UDim2.new(0.5,0,1,100)
+MainFrame.AnchorPoint = Vector2.new(0.5,1)
 MainFrame.BackgroundColor3 = config.bgColor
 MainFrame.Parent = ScreenGui
-
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,16)
-
-local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Color = accentColor
-MainStroke.Transparency = 0.3
-
-local UIGradient = Instance.new("UIGradient", MainFrame)
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, accentColor),
-    ColorSequenceKeypoint.new(1, config.bgColor)
-}
-UIGradient.Rotation = 90
+Instance.new("UICorner",MainFrame).CornerRadius = UDim.new(0,16)
 
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1,0,0,40)
 TitleBar.BackgroundColor3 = Color3.fromRGB(25,25,33)
 TitleBar.Parent = MainFrame
-Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0,16)
+Instance.new("UICorner",TitleBar).CornerRadius = UDim.new(0,16)
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(1,-120,1,0)
-TitleLabel.Position = UDim2.new(0,12,0,0)
+TitleLabel.Size = UDim2.new(1,-80,1,0)
+TitleLabel.Position = UDim2.new(0,10,0,0)
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.Text = "Elysium | Zsearcher"
-TitleLabel.TextColor3 = accentColor
+TitleLabel.TextColor3 = Color3.fromRGB(255,0,0)
 TitleLabel.Font = Enum.Font.GothamBold
 TitleLabel.TextSize = 15
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.Parent = TitleBar
 
-local function updateAccent(newColor)
-    accentColor = newColor
-    TweenService:Create(MainStroke,TweenInfo.new(0.5),{Color=accentColor}):Play()
-    TweenService:Create(TitleLabel,TweenInfo.new(0.5),{TextColor3=accentColor}):Play()
-end
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0,30,0,30)
+Close.Position = UDim2.new(1,-35,0.5,0)
+Close.AnchorPoint = Vector2.new(0.5,0.5)
+Close.Text = "X"
+Close.BackgroundColor3 = Color3.fromRGB(80,0,0)
+Close.TextColor3 = Color3.new(1,1,1)
+Close.Parent = TitleBar
+Instance.new("UICorner",Close)
 
-task.spawn(function()
-    while true do
-        task.wait(2)
-        currentColorIndex += 1
-        if currentColorIndex > #colorThemes[currentTheme] then
-            currentColorIndex = 1
-            currentTheme = currentTheme == 1 and 2 or 1
-        end
-        updateAccent(colorThemes[currentTheme][currentColorIndex])
-    end
-end)
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.new(0,30,0,30)
+Minimize.Position = UDim2.new(1,-70,0.5,0)
+Minimize.AnchorPoint = Vector2.new(0.5,0.5)
+Minimize.Text = "-"
+Minimize.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Minimize.TextColor3 = Color3.new(1,1,1)
+Minimize.Parent = TitleBar
+Instance.new("UICorner",Minimize)
 
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1,-16,1,-52)
-ContentFrame.Position = UDim2.new(0,8,0,44)
-ContentFrame.BackgroundTransparency = 1
-ContentFrame.Parent = MainFrame
-
-local Icons = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/lucide/dist/Icons.lua"))()
-
-local function icon(name)
-    return "rbxassetid://"..(Icons[name] or "")
-end
-
-local placeholders = {
-    "Try \"Bite By Night\"",
-    "Try \"Forsaken\"",
-    "Try \"Die of Death\"",
-    "Try \"Yoxi Hub\"",
-    "Try \"Open Source\"",
-    "Try \"Universal Hub\""
-}
-
-local function randPlaceholder()
-    return placeholders[math.random(1,#placeholders)]
-end
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1,-16,1,-52)
+Content.Position = UDim2.new(0,8,0,44)
+Content.BackgroundTransparency = 1
+Content.Parent = MainFrame
 
 local SearchBar = Instance.new("Frame")
-SearchBar.Size = UDim2.new(1,-20,0,42)
-SearchBar.Position = UDim2.new(0,10,0,6)
+SearchBar.Size = UDim2.new(1,-20,0,40)
+SearchBar.Position = UDim2.new(0,10,0,5)
 SearchBar.BackgroundColor3 = config.keyColor
-SearchBar.Parent = ContentFrame
-Instance.new("UICorner",SearchBar).CornerRadius = UDim.new(0,12)
+SearchBar.Parent = Content
+Instance.new("UICorner",SearchBar)
 
 local Box = Instance.new("TextBox")
-Box.Size = UDim2.new(1,-60,1,0)
-Box.Position = UDim2.new(0,12,0,0)
+Box.Size = UDim2.new(1,-10,1,0)
+Box.Position = UDim2.new(0,10,0,0)
 Box.BackgroundTransparency = 1
-Box.PlaceholderText = randPlaceholder()
+Box.PlaceholderText = "Search scripts..."
 Box.TextColor3 = config.textColor
 Box.Font = Enum.Font.GothamBold
 Box.TextSize = 14
 Box.Parent = SearchBar
 
-local SearchBtn = Instance.new("ImageButton")
-SearchBtn.Size = UDim2.new(0,32,0,32)
-SearchBtn.Position = UDim2.new(1,-36,0.5,0)
-SearchBtn.AnchorPoint = Vector2.new(0.5,0.5)
-SearchBtn.BackgroundColor3 = accentColor
-SearchBtn.Image = icon("search")
-SearchBtn.Parent = SearchBar
-Instance.new("UICorner",SearchBtn).CornerRadius = UDim.new(1,0)
-
 local Results = Instance.new("ScrollingFrame")
-Results.Size = UDim2.new(1,-20,1,-60)
-Results.Position = UDim2.new(0,10,0,52)
+Results.Size = UDim2.new(1,-40,1,-60)
+Results.Position = UDim2.new(0,10,0,50)
 Results.BackgroundTransparency = 1
-Results.ScrollBarThickness = 4
-Results.Parent = ContentFrame
+Results.ScrollBarThickness = 0
+Results.Parent = Content
+
+local Slider = Instance.new("Frame")
+Slider.Size = UDim2.new(0,4,1,-60)
+Slider.Position = UDim2.new(1,-6,0,50)
+Slider.BackgroundColor3 = Color3.fromRGB(80,0,0)
+Slider.Parent = Content
+Instance.new("UICorner",Slider)
 
 local Grid = Instance.new("UIGridLayout",Results)
 Grid.CellSize = UDim2.new(0.5,-8,0,110)
 Grid.CellPadding = UDim2.new(0,8,0,8)
+
+local minimized = false
+
+Minimize.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    TweenService:Create(Content,TweenInfo.new(0.3),{
+        Size = minimized and UDim2.new(1,-16,0,0) or UDim2.new(1,-16,1,-52)
+    }):Play()
+end)
+
+Close.MouseButton1Click:Connect(function()
+    MainFrame:Destroy()
+end)
+
+TweenService:Create(MainFrame,TweenInfo.new(0.6,Enum.EasingStyle.Back),{
+    Position = UDim2.new(0.5,0,1,-10)
+}):Play()
 
 local function fetch(q)
     local url = "https://scriptblox.com/api/script/search?q="..HttpService:UrlEncode(q)
@@ -166,65 +127,81 @@ local function fetch(q)
     return {}
 end
 
-local function clear()
-    for _,v in ipairs(Results:GetChildren()) do
-        if v:IsA("Frame") then
-            v:Destroy()
-        end
+local function creditAnim(label,text)
+    label.Text = ""
+    for i=1,#text do
+        label.Text = label.Text..text:sub(i,i)
+        label.TextTransparency = 1
+        TweenService:Create(label,TweenInfo.new(0.3,Enum.EasingStyle.Back),{
+            TextTransparency = 0
+        }):Play()
+        task.wait(0.02)
     end
+end
+
+local function loadingCard(card)
+    local spinner = Instance.new("ImageLabel")
+    spinner.Size = UDim2.new(0,20,0,20)
+    spinner.Position = UDim2.new(0.5,0,0.5,0)
+    spinner.AnchorPoint = Vector2.new(0.5,0.5)
+    spinner.BackgroundTransparency = 1
+    spinner.Image = "rbxassetid://116535712789945"
+    spinner.Parent = card
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function(dt)
+        spinner.Rotation += dt*180
+        if not spinner.Parent then
+            conn:Disconnect()
+        end
+    end)
+
+    task.wait(0.4)
+    spinner:Destroy()
 end
 
 local function card(data)
     local c = Instance.new("Frame")
     c.BackgroundColor3 = config.keyColor
     c.Parent = Results
-    Instance.new("UICorner",c).CornerRadius = UDim.new(0,14)
+    Instance.new("UICorner",c)
 
-    local stroke = Instance.new("UIStroke",c)
-    stroke.Color = accentColor
-    stroke.Transparency = 0.5
+    loadingCard(c)
 
     local title = Instance.new("TextLabel")
-    title.Text = data.title or "Unknown"
-    title.Size = UDim2.new(1,-10,0,18)
-    title.Position = UDim2.new(0,6,0,6)
+    title.Size = UDim2.new(1,-10,0,20)
+    title.Position = UDim2.new(0,6,0,10)
     title.BackgroundTransparency = 1
     title.TextColor3 = config.textColor
     title.Font = Enum.Font.GothamBold
     title.TextSize = 13
-    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Text = ""
     title.Parent = c
 
-    local author = Instance.new("TextLabel")
-    author.Text = "By "..(data.owner and data.owner.username or "Unknown")
-    author.Size = UDim2.new(1,-10,0,16)
-    author.Position = UDim2.new(0,6,0,26)
-    author.BackgroundTransparency = 1
-    author.TextColor3 = Color3.fromRGB(180,180,180)
-    author.Font = Enum.Font.Gotham
-    author.TextSize = 11
-    author.Parent = c
+    task.spawn(function()
+        creditAnim(title, data.title or "Unknown")
+    end)
 
     local views = Instance.new("TextLabel")
-    views.Text = tostring(data.views or 0).." views"
-    views.Size = UDim2.new(1,-10,0,16)
-    views.Position = UDim2.new(0,6,0,42)
+    views.Size = UDim2.new(1,-10,0,18)
+    views.Position = UDim2.new(0,6,0,35)
     views.BackgroundTransparency = 1
-    views.TextColor3 = accentColor
+    views.TextColor3 = Color3.fromRGB(255,0,0)
     views.Font = Enum.Font.GothamBold
     views.TextSize = 11
+    views.Text = tostring(data.views or 0).." views"
     views.Parent = c
 
     local exec = Instance.new("TextButton")
     exec.Size = UDim2.new(1,-10,0,24)
     exec.Position = UDim2.new(0,6,1,-30)
-    exec.BackgroundColor3 = accentColor
+    exec.BackgroundColor3 = Color3.fromRGB(255,0,0)
     exec.Text = "Execute"
     exec.TextColor3 = Color3.new(0,0,0)
     exec.Font = Enum.Font.GothamBold
     exec.TextSize = 12
     exec.Parent = c
-    Instance.new("UICorner",exec).CornerRadius = UDim.new(0,8)
+    Instance.new("UICorner",exec)
 
     exec.MouseButton1Click:Connect(function()
         if data.script then
@@ -239,20 +216,23 @@ local function card(data)
 end
 
 local function render(q)
-    clear()
+    for _,v in ipairs(Results:GetChildren()) do
+        if v:IsA("Frame") then
+            v:Destroy()
+        end
+    end
+
     local list = fetch(q)
+
     for i,v in ipairs(list) do
-        task.delay(i*0.03,function()
+        task.delay(i*0.05,function()
             card(v)
         end)
     end
+
     task.wait()
     Results.CanvasSize = UDim2.new(0,0,0,Grid.AbsoluteContentSize.Y+10)
 end
-
-SearchBtn.MouseButton1Click:Connect(function()
-    render(Box.Text)
-end)
 
 Box.FocusLost:Connect(function(e)
     if e then
@@ -260,12 +240,7 @@ Box.FocusLost:Connect(function(e)
     end
 end)
 
-Box:GetPropertyChangedSignal("Text"):Connect(function()
-    if Box.Text == "" then
-        Box.PlaceholderText = randPlaceholder()
-    end
+Results:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+    local percent = Results.CanvasPosition.Y / (Results.CanvasSize.Y.Offset)
+    Slider.Size = UDim2.new(0,4,math.clamp(1-percent,0.1,1),0)
 end)
-
-TweenService:Create(MainFrame,TweenInfo.new(0.6,Enum.EasingStyle.Back),{
-    Position = UDim2.new(0.5,0,1,-10)
-}):Play()
