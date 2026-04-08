@@ -1,8 +1,8 @@
 getgenv().gamesConfig = {  
     {  
-        gameName = "Name",  
-        placeId = 0000,  
-        ConfigScript = [[ loadstring(game:HttpGet(""))() ]]  
+        gameName = "Bite By Night",  
+        placeId = 70845479499574,  
+        ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Bite%20By%20Night"))() ]]    
     },  
 }  
 
