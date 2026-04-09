@@ -141,13 +141,6 @@ MiscTab:Button({
     end
 })
 
-SettingsTab:Paragraph({
-    Title = "Executor Info",
-    Desc = "Your current executor is " .. (identifyexecutor and identifyexecutor() or "Unknown"),
-    Color = "Grey",
-    Locked = false,
-})
-
 SettingsTab:Input({
     Title = "Config Name",
     Desc = "",
