@@ -118,6 +118,7 @@ MainTab:Toggle({
 MovementTab:Toggle({
     Title = "Infinite Stamina",
     Desc = "",
+    Flag = "InfStamina",
     Value = false,
     Callback = function(state)
         if state then
