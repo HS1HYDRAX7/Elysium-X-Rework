@@ -54,6 +54,19 @@ MainTab:Paragraph({
     Locked = false,
     Buttons = {
         {
+            Icon = "globe",
+            Title = "Website",
+            Callback = function()
+                setclipboard("https://hs1hydrax7.github.io/Zenith-Website/")
+                WindUI:Notify({
+                    Title = "Website",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+        {
             Icon = "message-circle",
             Title = "Discord",
             Callback = function()
