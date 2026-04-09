@@ -38,6 +38,7 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local SurvivorTab = Window:Tab({ Title = "Survivor", Icon = "sword", Locked = false })
 local MovementTab = Window:Tab({ Title = "Movement", Icon = "wind", Locked = false })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
 
@@ -119,6 +120,7 @@ MainTab:Toggle({
 SurvivorTab:Toggle({
     Title = "Auto Generator",
     Desc = "",
+    Flag = "AutoGen",
     Value = false,
     Callback = function(state)
 
@@ -155,6 +157,7 @@ SurvivorTab:Toggle({
 SurvivorTab:Toggle({
     Title = "Auto Escape",
     Desc = "",
+    Flag = "AutoEscape",
     Value = false,
     Callback = function(state)
 
@@ -225,6 +228,7 @@ SurvivorTab:Toggle({
 SurvivorTab:Toggle({
     Title = "Auto Barricade",
     Desc = "",
+    Flag = "AutoBarricade",
     Value = false,
     Callback = function(state)
 
@@ -343,6 +347,232 @@ MovementTab:Toggle({
                 end
             end
         end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Survivor ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local alive = workspace.PLAYERS.ALIVE
+        _G.espColor = _G.espColor or Color3.fromRGB(80,180,255)
+        _G.survivorESP = state
+
+        if state then
+
+            for _, v in ipairs(alive:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.survivors, v, _G.espColor)
+                end
+            end
+
+            _G.survivorAdd = alive.ChildAdded:Connect(function(v)
+                if not _G.survivorESP then return end
+                if v:IsA("Model") then
+                    add(esp.survivors, v, _G.espColor)
+                end
+            end)
+
+            _G.survivorRemove = alive.ChildRemoved:Connect(function(v)
+                if not _G.survivorESP then return end
+                remove(esp.survivors, v)
+            end)
+
+        else
+
+            if _G.survivorAdd then _G.survivorAdd:Disconnect() _G.survivorAdd = nil end
+            if _G.survivorRemove then _G.survivorRemove:Disconnect() _G.survivorRemove = nil end
+
+            clear(esp.survivors)
+
+        end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Survivor Tracers",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local alive = workspace.PLAYERS.ALIVE
+        _G.espColor = _G.espColor or Color3.fromRGB(80,180,255)
+        _G.survivorTracer = state
+
+        if state then
+
+            for _, v in ipairs(alive:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.espColor)
+                end
+            end
+
+            _G.tracerAdd = alive.ChildAdded:Connect(function(v)
+                if not _G.survivorTracer then return end
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.espColor)
+                end
+            end)
+
+            _G.tracerRemove = alive.ChildRemoved:Connect(function(v)
+                if not _G.survivorTracer then return end
+                remove(esp.tracers, v)
+            end)
+
+        else
+
+            if _G.tracerAdd then _G.tracerAdd:Disconnect() _G.tracerAdd = nil end
+            if _G.tracerRemove then _G.tracerRemove:Disconnect() _G.tracerRemove = nil end
+
+            clear(esp.tracers)
+
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "Color",
+    Desc = "",
+    Default = Color3.fromRGB(0,190,0),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.espColor = color
+
+        if _G.survivorESP then
+            clear(esp.survivors)
+            for _, v in ipairs(workspace.PLAYERS.ALIVE:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.survivors, v, _G.espColor)
+                end
+            end
+        end
+
+        if _G.survivorTracer then
+            clear(esp.tracers)
+            for _, v in ipairs(workspace.PLAYERS.ALIVE:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.espColor)
+                end
+            end
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Killer ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local killers = workspace.PLAYERS.KILLER
+        _G.killerColor = _G.killerColor or Color3.fromRGB(255,80,80)
+        _G.killerESP = state
+
+        if state then
+
+            for _, v in ipairs(killers:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.killers, v, _G.killerColor)
+                end
+            end
+
+            _G.killerAdd = killers.ChildAdded:Connect(function(v)
+                if not _G.killerESP then return end
+                if v:IsA("Model") then
+                    add(esp.killers, v, _G.killerColor)
+                end
+            end)
+
+            _G.killerRemove = killers.ChildRemoved:Connect(function(v)
+                if not _G.killerESP then return end
+                remove(esp.killers, v)
+            end)
+
+        else
+
+            if _G.killerAdd then _G.killerAdd:Disconnect() _G.killerAdd = nil end
+            if _G.killerRemove then _G.killerRemove:Disconnect() _G.killerRemove = nil end
+
+            clear(esp.killers)
+
+        end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Killer Tracers",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local killers = workspace.PLAYERS.KILLER
+        _G.killerColor = _G.killerColor or Color3.fromRGB(255,80,80)
+        _G.killerTracer = state
+
+        if state then
+
+            for _, v in ipairs(killers:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.killerColor)
+                end
+            end
+
+            _G.killerTracerAdd = killers.ChildAdded:Connect(function(v)
+                if not _G.killerTracer then return end
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.killerColor)
+                end
+            end)
+
+            _G.killerTracerRemove = killers.ChildRemoved:Connect(function(v)
+                if not _G.killerTracer then return end
+                remove(esp.tracers, v)
+            end)
+
+        else
+
+            if _G.killerTracerAdd then _G.killerTracerAdd:Disconnect() _G.killerTracerAdd = nil end
+            if _G.killerTracerRemove then _G.killerTracerRemove:Disconnect() _G.killerTracerRemove = nil end
+
+            clear(esp.tracers)
+
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "Color",
+    Desc = "",
+    Default = Color3.fromRGB(128,0,32),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.killerColor = color
+
+        if _G.killerESP then
+            clear(esp.killers)
+            for _, v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.killers, v, _G.killerColor)
+                end
+            end
+        end
+
+        if _G.killerTracer then
+            clear(esp.tracers)
+            for _, v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
+                if v:IsA("Model") then
+                    add(esp.tracers, v, _G.killerColor)
+                end
+            end
+        end
+
     end
 })
 
