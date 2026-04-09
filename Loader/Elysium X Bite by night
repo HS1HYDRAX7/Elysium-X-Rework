@@ -36,6 +36,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local SurvivorTab = Window:Tab({ Title = "Survivor", Icon = "sword", Locked = false })
 local MovementTab = Window:Tab({ Title = "Movement", Icon = "wind", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
@@ -112,6 +113,164 @@ MainTab:Toggle({
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+SurvivorTab:Toggle({
+    Title = "Auto Generator",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        local runService = game:GetService("RunService")
+
+        if state then
+
+            _G.AutoGen = true
+
+            _G.genConn = runService.RenderStepped:Connect(function()
+
+                if not _G.AutoGen then return end
+
+                if player.PlayerGui:FindFirstChild("Gen") then
+                    player.PlayerGui.Gen.GeneratorMain.Event:FireServer(true)
+                end
+
+            end)
+
+        else
+
+            _G.AutoGen = false
+
+            if _G.genConn then
+                _G.genConn:Disconnect()
+                _G.genConn = nil
+            end
+
+        end
+    end
+})
+
+SurvivorTab:Toggle({
+    Title = "Auto Escape",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local player = Players.LocalPlayer
+
+        if state then
+
+            _G.autoEscape = true
+            _G.teleported = false
+
+            _G.autoEscapeConn = RunService.RenderStepped:Connect(function()
+
+                if _G.teleported or not _G.autoEscape then return end
+
+                local char = player.Character
+                if not char then return end
+                if not workspace.GAME.CAN_ESCAPE.Value then return end
+                if char.Parent ~= workspace.PLAYERS.ALIVE then return end
+
+                local map = workspace.MAPS:FindFirstChild("GAME MAP")
+                if not map then return end
+
+                local escapes = map:FindFirstChild("Escapes")
+                if not escapes then return end
+
+                for _, part in pairs(escapes:GetChildren()) do
+                    if part:IsA("BasePart")
+                    and part:GetAttribute("Enabled")
+                    and part:FindFirstChildOfClass("Highlight")
+                    and part:FindFirstChildOfClass("Highlight").Enabled then
+
+                        local root = char:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            _G.teleported = true
+
+                            root.Anchored = true
+                            char.PrimaryPart.CFrame = part.CFrame
+
+                            task.delay(1.5, function()
+                                root.Anchored = false
+                            end)
+
+                            task.delay(10, function()
+                                _G.teleported = false
+                            end)
+                        end
+                    end
+                end
+
+            end)
+
+        else
+
+            _G.autoEscape = false
+
+            if _G.autoEscapeConn then
+                _G.autoEscapeConn:Disconnect()
+                _G.autoEscapeConn = nil
+            end
+
+        end
+    end
+})
+
+SurvivorTab:Toggle({
+    Title = "Auto Barricade",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        local gui = player:WaitForChild("PlayerGui")
+        local runService = game:GetService("RunService")
+
+        if state then
+
+            _G.dotEnabled = true
+
+            _G.dotConn = runService.RenderStepped:Connect(function()
+
+                if not _G.dotEnabled then return end
+
+                local dot = gui:FindFirstChild("Dot")
+                if dot and dot:IsA("ScreenGui") then
+                    local container = dot:FindFirstChild("Container")
+                    if container then
+                        local frame = container:FindFirstChild("Frame")
+                        if frame and frame:IsA("GuiObject") then
+
+                            if not dot.Enabled then
+                                dot:Destroy()
+                                return
+                            end
+
+                            frame.AnchorPoint = Vector2.new(0.5,0.5)
+                            frame.Position = UDim2.new(0.5,0,0.5,0)
+
+                        end
+                    end
+                end
+
+            end)
+
+        else
+
+            _G.dotEnabled = false
+
+            if _G.dotConn then
+                _G.dotConn:Disconnect()
+                _G.dotConn = nil
+            end
+
+        end
     end
 })
 
