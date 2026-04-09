@@ -150,6 +150,43 @@ MovementTab:Toggle({
     end
 })
 
+MovementTab:Toggle({
+    Title = "Noclip",
+    Desc = "",
+    Flag = "Noclip",
+    Value = false,
+    Callback = function(state)
+        if state then
+            getgenv()._noclip = true
+
+            getgenv()._noclipConn = game:GetService("RunService").Stepped:Connect(function()
+                if getgenv()._noclip and game.Players.LocalPlayer.Character then
+                    for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            getgenv()._noclip = false
+
+            if getgenv()._noclipConn then
+                getgenv()._noclipConn:Disconnect()
+                getgenv()._noclipConn = nil
+            end
+
+            if game.Players.LocalPlayer.Character then
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
+
 MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
