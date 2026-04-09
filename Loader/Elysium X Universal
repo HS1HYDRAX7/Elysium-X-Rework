@@ -79,19 +79,6 @@ MainTab:Paragraph({
                 })
             end,
         },
-        {
-            Icon = "clapperboard",
-            Title = "TikTok",
-            Callback = function()
-                setclipboard("@atlasscriptss")
-                WindUI:Notify({
-                    Title = "TikTok",
-                    Content = "Username Copied",
-                    Duration = 3,
-                    Icon = "link-2",
-                })
-            end,
-        },
     }
 })
 
