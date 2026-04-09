@@ -353,6 +353,7 @@ MovementTab:Toggle({
 VisualsTab:Toggle({
     Title = "Survivor ESP",
     Desc = "",
+    Flag = "SurvivorESP",
     Value = false,
     Callback = function(state)
 
@@ -394,6 +395,7 @@ VisualsTab:Toggle({
 VisualsTab:Toggle({
     Title = "Survivor Tracers",
     Desc = "",
+    Flag = "SurvivorTracers",
     Value = false,
     Callback = function(state)
 
@@ -435,7 +437,7 @@ VisualsTab:Toggle({
 VisualsTab:Colorpicker({
     Title = "Color",
     Desc = "",
-    Default = Color3.fromRGB(0,190,0),
+    Default = Color3.fromRGB(0,100,0),
     Transparency = 0,
     Locked = false,
     Callback = function(color)
@@ -466,6 +468,7 @@ VisualsTab:Colorpicker({
 VisualsTab:Toggle({
     Title = "Killer ESP",
     Desc = "",
+    Flag = "KillerESP",
     Value = false,
     Callback = function(state)
 
@@ -507,6 +510,7 @@ VisualsTab:Toggle({
 VisualsTab:Toggle({
     Title = "Killer Tracers",
     Desc = "",
+    Flag = "KillerTracers",
     Value = false,
     Callback = function(state)
 
@@ -569,6 +573,121 @@ VisualsTab:Colorpicker({
             for _, v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
                 if v:IsA("Model") then
                     add(esp.tracers, v, _G.killerColor)
+                end
+            end
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Generator ESP",
+    Desc = "",
+    Flag = "GeneratorESP",
+    Value = false,
+    Callback = function(state)
+
+        _G.genColor = _G.genColor or Color3.fromRGB(0,255,100)
+        _G.genESP = state
+
+        if state then
+
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.generators, v, _G.genColor)
+                end
+            end
+
+            _G.genAdd = workspace.DescendantAdded:Connect(function(v)
+                if not _G.genESP then return end
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.generators, v, _G.genColor)
+                end
+            end)
+
+            _G.genRemove = workspace.DescendantRemoving:Connect(function(v)
+                if not _G.genESP then return end
+                if esp.generators[v] then
+                    remove(esp.generators, v)
+                end
+            end)
+
+        else
+
+            if _G.genAdd then _G.genAdd:Disconnect() _G.genAdd = nil end
+            if _G.genRemove then _G.genRemove:Disconnect() _G.genRemove = nil end
+
+            clear(esp.generators)
+
+        end
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Generator Tracers",
+    Desc = "",
+    Flag = "GeneratorTracers",
+    Value = false,
+    Callback = function(state)
+
+        _G.genColor = _G.genColor or Color3.fromRGB(0,255,100)
+        _G.genTracer = state
+
+        if state then
+
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.tracers, v, _G.genColor)
+                end
+            end
+
+            _G.genTracerAdd = workspace.DescendantAdded:Connect(function(v)
+                if not _G.genTracer then return end
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.tracers, v, _G.genColor)
+                end
+            end)
+
+            _G.genTracerRemove = workspace.DescendantRemoving:Connect(function(v)
+                if not _G.genTracer then return end
+                remove(esp.tracers, v)
+            end)
+
+        else
+
+            if _G.genTracerAdd then _G.genTracerAdd:Disconnect() _G.genTracerAdd = nil end
+            if _G.genTracerRemove then _G.genTracerRemove:Disconnect() _G.genTracerRemove = nil end
+
+            clear(esp.tracers)
+
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "Color",
+    Desc = "",
+    Default = Color3.fromRGB(255,255,255),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.genColor = color
+
+        if _G.genESP then
+            clear(esp.generators)
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.generators, v, _G.genColor)
+                end
+            end
+        end
+
+        if _G.genTracer then
+            clear(esp.tracers)
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "Generator" then
+                    add(esp.tracers, v, _G.genColor)
                 end
             end
         end
