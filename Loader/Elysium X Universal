@@ -114,6 +114,13 @@ MainTab:Toggle({
     end
 })
 
+MainTab:Paragraph({
+    Title = "Executor Info",
+    Desc = "Executor: " .. (identifyexecutor and identifyexecutor() or "Unknown"),
+    Color = "Green",
+    Locked = false,
+})
+
 MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
