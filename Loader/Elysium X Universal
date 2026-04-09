@@ -114,13 +114,6 @@ MainTab:Toggle({
     end
 })
 
-MainTab:Paragraph({
-    Title = "Executor Info",
-    Desc = "Executor: " .. (identifyexecutor and identifyexecutor() or "Unknown"),
-    Color = "Green",
-    Locked = false,
-})
-
 MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
@@ -146,6 +139,13 @@ MiscTab:Button({
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
     end
+})
+
+SettingsTab:Paragraph({
+    Title = "Executor Info",
+    Desc = "Your current executor is " .. (identifyexecutor and identifyexecutor() or "Unknown"),
+    Color = "Grey",
+    Locked = false,
 })
 
 SettingsTab:Input({
