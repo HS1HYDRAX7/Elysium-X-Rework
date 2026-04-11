@@ -69,19 +69,6 @@ MainTab:Paragraph({
                 })
             end,
         },
-        {
-            Icon = "message-circle",
-            Title = "Discord",
-            Callback = function()
-                setclipboard("https://discord.gg/TSrKJKauCE")
-                WindUI:Notify({
-                    Title = "Discord",
-                    Content = "Invite Copied",
-                    Duration = 3,
-                    Icon = "link-2",
-                })
-            end,
-        },
     }
 })
 
