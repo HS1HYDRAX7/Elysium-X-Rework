@@ -3,10 +3,11 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
     Icon = "box",
-    Author = "By Zenith Studios",
+    Author = 'By <font color="rgb(189,252,255)">Zenith Studios</font>',
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
+    NewElements = true,
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true
@@ -49,6 +50,8 @@ MainTab:Paragraph({
     Locked = false,
 })
 
+MainTab:Space()
+
 MainTab:Paragraph({
     Title = "Zenith Studios",
     Desc = "! Links ¡",
@@ -69,6 +72,19 @@ MainTab:Paragraph({
                 })
             end,
         },
+        {
+            Icon = "message-circle",
+            Title = "Discord",
+            Callback = function()
+                setclipboard("https://discord.gg/G82NFt4Qnp")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = "Invite Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
     }
 })
 
@@ -84,10 +100,46 @@ MainTab:Dropdown({
 MainTab:Toggle({
     Title = "Transparency",
     Icon = "palette",
-    Flag = "Transparency",
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
+    end
+})
+
+MainTab:Section({
+    Title = "User Profile",
+    Icon = "shield-user",
+})
+
+MainTab:Toggle({
+    Title = "Profile Icon",
+    Desc = "Your profile on your left down",
+    Icon = "user",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:Enable()
+        else
+            Window.User:Disable()
+        end
+    end
+})
+
+MainTab:Toggle({
+    Title = "Set Profile Anonymous",
+    Desc = "Your profile on your left down",
+    Icon = "hat-glasses",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:SetAnonymous(true)
+        else
+            Window.User:SetAnonymous(false)
+        end
     end
 })
 
@@ -600,6 +652,7 @@ VisualsTab:Toggle({
     Value = false,
     Callback = function(state)
 
+
         local map = workspace.MAPS:FindFirstChild("GAME MAP")
         if not map then return end
         local gens = map:FindFirstChild("Generators")
@@ -742,7 +795,11 @@ VisualsTab:Colorpicker({
     end
 })
 
-MiscTab:Button({
+local Scripts = MiscTab:Section({
+    Title = "External Scripts"
+})
+
+Scripts:Button({
     Title = "Infinite Yield",
     Icon = "file",
     Locked = false,
@@ -751,7 +808,7 @@ MiscTab:Button({
     end
 })
 
-MiscTab:Button({
+Scripts:Button({
     Title = "Dex Explorer",
     Icon = "file",
     Locked = false,
@@ -760,7 +817,7 @@ MiscTab:Button({
     end
 })
 
-MiscTab:Button({
+Scripts:Button({
     Title = "Elysium Mobile KeyBoard",
     Icon = "file",
     Locked = false,
@@ -769,7 +826,11 @@ MiscTab:Button({
     end
 })
 
-SettingsTab:Input({
+local Settings = SettingsTab:Section({
+    Title = "General Settings"
+})
+ 
+Settings:Input({
     Title = "Config Name",
     Desc = "",
     Value = "",
@@ -780,7 +841,7 @@ SettingsTab:Input({
     end
 })
 
-local dropdown = SettingsTab:Dropdown({
+local dropdown = Settings:Dropdown({
     Title = "Configs",
     Desc = "",
     Values = {},
@@ -807,7 +868,7 @@ local function refreshDropdown()
     end
 end
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Refresh",
     Desc = "",
     Callback = function()
@@ -822,7 +883,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Load",
     Desc = "",
     Callback = function()
@@ -873,7 +934,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Save",
     Desc = "",
     Callback = function()
@@ -901,7 +962,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Delete",
     Desc = "",
     Callback = function()
