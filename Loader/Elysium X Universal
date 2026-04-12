@@ -3,10 +3,11 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
     Icon = "box",
-    Author = "By Zenith Studios",
+    Author = 'By <font color="rgb(189,252,255)">Zenith Studios</font>',
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
+    NewElements = true,
     Resizable = true,
     HideSearchBar = false,
     ScrollBarEnabled = true
@@ -37,7 +38,7 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
-local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
 MainTab:Paragraph({
     Title = "Open or Minimize UI IN PC",
@@ -45,6 +46,8 @@ MainTab:Paragraph({
     Color = "Green",
     Locked = false,
 })
+
+MainTab:Space()
 
 MainTab:Paragraph({
     Title = "Zenith Studios",
@@ -66,6 +69,19 @@ MainTab:Paragraph({
                 })
             end,
         },
+        {
+            Icon = "message-circle",
+            Title = "Discord",
+            Callback = function()
+                setclipboard("https://discord.gg/G82NFt4Qnp")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = "Invite Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
     }
 })
 
@@ -81,14 +97,54 @@ MainTab:Dropdown({
 MainTab:Toggle({
     Title = "Transparency",
     Icon = "palette",
-    Flag = "Transparency",
     Value = true,
     Callback = function(state)
         Window:ToggleTransparency(state)
     end
 })
 
-MiscTab:Button({
+MainTab:Section({
+    Title = "User Profile",
+    Icon = "shield-user",
+})
+
+MainTab:Toggle({
+    Title = "Profile Icon",
+    Desc = "Your profile on your left down",
+    Icon = "user",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:Enable()
+        else
+            Window.User:Disable()
+        end
+    end
+})
+
+MainTab:Toggle({
+    Title = "Set Profile Anonymous",
+    Desc = "Your profile on your left down",
+    Icon = "hat-glasses",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:SetAnonymous(true)
+        else
+            Window.User:SetAnonymous(false)
+        end
+    end
+})
+
+local Scripts = MiscTab:Section({
+    Title = "External Scripts"
+})
+
+Scripts:Button({
     Title = "Infinite Yield",
     Icon = "file",
     Locked = false,
@@ -97,7 +153,7 @@ MiscTab:Button({
     end
 })
 
-MiscTab:Button({
+Scripts:Button({
     Title = "Dex Explorer",
     Icon = "file",
     Locked = false,
@@ -106,7 +162,7 @@ MiscTab:Button({
     end
 })
 
-MiscTab:Button({
+Scripts:Button({
     Title = "Elysium Mobile KeyBoard",
     Icon = "file",
     Locked = false,
@@ -115,7 +171,43 @@ MiscTab:Button({
     end
 })
 
-SettingsTab:Input({
+Scripts:Toggle({
+    Title = "Anti Fling",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game.Players.LocalPlayer
+        _G.antiFling = state
+
+        if state then
+            _G.antiFlingConn = game:GetService("RunService").Stepped:Connect(function()
+                if not _G.antiFling then return end
+
+                local char = player.Character
+                if not char then return end
+
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+
+                root.AssemblyLinearVelocity = Vector3.zero
+                root.AssemblyAngularVelocity = Vector3.zero
+            end)
+        else
+            if _G.antiFlingConn then
+                _G.antiFlingConn:Disconnect()
+                _G.antiFlingConn = nil
+            end
+        end
+
+    end
+})
+
+local Settings = SettingsTab:Section({
+    Title = "General Settings"
+})
+ 
+Settings:Input({
     Title = "Config Name",
     Desc = "",
     Value = "",
@@ -126,7 +218,7 @@ SettingsTab:Input({
     end
 })
 
-local dropdown = SettingsTab:Dropdown({
+local dropdown = Settings:Dropdown({
     Title = "Configs",
     Desc = "",
     Values = {},
@@ -153,7 +245,7 @@ local function refreshDropdown()
     end
 end
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Refresh",
     Desc = "",
     Callback = function()
@@ -168,7 +260,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Load",
     Desc = "",
     Callback = function()
@@ -219,7 +311,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Save",
     Desc = "",
     Callback = function()
@@ -247,7 +339,7 @@ SettingsTab:Button({
     end
 })
 
-SettingsTab:Button({
+Settings:Button({
     Title = "Delete",
     Desc = "",
     Callback = function()
