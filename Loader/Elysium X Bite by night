@@ -331,7 +331,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local alive = workspace.PLAYERS.ALIVE
-        _G.espColor = _G.espColor or Color3.fromRGB(80,180,255)
+        _G.espColor = _G.espColor or Color3.fromRGB(0,100,0)
         _G.survivorESP = state
 
         if state then
@@ -367,7 +367,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local alive = workspace.PLAYERS.ALIVE
-        _G.espColor = _G.espColor or Color3.fromRGB(80,180,255)
+        _G.espColor = _G.espColor or Color3.fromRGB(0,100,0)
         _G.survivorTracer = state
 
         if state then
@@ -399,7 +399,7 @@ VisualsTab:Toggle({
 VisualsTab:Colorpicker({
     Title = "Color",
     Desc = "",
-    Default = Color3.fromRGB(80,180,255),
+    Default = Color3.fromRGB(0,100,0),
     Transparency = 0,
     Locked = false,
     Callback = function(color)
@@ -434,7 +434,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local killers = workspace.PLAYERS.KILLER
-        _G.killerColor = _G.killerColor or Color3.fromRGB(255,80,80)
+        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
         _G.killerESP = state
 
         if state then
@@ -470,7 +470,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local killers = workspace.PLAYERS.KILLER
-        _G.killerColor = _G.killerColor or Color3.fromRGB(255,80,80)
+        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
         _G.killerTracer = state
 
         if state then
@@ -502,7 +502,7 @@ VisualsTab:Toggle({
 VisualsTab:Colorpicker({
     Title = "Color",
     Desc = "",
-    Default = Color3.fromRGB(255,80,80),
+    Default = Color3.fromRGB(128,0,32),
     Transparency = 0,
     Locked = false,
     Callback = function(color)
@@ -537,7 +537,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local gens = workspace.MAPS["GAME MAP"].Generators
-        _G.genColor = _G.genColor or Color3.fromRGB(0,255,100)
+        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
         _G.genESP = state
 
         if state then
@@ -573,7 +573,7 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local gens = workspace.MAPS["GAME MAP"].Generators
-        _G.genColor = _G.genColor or Color3.fromRGB(0,255,100)
+        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
         _G.genTracer = state
 
         if state then
@@ -605,7 +605,7 @@ VisualsTab:Toggle({
 VisualsTab:Colorpicker({
     Title = "Color",
     Desc = "",
-    Default = Color3.fromRGB(0,255,100),
+    Default = Color3.fromRGB(255,255,255),
     Transparency = 0,
     Locked = false,
     Callback = function(color)
