@@ -331,31 +331,45 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local alive = workspace.PLAYERS.ALIVE
-        _G.espColor = _G.espColor or Color3.fromRGB(0,100,0)
         _G.survivorESP = state
+        _G.survivorColor = _G.survivorColor or Color3.fromRGB(0,100,0)
 
         if state then
-            for _, v in ipairs(alive:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.survivors, v, _G.espColor)
+            for _,v in ipairs(alive:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.survivorColor
+                    h.OutlineColor = _G.survivorColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end
 
             _G.survivorAdd = alive.ChildAdded:Connect(function(v)
                 if not _G.survivorESP then return end
                 if v:IsA("Model") then
-                    add(esp.survivors, v, _G.espColor)
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.survivorColor
+                    h.OutlineColor = _G.survivorColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end)
 
             _G.survivorRemove = alive.ChildRemoved:Connect(function(v)
-                if not _G.survivorESP then return end
-                remove(esp.survivors, v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
             end)
         else
             if _G.survivorAdd then _G.survivorAdd:Disconnect() _G.survivorAdd = nil end
             if _G.survivorRemove then _G.survivorRemove:Disconnect() _G.survivorRemove = nil end
-            clear(esp.survivors)
+
+            for _,v in ipairs(alive:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
         end
     end
 })
@@ -367,31 +381,54 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local alive = workspace.PLAYERS.ALIVE
-        _G.espColor = _G.espColor or Color3.fromRGB(0,100,0)
+        local player = game.Players.LocalPlayer
         _G.survivorTracer = state
+        _G.survivorColor = _G.survivorColor or Color3.fromRGB(0,100,0)
 
         if state then
-            for _, v in ipairs(alive:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.espColor)
-                end
-            end
-
-            _G.tracerAdd = alive.ChildAdded:Connect(function(v)
+            _G.tracerConn = game:GetService("RunService").RenderStepped:Connect(function()
                 if not _G.survivorTracer then return end
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.espColor)
-                end
-            end)
 
-            _G.tracerRemove = alive.ChildRemoved:Connect(function(v)
-                if not _G.survivorTracer then return end
-                remove(esp.tracers, v)
+                for _,v in ipairs(alive:GetChildren()) do
+                    if v:IsA("Model") then
+                        local root = v:FindFirstChild("HumanoidRootPart")
+                        local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+                        if root and myRoot then
+                            if not v:FindFirstChild("TRACER") then
+                                local beam = Instance.new("Beam")
+                                beam.Name = "TRACER"
+
+                                local a0 = Instance.new("Attachment", myRoot)
+                                local a1 = Instance.new("Attachment", root)
+
+                                beam.Attachment0 = a0
+                                beam.Attachment1 = a1
+                                beam.Color = ColorSequence.new(_G.survivorColor)
+                                beam.Width0 = 0.05
+                                beam.Width1 = 0.05
+                                beam.Parent = v
+
+                                beam:SetAttribute("A0", a0)
+                                beam:SetAttribute("A1", a1)
+                            end
+                        end
+                    end
+                end
             end)
         else
-            if _G.tracerAdd then _G.tracerAdd:Disconnect() _G.tracerAdd = nil end
-            if _G.tracerRemove then _G.tracerRemove:Disconnect() _G.tracerRemove = nil end
-            clear(esp.tracers)
+            if _G.tracerConn then _G.tracerConn:Disconnect() _G.tracerConn = nil end
+
+            for _,v in ipairs(alive:GetChildren()) do
+                local t = v:FindFirstChild("TRACER")
+                if t then
+                    local a0 = t:GetAttribute("A0")
+                    local a1 = t:GetAttribute("A1")
+                    if typeof(a0) == "Instance" then a0:Destroy() end
+                    if typeof(a1) == "Instance" then a1:Destroy() end
+                    t:Destroy()
+                end
+            end
         end
     end
 })
@@ -404,23 +441,18 @@ VisualsTab:Colorpicker({
     Locked = false,
     Callback = function(color)
 
-        _G.espColor = color
+        _G.survivorColor = color
 
-        if _G.survivorESP then
-            clear(esp.survivors)
-            for _, v in ipairs(workspace.PLAYERS.ALIVE:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.survivors, v, _G.espColor)
-                end
+        for _,v in ipairs(workspace.PLAYERS.ALIVE:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
             end
-        end
 
-        if _G.survivorTracer then
-            clear(esp.tracers)
-            for _, v in ipairs(workspace.PLAYERS.ALIVE:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.espColor)
-                end
+            local t = v:FindFirstChild("TRACER")
+            if t then
+                t.Color = ColorSequence.new(color)
             end
         end
 
@@ -434,31 +466,45 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local killers = workspace.PLAYERS.KILLER
-        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
         _G.killerESP = state
+        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
 
         if state then
-            for _, v in ipairs(killers:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.killers, v, _G.killerColor)
+            for _,v in ipairs(killers:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.killerColor
+                    h.OutlineColor = _G.killerColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end
 
             _G.killerAdd = killers.ChildAdded:Connect(function(v)
                 if not _G.killerESP then return end
                 if v:IsA("Model") then
-                    add(esp.killers, v, _G.killerColor)
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.killerColor
+                    h.OutlineColor = _G.killerColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end)
 
             _G.killerRemove = killers.ChildRemoved:Connect(function(v)
-                if not _G.killerESP then return end
-                remove(esp.killers, v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
             end)
         else
             if _G.killerAdd then _G.killerAdd:Disconnect() _G.killerAdd = nil end
             if _G.killerRemove then _G.killerRemove:Disconnect() _G.killerRemove = nil end
-            clear(esp.killers)
+
+            for _,v in ipairs(killers:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
         end
     end
 })
@@ -470,31 +516,54 @@ VisualsTab:Toggle({
     Callback = function(state)
 
         local killers = workspace.PLAYERS.KILLER
-        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
+        local player = game.Players.LocalPlayer
         _G.killerTracer = state
+        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
 
         if state then
-            for _, v in ipairs(killers:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.killerColor)
-                end
-            end
-
-            _G.killerTracerAdd = killers.ChildAdded:Connect(function(v)
+            _G.killerTracerConn = game:GetService("RunService").RenderStepped:Connect(function()
                 if not _G.killerTracer then return end
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.killerColor)
-                end
-            end)
 
-            _G.killerTracerRemove = killers.ChildRemoved:Connect(function(v)
-                if not _G.killerTracer then return end
-                remove(esp.tracers, v)
+                for _,v in ipairs(killers:GetChildren()) do
+                    if v:IsA("Model") then
+                        local root = v:FindFirstChild("HumanoidRootPart")
+                        local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+                        if root and myRoot then
+                            if not v:FindFirstChild("TRACER") then
+                                local beam = Instance.new("Beam")
+                                beam.Name = "TRACER"
+
+                                local a0 = Instance.new("Attachment", myRoot)
+                                local a1 = Instance.new("Attachment", root)
+
+                                beam.Attachment0 = a0
+                                beam.Attachment1 = a1
+                                beam.Color = ColorSequence.new(_G.killerColor)
+                                beam.Width0 = 0.05
+                                beam.Width1 = 0.05
+                                beam.Parent = v
+
+                                beam:SetAttribute("A0", a0)
+                                beam:SetAttribute("A1", a1)
+                            end
+                        end
+                    end
+                end
             end)
         else
-            if _G.killerTracerAdd then _G.killerTracerAdd:Disconnect() _G.killerTracerAdd = nil end
-            if _G.killerTracerRemove then _G.killerTracerRemove:Disconnect() _G.killerTracerRemove = nil end
-            clear(esp.tracers)
+            if _G.killerTracerConn then _G.killerTracerConn:Disconnect() _G.killerTracerConn = nil end
+
+            for _,v in ipairs(killers:GetChildren()) do
+                local t = v:FindFirstChild("TRACER")
+                if t then
+                    local a0 = t:GetAttribute("A0")
+                    local a1 = t:GetAttribute("A1")
+                    if typeof(a0) == "Instance" then a0:Destroy() end
+                    if typeof(a1) == "Instance" then a1:Destroy() end
+                    t:Destroy()
+                end
+            end
         end
     end
 })
@@ -509,21 +578,16 @@ VisualsTab:Colorpicker({
 
         _G.killerColor = color
 
-        if _G.killerESP then
-            clear(esp.killers)
-            for _, v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.killers, v, _G.killerColor)
-                end
+        for _,v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
             end
-        end
 
-        if _G.killerTracer then
-            clear(esp.tracers)
-            for _, v in ipairs(workspace.PLAYERS.KILLER:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.killerColor)
-                end
+            local t = v:FindFirstChild("TRACER")
+            if t then
+                t.Color = ColorSequence.new(color)
             end
         end
 
@@ -536,32 +600,50 @@ VisualsTab:Toggle({
     Value = false,
     Callback = function(state)
 
-        local gens = workspace.MAPS["GAME MAP"].Generators
-        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
+        local map = workspace.MAPS:FindFirstChild("GAME MAP")
+        if not map then return end
+        local gens = map:FindFirstChild("Generators")
+        if not gens then return end
+
         _G.genESP = state
+        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
 
         if state then
-            for _, v in ipairs(gens:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.generators, v, _G.genColor)
+            for _,v in ipairs(gens:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.genColor
+                    h.OutlineColor = _G.genColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end
 
             _G.genAdd = gens.ChildAdded:Connect(function(v)
                 if not _G.genESP then return end
                 if v:IsA("Model") then
-                    add(esp.generators, v, _G.genColor)
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.genColor
+                    h.OutlineColor = _G.genColor
+                    h.Adornee = v
+                    h.Parent = v
                 end
             end)
 
             _G.genRemove = gens.ChildRemoved:Connect(function(v)
-                if not _G.genESP then return end
-                remove(esp.generators, v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
             end)
         else
             if _G.genAdd then _G.genAdd:Disconnect() _G.genAdd = nil end
             if _G.genRemove then _G.genRemove:Disconnect() _G.genRemove = nil end
-            clear(esp.generators)
+
+            for _,v in ipairs(gens:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
         end
     end
 })
@@ -572,32 +654,59 @@ VisualsTab:Toggle({
     Value = false,
     Callback = function(state)
 
-        local gens = workspace.MAPS["GAME MAP"].Generators
-        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
+        local map = workspace.MAPS:FindFirstChild("GAME MAP")
+        if not map then return end
+        local gens = map:FindFirstChild("Generators")
+        if not gens then return end
+
+        local player = game.Players.LocalPlayer
         _G.genTracer = state
+        _G.genColor = _G.genColor or Color3.fromRGB(255,255,255)
 
         if state then
-            for _, v in ipairs(gens:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.genColor)
-                end
-            end
-
-            _G.genTracerAdd = gens.ChildAdded:Connect(function(v)
+            _G.genTracerConn = game:GetService("RunService").RenderStepped:Connect(function()
                 if not _G.genTracer then return end
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.genColor)
-                end
-            end)
 
-            _G.genTracerRemove = gens.ChildRemoved:Connect(function(v)
-                if not _G.genTracer then return end
-                remove(esp.tracers, v)
+                for _,v in ipairs(gens:GetChildren()) do
+                    if v:IsA("Model") then
+                        local root = v:FindFirstChild("HumanoidRootPart") or v:FindFirstChildWhichIsA("BasePart")
+                        local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+                        if root and myRoot then
+                            if not v:FindFirstChild("TRACER") then
+                                local beam = Instance.new("Beam")
+                                beam.Name = "TRACER"
+
+                                local a0 = Instance.new("Attachment", myRoot)
+                                local a1 = Instance.new("Attachment", root)
+
+                                beam.Attachment0 = a0
+                                beam.Attachment1 = a1
+                                beam.Color = ColorSequence.new(_G.genColor)
+                                beam.Width0 = 0.05
+                                beam.Width1 = 0.05
+                                beam.Parent = v
+
+                                beam:SetAttribute("A0", a0)
+                                beam:SetAttribute("A1", a1)
+                            end
+                        end
+                    end
+                end
             end)
         else
-            if _G.genTracerAdd then _G.genTracerAdd:Disconnect() _G.genTracerAdd = nil end
-            if _G.genTracerRemove then _G.genTracerRemove:Disconnect() _G.genTracerRemove = nil end
-            clear(esp.tracers)
+            if _G.genTracerConn then _G.genTracerConn:Disconnect() _G.genTracerConn = nil end
+
+            for _,v in ipairs(gens:GetChildren()) do
+                local t = v:FindFirstChild("TRACER")
+                if t then
+                    local a0 = t:GetAttribute("A0")
+                    local a1 = t:GetAttribute("A1")
+                    if typeof(a0) == "Instance" then a0:Destroy() end
+                    if typeof(a1) == "Instance" then a1:Destroy() end
+                    t:Destroy()
+                end
+            end
         end
     end
 })
@@ -612,21 +721,21 @@ VisualsTab:Colorpicker({
 
         _G.genColor = color
 
-        if _G.genESP then
-            clear(esp.generators)
-            for _, v in ipairs(workspace.MAPS["GAME MAP"].Generators:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.generators, v, _G.genColor)
-                end
-            end
-        end
+        local map = workspace.MAPS:FindFirstChild("GAME MAP")
+        if not map then return end
+        local gens = map:FindFirstChild("Generators")
+        if not gens then return end
 
-        if _G.genTracer then
-            clear(esp.tracers)
-            for _, v in ipairs(workspace.MAPS["GAME MAP"].Generators:GetChildren()) do
-                if v:IsA("Model") then
-                    add(esp.tracers, v, _G.genColor)
-                end
+        for _,v in ipairs(gens:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
+            end
+
+            local t = v:FindFirstChild("TRACER")
+            if t then
+                t.Color = ColorSequence.new(color)
             end
         end
 
