@@ -1,8 +1,8 @@
 getgenv().gamesConfig = {  
     {  
-        gameName = "Bite by night",  
+        gameName = "bite by night",  
         placeId = 70845479499574,  
-        ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Bite%20by%20night"))() ]]    
+        ConfigScript = [[ loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/Loader/Elysium%20X%20Bite%20By%20Night"))() ]]  
     },  
 }  
 
@@ -26,7 +26,7 @@ local RunService = game:GetService("RunService")
 local player = game:GetService("Players").LocalPlayer
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ZenithLoader"
+screenGui.Name = "ElysiumGraphiteLoader"
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.ResetOnSpawn = false
 
@@ -57,16 +57,47 @@ grad.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,60))
 }
 
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1,-80,0,22)
-statusLabel.Position = UDim2.new(0,40,0,35)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Checking Game..."
-statusLabel.TextColor3 = Color3.fromRGB(255,255,255)
-statusLabel.TextSize = 15
-statusLabel.Font = Enum.Font.GothamBold
-statusLabel.TextTransparency = 1
-statusLabel.Parent = container
+local function createAnimatedText(parent, text, yPos)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1,-80,0,22)
+    frame.Position = UDim2.new(0,40,0,yPos)
+    frame.BackgroundTransparency = 1
+    frame.Parent = parent
+
+    local letters = {}
+
+    for i = 1, #text do
+        local char = text:sub(i,i)
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0,10,1,0)
+        lbl.Position = UDim2.new(0,(i-1)*10,0,0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = char
+        lbl.TextColor3 = Color3.fromRGB(255,255,255)
+        lbl.TextSize = 15
+        lbl.Font = Enum.Font.GothamBold
+        lbl.TextTransparency = 1
+        lbl.Parent = frame
+        table.insert(letters,lbl)
+    end
+
+    local function animate(newText)
+        for i, lbl in ipairs(letters) do
+            local char = newText:sub(i,i) or ""
+            lbl.Text = char
+            lbl.Position = lbl.Position + UDim2.new(0,0,1,0)
+            TweenService:Create(lbl, TweenInfo.new(0.35, Enum.EasingStyle.Back), {
+                TextTransparency = 0,
+                Position = lbl.Position - UDim2.new(0,0,1,0)
+            }):Play()
+            task.wait(0.02)
+        end
+    end
+
+    return frame, animate
+end
+
+local statusFrame, animateStatus = createAnimatedText(container,"Checking Game...",35)
 
 local percentLabel = Instance.new("TextLabel")
 percentLabel.Size = UDim2.new(0,50,0,20)
@@ -107,40 +138,7 @@ spinner.Image = "rbxassetid://116535712789945"
 spinner.ImageColor3 = Color3.fromRGB(255,0,0)
 spinner.Parent = barBackground
 
-local creditFrame = Instance.new("Frame")
-creditFrame.Size = UDim2.new(1,-80,0,20)
-creditFrame.Position = UDim2.new(0,40,1,-25)
-creditFrame.BackgroundTransparency = 1
-creditFrame.Parent = container
-
-local creditText = "Made By Zenith Studios"
-local letters = {}
-
-for i = 1, #creditText do
-    local char = creditText:sub(i,i)
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0,10,1,0)
-    lbl.Position = UDim2.new(0,(i-1)*10,0,0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = char
-    lbl.TextColor3 = Color3.fromRGB(255,0,0)
-    lbl.TextSize = 13
-    lbl.Font = Enum.Font.GothamBold
-    lbl.TextTransparency = 1
-    lbl.Parent = creditFrame
-    table.insert(letters,lbl)
-end
-
-local function animateCredits()
-    for i, lbl in ipairs(letters) do
-        lbl.Position = lbl.Position + UDim2.new(0,0,1,0)
-        TweenService:Create(lbl, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
-            TextTransparency = 0,
-            Position = lbl.Position - UDim2.new(0,0,1,0)
-        }):Play()
-        task.wait(0.04)
-    end
-end
+local creditFrame, animateCredits = createAnimatedText(container,"Made By Zenith Studios",125)
 
 local selectedScript = nil
 local gameName = "Unknown"
@@ -176,7 +174,6 @@ end
 local function fadeIn()
     local info = TweenInfo.new(CONFIG.FadeInSpeed)
     TweenService:Create(stroke, info, {Transparency = 0}):Play()
-    TweenService:Create(statusLabel, info, {TextTransparency = 0}):Play()
     TweenService:Create(percentLabel, info, {TextTransparency = 0}):Play()
     TweenService:Create(barBackground, info, {BackgroundTransparency = 0}):Play()
     TweenService:Create(barFill, info, {BackgroundTransparency = 0}):Play()
@@ -185,14 +182,13 @@ end
 local function fadeOut()
     local info = TweenInfo.new(CONFIG.FadeOutSpeed)
     TweenService:Create(stroke, info, {Transparency = 1}):Play()
-    TweenService:Create(statusLabel, info, {TextTransparency = 1}):Play()
     TweenService:Create(percentLabel, info, {TextTransparency = 1}):Play()
     TweenService:Create(barBackground, info, {BackgroundTransparency = 1}):Play()
     TweenService:Create(barFill, info, {BackgroundTransparency = 1}):Play()
 end
 
 local function updateLoader(status, progress)
-    statusLabel.Text = status
+    animateStatus(status)
     percentLabel.Text = math.floor(progress).."%"
     TweenService:Create(barFill, TweenInfo.new(CONFIG.BarLerpSpeed), {
         Size = UDim2.new(progress/100,0,1,0)
@@ -208,9 +204,10 @@ task.spawn(function()
     popupIn()
     task.wait(CONFIG.PopupTime)
     fadeIn()
-    animateCredits()
+    animateCredits("Made By Zenith Studios")
+    animateStatus("Checking Game...")
 
-    task.wait(0.5)
+    task.wait(0.6)
     updateLoader("Detected: "..gameName, 30)
     task.wait(0.8)
     updateLoader("Loading "..getgenv().ScriptName, 70)
