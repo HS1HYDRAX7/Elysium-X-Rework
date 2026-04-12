@@ -1,0 +1,207 @@
+local Loader = {}
+Loader.__index = Loader
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = game:GetService("Players").LocalPlayer
+
+Loader.Games = {}
+
+function Loader:game(data)
+    table.insert(self.Games, data)
+end
+
+function Loader:start()
+
+    local CONFIG = {
+        Width = 540,
+        Height = 150
+    }
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "ZenithLoader"
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.ResetOnSpawn = false
+
+    pcall(function()
+        screenGui.Parent = game:GetService("CoreGui")
+    end)
+    if not screenGui.Parent then
+        screenGui.Parent = player:WaitForChild("PlayerGui")
+    end
+
+    local container = Instance.new("Frame")
+    container.AnchorPoint = Vector2.new(0.5,0.5)
+    container.Position = UDim2.new(0.5,0,0.5,0)
+    container.Size = UDim2.new(0,0,0,0)
+    container.BackgroundColor3 = Color3.fromRGB(10,10,10)
+    container.Parent = screenGui
+    Instance.new("UICorner", container).CornerRadius = UDim.new(0,14)
+
+    local stroke = Instance.new("UIStroke", container)
+    stroke.Thickness = 2
+
+    local grad = Instance.new("UIGradient", stroke)
+    grad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20,20,60)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120,0,40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(20,20,60))
+    }
+
+    local statusFrame = Instance.new("Frame")
+    statusFrame.Size = UDim2.new(1,-80,0,25)
+    statusFrame.Position = UDim2.new(0,40,0,35)
+    statusFrame.BackgroundTransparency = 1
+    statusFrame.Parent = container
+
+    local letters = {}
+    local function setAnimatedText(text)
+        for _,v in ipairs(letters) do v:Destroy() end
+        table.clear(letters)
+
+        for i = 1,#text do
+            local char = text:sub(i,i)
+
+            local lbl = Instance.new("TextLabel")
+            lbl.Size = UDim2.new(0,12,1,0)
+            lbl.Position = UDim2.new(0,(i-1)*12,0,0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = char
+            lbl.TextColor3 = Color3.fromRGB(255,255,255)
+            lbl.Font = Enum.Font.GothamBold
+            lbl.TextSize = 15
+            lbl.TextTransparency = 1
+            lbl.Parent = statusFrame
+
+            table.insert(letters,lbl)
+        end
+
+        for i,lbl in ipairs(letters) do
+            lbl.Position = lbl.Position + UDim2.new(0,0,1,0)
+            TweenService:Create(lbl, TweenInfo.new(0.35, Enum.EasingStyle.Back), {
+                TextTransparency = 0,
+                Position = lbl.Position - UDim2.new(0,0,1,0)
+            }):Play()
+            task.wait(0.02)
+        end
+    end
+
+    local barBg = Instance.new("Frame")
+    barBg.Size = UDim2.new(1,-100,0,10)
+    barBg.Position = UDim2.new(0,40,0,80)
+    barBg.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    barBg.Parent = container
+    Instance.new("UICorner", barBg)
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new(0,0,1,0)
+    fill.BackgroundTransparency = 1
+    fill.Parent = barBg
+    Instance.new("UICorner", fill)
+
+    local fillGrad = Instance.new("UIGradient", fill)
+    fillGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255,80,80))
+    }
+
+    local spinner = Instance.new("ImageLabel")
+    spinner.Size = UDim2.new(0,22,0,22)
+    spinner.Position = UDim2.new(1,10,0.5,-11)
+    spinner.BackgroundTransparency = 1
+    spinner.Image = "rbxassetid://116535712789945"
+    spinner.ImageColor3 = Color3.fromRGB(255,0,0)
+    spinner.Parent = barBg
+
+    local creditFrame = Instance.new("Frame")
+    creditFrame.Size = UDim2.new(1,-80,0,20)
+    creditFrame.Position = UDim2.new(0,40,1,-25)
+    creditFrame.BackgroundTransparency = 1
+    creditFrame.Parent = container
+
+    local creditText = "Made By Zenith Studios"
+    local creditLetters = {}
+
+    for i = 1,#creditText do
+        local c = creditText:sub(i,i)
+        local l = Instance.new("TextLabel")
+        l.Size = UDim2.new(0,10,1,0)
+        l.Position = UDim2.new(0,(i-1)*10,0,0)
+        l.BackgroundTransparency = 1
+        l.Text = c
+        l.TextColor3 = Color3.fromRGB(255,0,0)
+        l.Font = Enum.Font.GothamBold
+        l.TextSize = 13
+        l.TextTransparency = 1
+        l.Parent = creditFrame
+        table.insert(creditLetters,l)
+    end
+
+    local function animateCredits()
+        for i,l in ipairs(creditLetters) do
+            l.Position = l.Position + UDim2.new(0,0,1,0)
+            TweenService:Create(l, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
+                TextTransparency = 0,
+                Position = l.Position - UDim2.new(0,0,1,0)
+            }):Play()
+            task.wait(0.03)
+        end
+    end
+
+    local selected = nil
+    local gName = "Unknown"
+
+    for _,g in ipairs(self.Games) do
+        if game.PlaceId == tonumber(g.PlaceId) then
+            selected = g.ConfigScript
+            gName = g.GameName
+            break
+        end
+    end
+
+    if not selected and self.Universal then
+        selected = self.Universal
+    end
+
+    local function update(progress, text)
+        setAnimatedText(text)
+        TweenService:Create(fill, TweenInfo.new(0.3), {
+            Size = UDim2.new(progress/100,0,1,0)
+        }):Play()
+    end
+
+    TweenService:Create(container, TweenInfo.new(0.35, Enum.EasingStyle.Back), {
+        Size = UDim2.new(0,CONFIG.Width,0,CONFIG.Height)
+    }):Play()
+
+    task.wait(0.4)
+    animateCredits()
+
+    update(25, "Detecting "..gName)
+    task.wait(0.8)
+    update(65, "Loading Script")
+    task.wait(0.8)
+    update(100, "Executing")
+
+    task.wait(0.4)
+
+    task.spawn(function()
+        pcall(function()
+            loadstring(selected)()
+        end)
+    end)
+
+    TweenService:Create(container, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0,0,0,0)
+    }):Play()
+
+    task.wait(0.4)
+    screenGui:Destroy()
+
+    RunService.RenderStepped:Connect(function(dt)
+        grad.Rotation += dt*90
+        spinner.Rotation += dt*180
+    end)
+end
+
+return setmetatable({}, Loader)
