@@ -38,6 +38,7 @@ Window:EditOpenButton({
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local MovementTab = Window:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
@@ -308,6 +309,246 @@ MovementTab:Toggle({
             end)
         else
             _G.infStamina = false
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Killer ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local killers = teams and teams:FindFirstChild("Killer")
+        if not killers then return end
+
+        _G.killerESP = state
+        _G.killerColor = _G.killerColor or Color3.fromRGB(128,0,32)
+
+        if state then
+            for _,v in ipairs(killers:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.killerColor
+                    h.OutlineColor = _G.killerColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end
+
+            _G.killerAdd = killers.ChildAdded:Connect(function(v)
+                if not _G.killerESP then return end
+                if v:IsA("Model") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.killerColor
+                    h.OutlineColor = _G.killerColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end)
+
+            _G.killerRemove = killers.ChildRemoved:Connect(function(v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end)
+        else
+            if _G.killerAdd then _G.killerAdd:Disconnect() _G.killerAdd = nil end
+            if _G.killerRemove then _G.killerRemove:Disconnect() _G.killerRemove = nil end
+
+            for _,v in ipairs(killers:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(128,0,32),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.killerColor = color
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local killers = teams and teams:FindFirstChild("Killer")
+        if not killers then return end
+
+        for _,v in ipairs(killers:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
+            end
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Survivor ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local survivors = teams and teams:FindFirstChild("Survivor")
+        if not survivors then return end
+
+        _G.survivorESP = state
+        _G.survivorColor = _G.survivorColor or Color3.fromRGB(0,100,0)
+
+        if state then
+            for _,v in ipairs(survivors:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.survivorColor
+                    h.OutlineColor = _G.survivorColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end
+
+            _G.survivorAdd = survivors.ChildAdded:Connect(function(v)
+                if not _G.survivorESP then return end
+                if v:IsA("Model") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.survivorColor
+                    h.OutlineColor = _G.survivorColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end)
+
+            _G.survivorRemove = survivors.ChildRemoved:Connect(function(v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end)
+        else
+            if _G.survivorAdd then _G.survivorAdd:Disconnect() _G.survivorAdd = nil end
+            if _G.survivorRemove then _G.survivorRemove:Disconnect() _G.survivorRemove = nil end
+
+            for _,v in ipairs(survivors:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(0,100,0),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.survivorColor = color
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local survivors = teams and teams:FindFirstChild("Survivor")
+        if not survivors then return end
+
+        for _,v in ipairs(survivors:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
+            end
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Ghost ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local ghosts = teams and teams:FindFirstChild("Ghost")
+        if not ghosts then return end
+
+        _G.ghostESP = state
+        _G.ghostColor = _G.ghostColor or Color3.fromRGB(255,255,255)
+
+        if state then
+            for _,v in ipairs(ghosts:GetChildren()) do
+                if v:IsA("Model") and not v:FindFirstChild("ESP_HIGHLIGHT") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.ghostColor
+                    h.OutlineColor = _G.ghostColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end
+
+            _G.ghostAdd = ghosts.ChildAdded:Connect(function(v)
+                if not _G.ghostESP then return end
+                if v:IsA("Model") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "ESP_HIGHLIGHT"
+                    h.FillColor = _G.ghostColor
+                    h.OutlineColor = _G.ghostColor
+                    h.Adornee = v
+                    h.Parent = v
+                end
+            end)
+
+            _G.ghostRemove = ghosts.ChildRemoved:Connect(function(v)
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end)
+        else
+            if _G.ghostAdd then _G.ghostAdd:Disconnect() _G.ghostAdd = nil end
+            if _G.ghostRemove then _G.ghostRemove:Disconnect() _G.ghostRemove = nil end
+
+            for _,v in ipairs(ghosts:GetChildren()) do
+                local h = v:FindFirstChild("ESP_HIGHLIGHT")
+                if h then h:Destroy() end
+            end
+        end
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(255,255,255),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G.ghostColor = color
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+        local ghosts = teams and teams:FindFirstChild("Ghost")
+        if not ghosts then return end
+
+        for _,v in ipairs(ghosts:GetChildren()) do
+            local h = v:FindFirstChild("ESP_HIGHLIGHT")
+            if h then
+                h.FillColor = color
+                h.OutlineColor = color
+            end
         end
 
     end
