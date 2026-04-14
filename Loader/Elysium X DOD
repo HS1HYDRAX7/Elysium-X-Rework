@@ -39,6 +39,7 @@ Window:EditOpenButton({
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local MovementTab = Window:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false })
 local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
+local SkillsSelectorTab = Window:Tab({ Title = "Skills Selector", Icon = "sword", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
@@ -145,25 +146,38 @@ MainTab:Toggle({
 MovementTab:Toggle({
     Title = "Infinite Stamina",
     Desc = "",
-    Flag = "InfStamina",
     Value = false,
     Callback = function(state)
+
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
 
         _G.infStamina = state
 
         if state then
-            _G.infStaminaThread = task.spawn(function()
-                while true do
-                    task.wait(0.01)
-                    if not _G.infStamina then break end
-
-                    local player = game.Players.LocalPlayer
-                    local staminaM = player and player:FindFirstChild("staminaM") or (player.Character and player.Character:FindFirstChild("staminaM"))
-
-                    if staminaM then
-                        staminaM.Stamina = math.huge
-                        staminaM.MaxStamina = math.huge
+            _G.infStamConn = task.spawn(function()
+                while _G.infStamina do
+                    local gui = player:FindFirstChild("PlayerGui")
+                    if gui then
+                        local main = gui:FindFirstChild("MainGui")
+                        if main then
+                            local client = main:FindFirstChild("Client")
+                            if client then
+                                local modules = client:FindFirstChild("Modules")
+                                if modules then
+                                    local movement = modules:FindFirstChild("Movement")
+                                    if movement then
+                                        local staminaM = require(movement)
+                                        if staminaM then
+                                            staminaM.Stamina = math.huge
+                                            staminaM.MaxStamina = math.huge
+                                        end
+                                    end
+                                end
+                            end
+                        end
                     end
+                    task.wait()
                 end
             end)
         else
@@ -419,50 +433,123 @@ VisualsTab:Colorpicker({
 VisualsTab:Toggle({
     Title = "Ignore (yourself)",
     Desc = "",
-    Flag = "Ignore",
     Value = false,
     Callback = function(state)
 
-        local player = game:GetService("Players").LocalPlayer
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
         _G.ignoreSelf = state
 
-        local function handle(folder)
-            if not folder then return end
-            for _,v in ipairs(folder:GetChildren()) do
-                if v:IsA("Model") then
-                    local isSelf = (v == player.Character)
-                    local h = v:FindFirstChild("ESP_HIGHLIGHT")
+        local function removeSelfESP(char)
+            if not char then return end
+            local h = char:FindFirstChild("ESP_HIGHLIGHT")
+            if h then h:Destroy() end
+        end
 
-                    if isSelf then
-                        if state and h then
-                            h:Destroy()
-                        elseif not state then
-                            if not h then
-                                local color =
-                                    (folder.Name == "Killer" and (_G.killerColor or Color3.fromRGB(128,0,32))) or
-                                    (folder.Name == "Survivor" and (_G.survivorColor or Color3.fromRGB(0,100,0))) or
-                                    (folder.Name == "Ghost" and (_G.ghostColor or Color3.fromRGB(255,255,255)))
+        local function applySelfESP(char)
+            if not char then return end
 
-                                local nh = Instance.new("Highlight")
-                                nh.Name = "ESP_HIGHLIGHT"
-                                nh.FillColor = color
-                                nh.OutlineColor = color
-                                nh.Adornee = v
-                                nh.Parent = v
-                            end
-                        end
-                    end
-                end
+            local parent = char.Parent
+            if not parent then return end
+
+            local color =
+                (parent.Name == "Killer" and (_G.killerColor or Color3.fromRGB(128,0,32))) or
+                (parent.Name == "Survivor" and (_G.survivorColor or Color3.fromRGB(0,100,0))) or
+                (parent.Name == "Ghost" and (_G.ghostColor or Color3.fromRGB(255,255,255)))
+
+            if not char:FindFirstChild("ESP_HIGHLIGHT") and color then
+                local h = Instance.new("Highlight")
+                h.Name = "ESP_HIGHLIGHT"
+                h.FillColor = color
+                h.OutlineColor = color
+                h.Adornee = char
+                h.Parent = char
             end
         end
 
-        local teams = workspace:FindFirstChild("GameAssets")
-        teams = teams and teams:FindFirstChild("Teams")
+        if state then
+            if player.Character then
+                removeSelfESP(player.Character)
+            end
 
-        if teams then
-            handle(teams:FindFirstChild("Killer"))
-            handle(teams:FindFirstChild("Survivor"))
-            handle(teams:FindFirstChild("Ghost"))
+            _G.ignoreCharConn = player.CharacterAdded:Connect(function(char)
+                if _G.ignoreSelf then
+                    task.wait()
+                    removeSelfESP(char)
+                end
+            end)
+
+            _G.ignoreParentConn = player:GetPropertyChangedSignal("Character"):Connect(function()
+                local char = player.Character
+                if char and _G.ignoreSelf then
+                    task.wait()
+                    removeSelfESP(char)
+                end
+            end)
+
+        else
+            if _G.ignoreCharConn then _G.ignoreCharConn:Disconnect() _G.ignoreCharConn = nil end
+            if _G.ignoreParentConn then _G.ignoreParentConn:Disconnect() _G.ignoreParentConn = nil end
+
+            if player.Character then
+                applySelfESP(player.Character)
+            end
+        end
+
+    end
+})
+
+SkillsSelectorTab:Dropdown({
+    Title = "Select Skill 1",
+    Desc = "",
+    Values = { "None", "Adrenaline", "Punch", "Caretaker", "Cloak", "Block", "Dash", "BonusPad", "Hotdog", "Revolver", "Taunt", "Banana" },
+    Value = "None",
+    Callback = function(option)
+        _G.skill1 = option
+    end
+})
+
+SkillsSelectorTab:Dropdown({
+    Title = "Select Skill 2",
+    Desc = "",
+    Values = { "None", "Adrenaline", "Punch", "Caretaker", "Cloak", "Block", "Dash", "BonusPad", "Hotdog", "Revolver", "Taunt", "Banana" },
+    Value = "None",
+    Callback = function(option)
+        _G.skill2 = option
+    end
+})
+
+SkillsSelectorTab:Button({
+    Title = "Give Ability",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        if TestRequire() ~= true then
+            ErrorRequire()
+            return
+        end
+
+        local abilities = {}
+
+        if _G.skill1 and _G.skill1 ~= "None" then
+            table.insert(abilities, tostring(_G.skill1))
+        end
+
+        if _G.skill2 and _G.skill2 ~= "None" then
+            table.insert(abilities, tostring(_G.skill2))
+        end
+
+        if #abilities == 0 then return end
+
+        game:GetService("ReplicatedStorage")
+            :WaitForChild("Events")
+            :WaitForChild("RemoteEvents")
+            :WaitForChild("AbilitySelection")
+            :FireServer(abilities)
+
+        for _,ability in ipairs(abilities) do
+            AbilityModule["CreateAbility"](ReturnAbilityData(ability))
         end
 
     end
