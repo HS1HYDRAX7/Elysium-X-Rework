@@ -143,141 +143,6 @@ MainTab:Toggle({
 })
 
 MovementTab:Toggle({
-    Title = "FrontFlip",
-    Desc = "",
-    Value = false,
-    Callback = function(state)
-
-        local player = game:GetService("Players").LocalPlayer
-        local UIS = game:GetService("UserInputService")
-
-        _G.frontFlip = state
-
-        if state then
-            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
-            if not sausageHolder then return end
-
-            _G.ffOriginalSize = sausageHolder.Size
-
-            local buttonFrame = Instance.new("Frame")
-            buttonFrame.Name = "FF_Frame"
-            buttonFrame.Size = UDim2.new(0, 48, 0, 44)
-            buttonFrame.BackgroundTransparency = 1
-            buttonFrame.BorderSizePixel = 0
-            buttonFrame.Parent = sausageHolder
-
-            local imageButton = Instance.new("ImageButton")
-            imageButton.Name = "FF_Button"
-            imageButton.BackgroundTransparency = 1
-            imageButton.BorderSizePixel = 0
-            imageButton.Size = UDim2.new(0, 36, 0, 36)
-            imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
-            imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
-            imageButton.Image = "rbxassetid://70627586472131"
-            imageButton.Parent = buttonFrame
-
-            sausageHolder.Size = UDim2.new(0, sausageHolder.Size.X.Offset + 48, 0, sausageHolder.Size.Y.Offset)
-            buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
-
-            local FlipCooldown = false
-
-            local function FortniteFlips()
-                if FlipCooldown or not _G.frontFlip then return end
-                FlipCooldown = true
-
-                local character = player.Character
-                local hrp = character and character:FindFirstChild("HumanoidRootPart")
-                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
-
-                if not hrp or not humanoid then
-                    FlipCooldown = false
-                    return
-                end
-
-                local savedTracks = {}
-
-                if animator then
-                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                        savedTracks[#savedTracks+1] = {
-                            id = track.Animation.AnimationId,
-                            time = track.TimePosition
-                        }
-                        track:Stop()
-                    end
-                end
-
-                humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-
-                local duration = 0.45
-                local steps = 120
-                local startCFrame = hrp.CFrame
-                local forwardVector = startCFrame.LookVector
-                local upVector = Vector3.new(0,1,0)
-
-                task.spawn(function()
-                    local startTime = tick()
-
-                    for i = 1, steps do
-                        if not _G.frontFlip then break end
-
-                        local t = i/steps
-                        local height = 4*(t - t^2)*10
-                        local nextPos = startCFrame.Position + forwardVector*(35*t) + upVector*height
-                        local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i*(360/steps)),0,0)
-
-                        hrp.CFrame = CFrame.new(nextPos) * rotation
-
-                        local elapsed = tick() - startTime
-                        local expected = (duration/steps)*i
-                        local waitTime = expected - elapsed
-                        if waitTime > 0 then task.wait(waitTime) end
-                    end
-
-                    hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector*35) * startCFrame.Rotation
-                    humanoid:ChangeState(Enum.HumanoidStateType.Running)
-
-                    if animator then
-                        for _,data in ipairs(savedTracks) do
-                            local anim = Instance.new("Animation")
-                            anim.AnimationId = data.id
-                            local newTrack = animator:LoadAnimation(anim)
-                            newTrack:Play()
-                            newTrack.TimePosition = data.time
-                        end
-                    end
-
-                    task.wait(3.5)
-                    FlipCooldown = false
-                end)
-            end
-
-            _G.ffClick = imageButton.Activated:Connect(FortniteFlips)
-
-            _G.ffKey = UIS.InputBegan:Connect(function(input, busy)
-                if not busy and input.KeyCode == Enum.KeyCode.F then
-                    FortniteFlips()
-                end
-            end)
-
-        else
-            _G.frontFlip = false
-
-            if _G.ffClick then _G.ffClick:Disconnect() _G.ffClick = nil end
-            if _G.ffKey then _G.ffKey:Disconnect() _G.ffKey = nil end
-
-            local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2")
-            if sausageHolder then
-                sausageHolder.Size = _G.ffOriginalSize or sausageHolder.Size
-                local frame = sausageHolder:FindFirstChild("FF_Frame")
-                if frame then frame:Destroy() end
-            end
-        end
-
-    end
-})
-
-MovementTab:Toggle({
     Title = "Infinite Stamina",
     Desc = "",
     Flag = "InfStamina",
@@ -311,6 +176,7 @@ MovementTab:Toggle({
 VisualsTab:Toggle({
     Title = "Killer ESP",
     Desc = "",
+    Flag = "KillerESP",
     Value = false,
     Callback = function(state)
 
@@ -391,6 +257,7 @@ VisualsTab:Colorpicker({
 VisualsTab:Toggle({
     Title = "Survivor ESP",
     Desc = "",
+    Flag = "SurvivorESP",
     Value = false,
     Callback = function(state)
 
@@ -471,6 +338,7 @@ VisualsTab:Colorpicker({
 VisualsTab:Toggle({
     Title = "Ghost ESP",
     Desc = "",
+    Flag = "GhostESP",
     Value = false,
     Callback = function(state)
 
@@ -543,6 +411,58 @@ VisualsTab:Colorpicker({
                 h.FillColor = color
                 h.OutlineColor = color
             end
+        end
+
+    end
+})
+
+VisualsTab:Toggle({
+    Title = "Ignore (yourself)",
+    Desc = "",
+    Flag = "Ignore",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        _G.ignoreSelf = state
+
+        local function handle(folder)
+            if not folder then return end
+            for _,v in ipairs(folder:GetChildren()) do
+                if v:IsA("Model") then
+                    local isSelf = (v == player.Character)
+                    local h = v:FindFirstChild("ESP_HIGHLIGHT")
+
+                    if isSelf then
+                        if state and h then
+                            h:Destroy()
+                        elseif not state then
+                            if not h then
+                                local color =
+                                    (folder.Name == "Killer" and (_G.killerColor or Color3.fromRGB(128,0,32))) or
+                                    (folder.Name == "Survivor" and (_G.survivorColor or Color3.fromRGB(0,100,0))) or
+                                    (folder.Name == "Ghost" and (_G.ghostColor or Color3.fromRGB(255,255,255)))
+
+                                local nh = Instance.new("Highlight")
+                                nh.Name = "ESP_HIGHLIGHT"
+                                nh.FillColor = color
+                                nh.OutlineColor = color
+                                nh.Adornee = v
+                                nh.Parent = v
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        local teams = workspace:FindFirstChild("GameAssets")
+        teams = teams and teams:FindFirstChild("Teams")
+
+        if teams then
+            handle(teams:FindFirstChild("Killer"))
+            handle(teams:FindFirstChild("Survivor"))
+            handle(teams:FindFirstChild("Ghost"))
         end
 
     end
