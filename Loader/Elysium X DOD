@@ -188,7 +188,70 @@ MovementTab:Toggle({
 })
 
 MovementTab:Toggle({
-    Title = "Custom Jump Button",
+    Title = "Enable Jump",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        local UIS = game:GetService("UserInputService")
+
+        _G.jumpEnabled = state
+
+        local function setup(char)
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
+
+            if _G.jumpEnabled then
+                hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+                hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+            end
+        end
+
+        if state then
+
+            if player.Character then
+                setup(player.Character)
+            end
+
+            _G.jumpCharConn = player.CharacterAdded:Connect(function(char)
+                task.wait(0.3)
+                setup(char)
+            end)
+
+            _G.jumpInputConn = UIS.InputBegan:Connect(function(input, gpe)
+                if gpe then return end
+
+                if input.KeyCode == Enum.KeyCode.Space then
+                    local char = player.Character
+                    if char then
+                        local hum = char:FindFirstChildOfClass("Humanoid")
+                        if hum and hum.FloorMaterial ~= Enum.Material.Air then
+                            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                        end
+                    end
+                end
+            end)
+
+        else
+
+            if _G.jumpCharConn then
+                _G.jumpCharConn:Disconnect()
+                _G.jumpCharConn = nil
+            end
+
+            if _G.jumpInputConn then
+                _G.jumpInputConn:Disconnect()
+                _G.jumpInputConn = nil
+            end
+
+        end
+
+    end
+})
+
+MovementTab:Toggle({
+    Title = "Mobile Jump Button",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -198,7 +261,7 @@ MovementTab:Toggle({
         if state then
 
             local gui = Instance.new("ScreenGui")
-            gui.Name = "CustomJumpUI"
+            gui.Name = "MobileJumpButton"
             gui.Parent = game.CoreGui
 
             local button = Instance.new("ImageButton")
@@ -261,17 +324,13 @@ MovementTab:Toggle({
             local char = workspace:FindFirstChild(player.Name)
             if not char then return end
 
-            local sprint = char:GetAttribute("SprintSpeed")
-            if sprint == nil then return end
-
-            if _G.defaultSprint == nil then
-                _G.defaultSprint = sprint
-            end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
 
             if _G.sprintEnabled then
-                char:SetAttribute("SprintSpeed", _G.sprintValue)
+                hum.WalkSpeedModifier = _G.sprintValue
             else
-                char:SetAttribute("SprintSpeed", _G.defaultSprint)
+                hum.WalkSpeedModifier = 0
             end
         end
 
@@ -279,7 +338,7 @@ MovementTab:Toggle({
 
         if state then
             _G.sprintConn = player.CharacterAdded:Connect(function()
-                task.wait(0.5)
+                task.wait(0.3)
                 apply()
             end)
         else
@@ -297,9 +356,9 @@ MovementTab:Slider({
     Desc = "",
     Step = 1,
     Value = {
-        Min = 26,
+        Min = 0,
         Max = 100,
-        Default = 26,
+        Default = 0,
     },
     Callback = function(value)
 
@@ -309,8 +368,11 @@ MovementTab:Slider({
             local player = game:GetService("Players").LocalPlayer
             local char = workspace:FindFirstChild(player.Name)
 
-            if char and char:GetAttribute("SprintSpeed") ~= nil then
-                char:SetAttribute("SprintSpeed", value)
+            if char then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum.WalkSpeedModifier = value
+                end
             end
         end
 
