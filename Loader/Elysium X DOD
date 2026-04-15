@@ -299,7 +299,7 @@ MovementTab:Slider({
     Value = {
         Min = 1,
         Max = 100,
-        Default = 1,
+        Default = 5,
     },
     Callback = function(value)
 
