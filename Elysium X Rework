@@ -24,14 +24,14 @@ local RunService = game:GetService("RunService")
 local player = game:GetService("Players").LocalPlayer
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ElysiumGraphiteLoader"
+screenGui.Name = "ZenithLoader"
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.ResetOnSpawn = false
 
 local finishSound = Instance.new("Sound")
 finishSound.SoundId = "rbxassetid://131228548"
 finishSound.Volume = 1
-finishSound.Parent = screenGui
+finishSound.Parent = game:GetService("SoundService")
 
 pcall(function()
     screenGui.Parent = game:GetService("CoreGui")
@@ -207,7 +207,9 @@ task.spawn(function()
 
     updateLoader(100)
 
+task.delay(4, function()
     finishSound:Play()
+end)
 
     task.wait(0.5)
 
