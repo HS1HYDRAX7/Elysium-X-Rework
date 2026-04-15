@@ -258,12 +258,11 @@ MovementTab:Toggle({
         _G.sprintValue = _G.sprintValue or 70
 
         local function getCharacter()
-            return workspace:FindFirstChild(player.Name)
-                or (workspace:FindFirstChild("PLAYERS") and (
-                    (workspace.PLAYERS:FindFirstChild("Survivor") and workspace.PLAYERS.Survivor:FindFirstChild(player.Name))
-                    or (workspace.PLAYERS:FindFirstChild("Killer") and workspace.PLAYERS.Killer:FindFirstChild(player.Name))
-                ))
-                or (workspace:FindFirstChild("GameAssets") and workspace.GameAssets:FindFirstChild("Teams") and workspace.GameAssets.Teams:FindFirstChild("Ghost") and workspace.GameAssets.Teams.Ghost:FindFirstChild(player.Name))
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
         end
 
         local function apply()
@@ -288,29 +287,19 @@ MovementTab:Toggle({
                     task.wait(0.1)
                 end
             end)
-
-            _G.sprintConn = player.CharacterAdded:Connect(function()
-                task.wait(0.5)
-                apply()
-            end)
-        else
-            if _G.sprintConn then
-                _G.sprintConn:Disconnect()
-                _G.sprintConn = nil
-            end
         end
 
     end
 })
 
 MovementTab:Slider({
-    Title = "Sprint Boost Value",
+    Title = "Sprint Speed",
     Desc = "",
     Step = 1,
     Value = {
-        Min = 1,
+        Min = 0,
         Max = 100,
-        Default = 1,
+        Default = 70,
     },
     Callback = function(value)
 
