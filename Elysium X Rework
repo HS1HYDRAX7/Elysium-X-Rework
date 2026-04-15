@@ -29,7 +29,7 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.ResetOnSpawn = false
 
 local finishSound = Instance.new("Sound")
-finishSound.SoundId = "rbxassetid://131228548"
+finishSound.SoundId = "rbxassetid://82845990304289"
 finishSound.Volume = 1
 finishSound.Parent = game:GetService("SoundService")
 
