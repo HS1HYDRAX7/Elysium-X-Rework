@@ -16,8 +16,6 @@ local CONFIG = {
     BarHeight = 10,
     BarPaddingX = 40,
     BarLerpSpeed = 0.35,
-    FadeInSpeed = 0.25,
-    FadeOutSpeed = 0.25,
     PopupTime = 0.35
 }
 
@@ -29,6 +27,11 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ElysiumGraphiteLoader"
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.ResetOnSpawn = false
+
+local finishSound = Instance.new("Sound")
+finishSound.SoundId = "rbxassetid://131228548"
+finishSound.Volume = 1
+finishSound.Parent = screenGui
 
 pcall(function()
     screenGui.Parent = game:GetService("CoreGui")
@@ -48,21 +51,15 @@ Instance.new("UICorner", container).CornerRadius = UDim.new(0,14)
 
 local stroke = Instance.new("UIStroke", container)
 stroke.Thickness = 2
-stroke.Transparency = 0
 
 local grad = Instance.new("UIGradient", stroke)
 grad.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(120,0,0))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80,0,0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150,0,40)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(80,0,0))
 }
 
-local statusFrame = Instance.new("Frame")
-statusFrame.Size = UDim2.new(1,-80,0,22)
-statusFrame.Position = UDim2.new(0,40,0,35)
-statusFrame.BackgroundTransparency = 1
-statusFrame.Parent = container
-
-local function createAnimatedText(parent, text)
+local function createAnimatedText(parent, text, color)
     local letters = {}
     for i = 1, #text do
         local char = text:sub(i,i)
@@ -71,7 +68,7 @@ local function createAnimatedText(parent, text)
         lbl.Position = UDim2.new(0,(i-1)*10,0,0)
         lbl.BackgroundTransparency = 1
         lbl.Text = char
-        lbl.TextColor3 = Color3.fromRGB(255,255,255)
+        lbl.TextColor3 = color
         lbl.TextSize = 15
         lbl.Font = Enum.Font.GothamBold
         lbl.TextTransparency = 1
@@ -81,7 +78,33 @@ local function createAnimatedText(parent, text)
     return letters
 end
 
-local statusLetters = createAnimatedText(statusFrame,"Checking ")
+local function animateLetters(tbl)
+    for i,lbl in ipairs(tbl) do
+        lbl.Position = lbl.Position + UDim2.new(0,0,1,0)
+        TweenService:Create(lbl, TweenInfo.new(0.35,Enum.EasingStyle.Back),{
+            TextTransparency = 0,
+            Position = lbl.Position - UDim2.new(0,0,1,0)
+        }):Play()
+        task.wait(0.03)
+    end
+end
+
+local statusFrame = Instance.new("Frame")
+statusFrame.Size = UDim2.new(1,-80,0,22)
+statusFrame.Position = UDim2.new(0,40,0,35)
+statusFrame.BackgroundTransparency = 1
+statusFrame.Parent = container
+
+local statusLetters = createAnimatedText(statusFrame,"Checking",Color3.fromRGB(255,255,255))
+
+local executingFrame = Instance.new("Frame")
+executingFrame.Size = UDim2.new(1,-80,0,22)
+executingFrame.Position = UDim2.new(0,40,0,35)
+executingFrame.BackgroundTransparency = 1
+executingFrame.Visible = false
+executingFrame.Parent = container
+
+local executingLetters = createAnimatedText(executingFrame,"Executing",Color3.fromRGB(255,255,255))
 
 local percentLabel = Instance.new("TextLabel")
 percentLabel.Size = UDim2.new(0,50,0,20)
@@ -97,13 +120,11 @@ local barBackground = Instance.new("Frame")
 barBackground.Size = UDim2.new(1,-100,0,CONFIG.BarHeight)
 barBackground.Position = UDim2.new(0,40,0,80)
 barBackground.BackgroundColor3 = Color3.fromRGB(25,25,25)
-barBackground.BackgroundTransparency = 0
 barBackground.Parent = container
 Instance.new("UICorner", barBackground).CornerRadius = UDim.new(0,4)
 
 local barFill = Instance.new("Frame")
 barFill.Size = UDim2.new(0,0,1,0)
-barFill.BackgroundTransparency = 0
 barFill.BackgroundColor3 = Color3.fromRGB(255,0,0)
 barFill.Parent = barBackground
 Instance.new("UICorner", barFill).CornerRadius = UDim.new(0,4)
@@ -122,31 +143,19 @@ creditFrame.Position = UDim2.new(0,40,1,-25)
 creditFrame.BackgroundTransparency = 1
 creditFrame.Parent = container
 
-local creditLetters = createAnimatedText(creditFrame,"Made By Zenith Studios")
+local creditLetters = createAnimatedText(creditFrame,"Made By Zenith Studios",Color3.fromRGB(255,0,0))
 
-local function animateLetters(tbl)
-    for i,lbl in ipairs(tbl) do
-        lbl.Position = lbl.Position + UDim2.new(0,0,1,0)
-        TweenService:Create(lbl, TweenInfo.new(0.35,Enum.EasingStyle.Back),{
-            TextTransparency = 0,
-            Position = lbl.Position - UDim2.new(0,0,1,0)
-        }):Play()
-        task.wait(0.03)
-    end
+local function updateLoader(progress)
+    percentLabel.Text = math.floor(progress).."%"
+    TweenService:Create(barFill, TweenInfo.new(CONFIG.BarLerpSpeed), {
+        Size = UDim2.new(progress/100,0,1,0)
+    }):Play()
 end
 
-local function animateDots(baseText)
-    local dots = {""," ."," . ."," . . ."}
-    local index = 1
-    while true do
-        local full = baseText .. dots[index]
-        for i,v in ipairs(statusLetters) do
-            v.Text = full:sub(i,i) or ""
-        end
-        index = index % #dots + 1
-        task.wait(0.4)
-    end
-end
+RunService.RenderStepped:Connect(function(dt)
+    grad.Rotation += dt*120
+    spinner.Rotation += dt*180
+end)
 
 local selectedScript = nil
 local gameName = "Unknown"
@@ -177,28 +186,12 @@ local function popupOut()
     }):Play()
 end
 
-local function updateLoader(progress)
-    percentLabel.Text = math.floor(progress).."%"
-    TweenService:Create(barFill, TweenInfo.new(CONFIG.BarLerpSpeed), {
-        Size = UDim2.new(progress/100,0,1,0)
-    }):Play()
-end
-
-RunService.RenderStepped:Connect(function(dt)
-    grad.Rotation += dt*120
-    spinner.Rotation += dt*180
-end)
-
 task.spawn(function()
     popupIn()
     task.wait(CONFIG.PopupTime)
 
     animateLetters(statusLetters)
     animateLetters(creditLetters)
-
-    task.spawn(function()
-        animateDots("Checking")
-    end)
 
     task.wait(0.6)
     updateLoader(30)
@@ -207,10 +200,14 @@ task.spawn(function()
     updateLoader(70)
 
     task.wait(0.8)
-    task.spawn(function()
-        animateDots("Executing")
-    end)
+
+    statusFrame.Visible = false
+    executingFrame.Visible = true
+    animateLetters(executingLetters)
+
     updateLoader(100)
+
+    finishSound:Play()
 
     task.wait(0.5)
 
