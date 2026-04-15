@@ -188,82 +188,100 @@ MovementTab:Toggle({
 })
 
 MovementTab:Toggle({
+    Title = "Force Jump",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+
+        if state then
+
+            _G.forceJumpConn = game:GetService("RunService").RenderStepped:Connect(function()
+                local char = player.Character
+                if not char then return end
+
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if not hum then return end
+
+                if hum:GetState() == Enum.HumanoidStateType.Jumping then
+                    local hrp = char:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.Velocity = Vector3.new(hrp.Velocity.X, 60, hrp.Velocity.Z)
+                    end
+                end
+            end)
+
+        else
+            if _G.forceJumpConn then
+                _G.forceJumpConn:Disconnect()
+                _G.forceJumpConn = nil
+            end
+        end
+
+    end
+})
+
+MovementTab:Toggle({
     Title = "Mobile Jump Button",
     Desc = "",
     Value = false,
     Callback = function(state)
 
         local player = game:GetService("Players").LocalPlayer
-        local UIS = game:GetService("UserInputService")
-
-        _G.customJump = state
 
         if state then
 
             local gui = Instance.new("ScreenGui")
-            gui.Name = "CUSTOM_JUMP_GUI"
-            gui.ResetOnSpawn = false
-            gui.Parent = player:WaitForChild("PlayerGui")
+            gui.Name = "MobileJumpButton"
+            gui.Parent = game.CoreGui
 
             local button = Instance.new("ImageButton")
-            button.Name = "JumpButton"
-            button.Size = UDim2.new(0, 70, 0, 70)
-            button.Position = UDim2.new(1, -90, 1, -120)
+            button.Parent = gui
+            button.Size = UDim2.new(0, 80, 0, 80)
+            button.Position = UDim2.new(0, 548, 0, 102)
             button.BackgroundTransparency = 1
             button.Image = "rbxassetid://8618269848"
-            button.Parent = gui
 
             local icon = Instance.new("ImageLabel")
-            icon.Size = UDim2.new(0, 36, 0, 36)
+            icon.Parent = button
+            icon.Size = UDim2.new(0, 40, 0, 40)
             icon.AnchorPoint = Vector2.new(0.5, 0.5)
             icon.Position = UDim2.new(0.5, 0, 0.5, 0)
             icon.BackgroundTransparency = 1
             icon.Image = "rbxassetid://99260194327483"
-            icon.Parent = button
 
-            local tweenService = game:GetService("TweenService")
-
-            local function animate(scale)
-                local tween = tweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, 70 * scale, 0, 70 * scale)
-                })
-                tween:Play()
+            local function animate()
+                button:TweenSize(UDim2.new(0, 90, 0, 90), "Out", "Quad", 0.1, true)
+                task.wait(0.1)
+                button:TweenSize(UDim2.new(0, 80, 0, 80), "Out", "Quad", 0.1, true)
             end
 
-            local function doJump()
+            local function canJump(humanoid)
+                return humanoid.FloorMaterial ~= Enum.Material.Air
+            end
+
+            local function jump()
                 local char = player.Character
-                local humanoid = char and char:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                if char then
+                    local hum = char:FindFirstChildOfClass("Humanoid")
+                    if hum and canJump(hum) then
+                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                    end
                 end
             end
 
-            _G.jumpPress = button.MouseButton1Down:Connect(function()
-                animate(0.85)
-                doJump()
+            button.MouseButton1Click:Connect(function()
+                animate()
+                jump()
             end)
 
-            _G.jumpRelease = button.MouseButton1Up:Connect(function()
-                animate(1)
-            end)
-
-            _G.jumpKey = UIS.InputBegan:Connect(function(input, gpe)
-                if not gpe and input.KeyCode == Enum.KeyCode.Space then
-                    doJump()
-                end
-            end)
+            _G.jumpGui = gui
 
         else
-            _G.customJump = false
-
-            if _G.jumpPress then _G.jumpPress:Disconnect() _G.jumpPress = nil end
-            if _G.jumpRelease then _G.jumpRelease:Disconnect() _G.jumpRelease = nil end
-            if _G.jumpKey then _G.jumpKey:Disconnect() _G.jumpKey = nil end
-
-            local player = game:GetService("Players").LocalPlayer
-            local gui = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("CUSTOM_JUMP_GUI")
-            if gui then
-                gui:Destroy()
+            if _G.jumpGui then
+                _G.jumpGui:Destroy()
+                _G.jumpGui = nil
             end
         end
 
@@ -277,25 +295,39 @@ MovementTab:Toggle({
     Callback = function(state)
 
         local player = game:GetService("Players").LocalPlayer
-        local char = workspace:FindFirstChild(player.Name)
 
         _G.sprintEnabled = state
         _G.sprintValue = _G.sprintValue or 70
 
-        if state then
-            if char then
-                local sprint = char:FindFirstChild("SprintSpeed")
-                if sprint then
-                    _G.defaultSprint = _G.defaultSprint or sprint.Value
-                    sprint.Value = _G.sprintValue
-                end
+        local function apply()
+            local char = workspace:FindFirstChild(player.Name)
+            if not char then return end
+
+            local sprint = char:FindFirstChild("SprintSpeed")
+            if not sprint then return end
+
+            if _G.defaultSprint == nil then
+                _G.defaultSprint = sprint.Value
             end
+
+            if _G.sprintEnabled then
+                sprint.Value = _G.sprintValue
+            else
+                sprint.Value = _G.defaultSprint
+            end
+        end
+
+        apply()
+
+        if state then
+            _G.sprintConn = player.CharacterAdded:Connect(function()
+                task.wait(0.5)
+                apply()
+            end)
         else
-            if char then
-                local sprint = char:FindFirstChild("SprintSpeed")
-                if sprint and _G.defaultSprint then
-                    sprint.Value = _G.defaultSprint
-                end
+            if _G.sprintConn then
+                _G.sprintConn:Disconnect()
+                _G.sprintConn = nil
             end
         end
 
@@ -303,7 +335,7 @@ MovementTab:Toggle({
 })
 
 MovementTab:Slider({
-    Title = "Sprint Speed",
+    Title = "Sprint Boost Value",
     Desc = "",
     Step = 1,
     Value = {
