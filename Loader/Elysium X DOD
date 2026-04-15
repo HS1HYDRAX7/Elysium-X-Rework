@@ -255,7 +255,7 @@ MovementTab:Toggle({
         local player = game:GetService("Players").LocalPlayer
 
         _G.sprintEnabled = state
-        _G.sprintValue = _G.sprintValue or 70
+        _G.sprintValue = _G.sprintValue or 5
 
         local function getCharacter()
             for _,v in ipairs(workspace:GetDescendants()) do
