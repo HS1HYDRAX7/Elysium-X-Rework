@@ -257,8 +257,17 @@ MovementTab:Toggle({
         _G.sprintEnabled = state
         _G.sprintValue = _G.sprintValue or 70
 
+        local function getCharacter()
+            return workspace:FindFirstChild(player.Name)
+                or (workspace:FindFirstChild("PLAYERS") and (
+                    (workspace.PLAYERS:FindFirstChild("Survivor") and workspace.PLAYERS.Survivor:FindFirstChild(player.Name))
+                    or (workspace.PLAYERS:FindFirstChild("Killer") and workspace.PLAYERS.Killer:FindFirstChild(player.Name))
+                ))
+                or (workspace:FindFirstChild("GameAssets") and workspace.GameAssets:FindFirstChild("Teams") and workspace.GameAssets.Teams:FindFirstChild("Ghost") and workspace.GameAssets.Teams.Ghost:FindFirstChild(player.Name))
+        end
+
         local function apply()
-            local char = workspace:FindFirstChild(player.Name)
+            local char = getCharacter()
             if not char then return end
 
             if char:GetAttribute("WalkSpeedModifier") == nil then return end
@@ -284,7 +293,6 @@ MovementTab:Toggle({
                 task.wait(0.5)
                 apply()
             end)
-
         else
             if _G.sprintConn then
                 _G.sprintConn:Disconnect()
@@ -300,9 +308,9 @@ MovementTab:Slider({
     Desc = "",
     Step = 1,
     Value = {
-        Min = 0,
+        Min = 1,
         Max = 100,
-        Default = 0,
+        Default = 1,
     },
     Callback = function(value)
 
