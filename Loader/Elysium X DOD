@@ -293,7 +293,7 @@ MovementTab:Toggle({
 })
 
 MovementTab:Slider({
-    Title = "Sprint Speed",
+    Title = "Sprint Boost Value",
     Desc = "",
     Step = 1,
     Value = {
