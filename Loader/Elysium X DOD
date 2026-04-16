@@ -551,6 +551,8 @@ VisualsTab:Colorpicker({
     end
 })
 
+VisualsTab:Space()
+
 VisualsTab:Toggle({
     Title = "Ignore (yourself)",
     Desc = "",
@@ -657,6 +659,8 @@ SkillsSelectorTab:Dropdown({
 
     end
 })
+
+SkillsSelectorTab:Space()
 
 SkillsSelectorTab:Button({
     Title = "Give Ability",
