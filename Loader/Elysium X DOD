@@ -626,7 +626,16 @@ SkillsSelectorTab:Dropdown({
     Values = { "None", "Adrenaline", "Punch", "Caretaker", "Cloak", "Block", "Dash", "BonusPad", "Hotdog", "Revolver", "Taunt", "Banana" },
     Value = "None",
     Callback = function(option)
-        _G.skill1 = option
+
+        local player = game:GetService("Players").LocalPlayer
+
+        for _,v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("Model") and v.Name == player.Name then
+                v:SetAttribute("Ability1", option)
+                break
+            end
+        end
+
     end
 })
 
@@ -636,7 +645,16 @@ SkillsSelectorTab:Dropdown({
     Values = { "None", "Adrenaline", "Punch", "Caretaker", "Cloak", "Block", "Dash", "BonusPad", "Hotdog", "Revolver", "Taunt", "Banana" },
     Value = "None",
     Callback = function(option)
-        _G.skill2 = option
+
+        local player = game:GetService("Players").LocalPlayer
+
+        for _,v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("Model") and v.Name == player.Name then
+                v:SetAttribute("Ability2", option)
+                break
+            end
+        end
+
     end
 })
 
@@ -646,22 +664,38 @@ SkillsSelectorTab:Button({
     Locked = false,
     Callback = function()
 
+        local player = game:GetService("Players").LocalPlayer
+
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
+        end
+
+        local char = getCharacter()
+        if not char then return end
+
+        local ability1 = char:GetAttribute("Ability1")
+        local ability2 = char:GetAttribute("Ability2")
+
+        local abilities = {}
+
+        if ability1 and ability1 ~= "None" then
+            table.insert(abilities, tostring(ability1))
+        end
+
+        if ability2 and ability2 ~= "None" then
+            table.insert(abilities, tostring(ability2))
+        end
+
+        if #abilities == 0 then return end
+
         if TestRequire() ~= true then
             ErrorRequire()
             return
         end
-
-        local abilities = {}
-
-        if _G.skill1 and _G.skill1 ~= "None" then
-            table.insert(abilities, tostring(_G.skill1))
-        end
-
-        if _G.skill2 and _G.skill2 ~= "None" then
-            table.insert(abilities, tostring(_G.skill2))
-        end
-
-        if #abilities == 0 then return end
 
         game:GetService("ReplicatedStorage")
             :WaitForChild("Events")
