@@ -188,6 +188,75 @@ MovementTab:Toggle({
 })
 
 MovementTab:Toggle({
+    Title = "Enable Jump (IN-GAME)",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        local UIS = game:GetService("UserInputService")
+
+        _G.jumpEnabled = state
+
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
+        end
+
+        local function setup()
+            local char = getCharacter()
+            if not char then return end
+
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
+
+            hum.UseJumpPower = true
+            hum.JumpPower = 50
+        end
+
+        if state then
+
+            setup()
+
+            _G.jumpInputConn = UIS.InputBegan:Connect(function(input, gpe)
+                if gpe then return end
+
+                if input.KeyCode == Enum.KeyCode.Space then
+                    local char = getCharacter()
+                    if not char then return end
+
+                    local hum = char:FindFirstChildOfClass("Humanoid")
+                    if not hum then return end
+
+                    if hum.FloorMaterial ~= Enum.Material.Air then
+                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                    end
+                end
+            end)
+
+            _G.jumpLoop = task.spawn(function()
+                while _G.jumpEnabled do
+                    setup()
+                    task.wait(0.2)
+                end
+            end)
+
+        else
+
+            if _G.jumpInputConn then
+                _G.jumpInputConn:Disconnect()
+                _G.jumpInputConn = nil
+            end
+
+        end
+
+    end
+})
+
+MovementTab:Toggle({
     Title = "Mobile Jump Button",
     Desc = "",
     Value = false,
