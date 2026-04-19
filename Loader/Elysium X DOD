@@ -216,10 +216,16 @@ MovementTab:Toggle({
             end
         end
 
-        local function getHumanoid()
+        local function jump()
             local char = getCharacter()
             if not char then return end
-            return char:FindFirstChildOfClass("Humanoid")
+
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
+
+            if hum.FloorMaterial ~= Enum.Material.Air then
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
         end
 
         if state then
@@ -228,20 +234,20 @@ MovementTab:Toggle({
                 if gpe then return end
 
                 if input.KeyCode == Enum.KeyCode.Space then
-                    local hum = getHumanoid()
-                    if not hum then return end
-
-                    if hum.FloorMaterial ~= Enum.Material.Air then
-                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
-                    end
+                    jump()
                 end
             end)
 
             _G.jumpBtnConn = game:GetService("RunService").RenderStepped:Connect(function()
-                local hum = getHumanoid()
-                if hum then
-                    hum.UseJumpPower = true
-                    hum.JumpPower = 50
+                if not _G.jumpEnabled then return end
+
+                local gui = game.CoreGui:FindFirstChild("MobileJumpButton")
+                if gui then
+                    local btn = gui:FindFirstChildWhichIsA("ImageButton", true)
+                    if btn and not btn:GetAttribute("Connected") then
+                        btn:SetAttribute("Connected", true)
+                        btn.MouseButton1Click:Connect(jump)
+                    end
                 end
             end)
 
@@ -317,9 +323,6 @@ MovementTab:Toggle({
                 _G.jumpGui = nil
             end
         end
-
-    end
-})
 
 MovementTab:Toggle({
     Title = "Sprint Boost",
