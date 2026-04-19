@@ -149,39 +149,50 @@ MovementTab:Toggle({
     Value = false,
     Callback = function(state)
 
-        local Players = game:GetService("Players")
-        local player = Players.LocalPlayer
+        local player = game:GetService("Players").LocalPlayer
 
         _G.infStamina = state
 
+        local function getModule()
+            local gui = player:FindFirstChild("PlayerGui")
+            if not gui then return end
+
+            local main = gui:FindFirstChild("MainGui")
+            if not main then return end
+
+            local client = main:FindFirstChild("Client")
+            if not client then return end
+
+            local modules = client:FindFirstChild("Modules")
+            if not modules then return end
+
+            local movement = modules:FindFirstChild("Movement")
+            if not movement then return end
+
+            return require(movement)
+        end
+
         if state then
-            _G.infStamConn = task.spawn(function()
-                while _G.infStamina do
-                    local gui = player:FindFirstChild("PlayerGui")
-                    if gui then
-                        local main = gui:FindFirstChild("MainGui")
-                        if main then
-                            local client = main:FindFirstChild("Client")
-                            if client then
-                                local modules = client:FindFirstChild("Modules")
-                                if modules then
-                                    local movement = modules:FindFirstChild("Movement")
-                                    if movement then
-                                        local staminaM = require(movement)
-                                        if staminaM then
-                                            staminaM.Stamina = math.huge
-                                            staminaM.MaxStamina = math.huge
-                                        end
-                                    end
-                                end
-                            end
-                        end
+
+            local staminaM = getModule()
+            if staminaM then
+                staminaM.Stamina = 100
+                staminaM.MaxStamina = 100
+
+                _G.stamConn = game:GetService("RunService").Heartbeat:Connect(function()
+                    if _G.infStamina and staminaM.Stamina < 100 then
+                        staminaM.Stamina = 100
                     end
-                    task.wait()
-                end
-            end)
+                end)
+            end
+
         else
-            _G.infStamina = false
+
+            if _G.stamConn then
+                _G.stamConn:Disconnect()
+                _G.stamConn = nil
+            end
+
         end
 
     end
@@ -195,8 +206,6 @@ MovementTab:Toggle({
 
         local player = game:GetService("Players").LocalPlayer
         local UIS = game:GetService("UserInputService")
-
-        _G.jumpEnabled = state
 
         local function getCharacter()
             for _,v in ipairs(workspace:GetDescendants()) do
@@ -221,6 +230,11 @@ MovementTab:Toggle({
 
             setup()
 
+            _G.jumpCharConn = player.CharacterAdded:Connect(function()
+                task.wait(0.3)
+                setup()
+            end)
+
             _G.jumpInputConn = UIS.InputBegan:Connect(function(input, gpe)
                 if gpe then return end
 
@@ -237,14 +251,12 @@ MovementTab:Toggle({
                 end
             end)
 
-            _G.jumpLoop = task.spawn(function()
-                while _G.jumpEnabled do
-                    setup()
-                    task.wait(0.2)
-                end
-            end)
-
         else
+
+            if _G.jumpCharConn then
+                _G.jumpCharConn:Disconnect()
+                _G.jumpCharConn = nil
+            end
 
             if _G.jumpInputConn then
                 _G.jumpInputConn:Disconnect()
@@ -334,10 +346,8 @@ MovementTab:Toggle({
             end
         end
 
-        local function apply()
-            local char = getCharacter()
+        local function apply(char)
             if not char then return end
-
             if char:GetAttribute("WalkSpeedModifier") == nil then return end
 
             if _G.sprintEnabled then
@@ -347,15 +357,38 @@ MovementTab:Toggle({
             end
         end
 
-        apply()
-
         if state then
-            _G.sprintLoop = task.spawn(function()
-                while _G.sprintEnabled do
-                    apply()
-                    task.wait(0.1)
+
+            local char = getCharacter()
+            apply(char)
+
+            _G.sprintCharConn = player.CharacterAdded:Connect(function()
+                task.wait(0.5)
+                apply(getCharacter())
+            end)
+
+            _G.sprintAttrConn = workspace.DescendantAdded:Connect(function(v)
+                if v:IsA("Model") and v.Name == player.Name then
+                    task.wait(0.2)
+                    apply(v)
                 end
             end)
+
+        else
+
+            local char = getCharacter()
+            apply(char)
+
+            if _G.sprintCharConn then
+                _G.sprintCharConn:Disconnect()
+                _G.sprintCharConn = nil
+            end
+
+            if _G.sprintAttrConn then
+                _G.sprintAttrConn:Disconnect()
+                _G.sprintAttrConn = nil
+            end
+
         end
 
     end
