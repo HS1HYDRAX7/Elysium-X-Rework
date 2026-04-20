@@ -205,6 +205,7 @@ MovementTab:Toggle({
 
         local player = game:GetService("Players").LocalPlayer
         local UIS = game:GetService("UserInputService")
+        local RunService = game:GetService("RunService")
 
         _G.jumpEnabled = state
 
@@ -220,25 +221,26 @@ MovementTab:Toggle({
             local char = getCharacter()
             if not char then return end
 
+            local root = char:FindFirstChild("HumanoidRootPart")
             local hum = char:FindFirstChildOfClass("Humanoid")
-            if not hum then return end
 
-            if hum.FloorMaterial ~= Enum.Material.Air then
-                hum:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
+            if not root or not hum then return end
+
+            if hum.FloorMaterial == Enum.Material.Air then return end
+
+            root.Velocity = Vector3.new(root.Velocity.X, 50, root.Velocity.Z)
         end
 
         if state then
 
             _G.jumpInputConn = UIS.InputBegan:Connect(function(input, gpe)
                 if gpe then return end
-
                 if input.KeyCode == Enum.KeyCode.Space then
                     jump()
                 end
             end)
 
-            _G.jumpBtnConn = game:GetService("RunService").RenderStepped:Connect(function()
+            _G.jumpBtnConn = RunService.RenderStepped:Connect(function()
                 if not _G.jumpEnabled then return end
 
                 local gui = game.CoreGui:FindFirstChild("MobileJumpButton")
@@ -418,6 +420,19 @@ MovementTab:Slider({
     Callback = function(value)
 
         _G.sprintValue = value
+
+        if _G.sprintEnabled then
+            local player = game:GetService("Players").LocalPlayer
+
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    if v:GetAttribute("WalkSpeedModifier") ~= nil then
+                        v:SetAttribute("WalkSpeedModifier", value)
+                    end
+                    break
+                end
+            end
+        end
 
     end
 })
