@@ -276,10 +276,19 @@ MovementTab:Toggle({
 
         local player = game:GetService("Players").LocalPlayer
 
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
+        end
+
         if state then
 
             local gui = Instance.new("ScreenGui")
             gui.Name = "MobileJumpButton"
+            gui.ResetOnSpawn = false
             gui.Parent = game.CoreGui
 
             local button = Instance.new("ImageButton")
@@ -297,32 +306,38 @@ MovementTab:Toggle({
             icon.BackgroundTransparency = 1
             icon.Image = "rbxassetid://99260194327483"
 
-            local function canJump(humanoid)
-                return humanoid.FloorMaterial ~= Enum.Material.Air
-            end
-
             local function jump()
-                local char = player.Character
-                if char then
-                    local hum = char:FindFirstChildOfClass("Humanoid")
-                    if hum and canJump(hum) then
-                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
-                    end
+                local char = getCharacter()
+                if not char then return end
+
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if not hum then return end
+
+                if hum.FloorMaterial ~= Enum.Material.Air then
+                    hum:ChangeState(Enum.HumanoidStateType.Jumping)
                 end
             end
 
-            button.MouseButton1Click:Connect(function()
-                jump()
-            end)
+            _G.jumpBtnConnection = button.MouseButton1Click:Connect(jump)
 
             _G.jumpGui = gui
 
         else
+
+            if _G.jumpBtnConnection then
+                _G.jumpBtnConnection:Disconnect()
+                _G.jumpBtnConnection = nil
+            end
+
             if _G.jumpGui then
                 _G.jumpGui:Destroy()
                 _G.jumpGui = nil
             end
+
         end
+
+    end
+})
 
 MovementTab:Toggle({
     Title = "Sprint Boost",
