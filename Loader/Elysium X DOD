@@ -2,8 +2,8 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
-    Icon = "box",
-    Author = 'By <font color="rgb(189,252,255)">Zenith Studios</font>',
+    Icon = "biohazard",
+    Author = "By Zenith Studios",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
