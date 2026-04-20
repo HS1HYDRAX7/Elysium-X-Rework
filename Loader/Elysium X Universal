@@ -2,8 +2,8 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Elysium X Rework",
-    Icon = "box",
-    Author = 'By <font color="rgb(189,252,255)">Zenith Studios</font>',
+    Icon = "biohazard",
+    Author = "By Zenith Studios",
     Folder = "Elysium X Rework",
     Transparent = true,
     Theme = "Crimson",
@@ -40,11 +40,14 @@ local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
-MainTab:Paragraph({
+local keybind = MainTab:Keybind({
     Title = "Open or Minimize UI IN PC",
     Desc = "PRESS G in your keyboard to open the ui or minimize the ui in pc",
-    Color = "Green",
-    Locked = false,
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+        keybind:SetDesc("PRESS " .. v .. " in your keyboard to open the ui or minimize the ui in pc")
+    end
 })
 
 MainTab:Space()
