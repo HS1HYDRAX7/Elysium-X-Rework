@@ -218,6 +218,8 @@ MovementTab:Toggle({
         end
 
         local function jump()
+            if not _G.jumpEnabled then return end
+
             local char = getCharacter()
             if not char then return end
 
@@ -225,13 +227,20 @@ MovementTab:Toggle({
             local hum = char:FindFirstChildOfClass("Humanoid")
 
             if not root or not hum then return end
-
             if hum.FloorMaterial == Enum.Material.Air then return end
 
             root.Velocity = Vector3.new(root.Velocity.X, 50, root.Velocity.Z)
         end
 
         if state then
+
+            if _G.jumpInputConn then
+                _G.jumpInputConn:Disconnect()
+            end
+
+            if _G.jumpBtnConn then
+                _G.jumpBtnConn:Disconnect()
+            end
 
             _G.jumpInputConn = UIS.InputBegan:Connect(function(input, gpe)
                 if gpe then return end
@@ -254,6 +263,8 @@ MovementTab:Toggle({
             end)
 
         else
+
+            _G.jumpEnabled = false
 
             if _G.jumpInputConn then
                 _G.jumpInputConn:Disconnect()
