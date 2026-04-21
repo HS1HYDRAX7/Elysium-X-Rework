@@ -699,62 +699,47 @@ VisualsTab:Toggle({
 
         local Players = game:GetService("Players")
         local player = Players.LocalPlayer
+
         _G.ignoreSelf = state
 
-        local function removeSelfESP(char)
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
+        end
+
+        local function removeSelfESP()
+            local char = getCharacter()
             if not char then return end
+
             local h = char:FindFirstChild("ESP_HIGHLIGHT")
             if h then h:Destroy() end
         end
 
-        local function applySelfESP(char)
-            if not char then return end
-
-            local parent = char.Parent
-            if not parent then return end
-
-            local color =
-                (parent.Name == "Killer" and (_G.killerColor or Color3.fromRGB(128,0,32))) or
-                (parent.Name == "Survivor" and (_G.survivorColor or Color3.fromRGB(0,100,0))) or
-                (parent.Name == "Ghost" and (_G.ghostColor or Color3.fromRGB(255,255,255)))
-
-            if not char:FindFirstChild("ESP_HIGHLIGHT") and color then
-                local h = Instance.new("Highlight")
-                h.Name = "ESP_HIGHLIGHT"
-                h.FillColor = color
-                h.OutlineColor = color
-                h.Adornee = char
-                h.Parent = char
-            end
-        end
-
         if state then
-            if player.Character then
-                removeSelfESP(player.Character)
+
+            removeSelfESP()
+
+            if _G.ignoreLoop then
+                _G.ignoreLoop:Disconnect()
             end
 
-            _G.ignoreCharConn = player.CharacterAdded:Connect(function(char)
-                if _G.ignoreSelf then
-                    task.wait()
-                    removeSelfESP(char)
-                end
-            end)
-
-            _G.ignoreParentConn = player:GetPropertyChangedSignal("Character"):Connect(function()
-                local char = player.Character
-                if char and _G.ignoreSelf then
-                    task.wait()
-                    removeSelfESP(char)
-                end
+            _G.ignoreLoop = game:GetService("RunService").RenderStepped:Connect(function()
+                if not _G.ignoreSelf then return end
+                removeSelfESP()
             end)
 
         else
-            if _G.ignoreCharConn then _G.ignoreCharConn:Disconnect() _G.ignoreCharConn = nil end
-            if _G.ignoreParentConn then _G.ignoreParentConn:Disconnect() _G.ignoreParentConn = nil end
 
-            if player.Character then
-                applySelfESP(player.Character)
+            _G.ignoreSelf = false
+
+            if _G.ignoreLoop then
+                _G.ignoreLoop:Disconnect()
+                _G.ignoreLoop = nil
             end
+
         end
 
     end
