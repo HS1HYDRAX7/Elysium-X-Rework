@@ -867,33 +867,128 @@ Scripts:Button({
 })
 
 Scripts:Toggle({
-    Title = "Anti Fling",
+    Title = "FPS Counter",
     Desc = "",
-    Flag = "AntiFling",
     Value = false,
     Callback = function(state)
 
-        local player = game.Players.LocalPlayer
-        _G.antiFling = state
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local player = Players.LocalPlayer
 
         if state then
-            _G.antiFlingConn = game:GetService("RunService").Stepped:Connect(function()
-                if not _G.antiFling then return end
 
-                local char = player.Character
-                if not char then return end
+            if _G.fpsGui then return end
 
-                local root = char:FindFirstChild("HumanoidRootPart")
-                if not root then return end
+            local function getVoiceOffset()
+                local offset = 0
 
-                root.AssemblyLinearVelocity = Vector3.zero
-                root.AssemblyAngularVelocity = Vector3.zero
-            end)
-        else
-            if _G.antiFlingConn then
-                _G.antiFlingConn:Disconnect()
-                _G.antiFlingConn = nil
+                local success, voiceChat = pcall(function()
+                    return game:GetService("VoiceChatService")
+                end)
+
+                if success and voiceChat then
+                    if voiceChat:IsVoiceEnabledForUserIdAsync(player.UserId) then
+                        offset = 40
+                    end
+                end
+
+                return offset
             end
+
+            local function createCoreGuiVersion()
+                local Frame1 = Instance.new("Frame")
+                Frame1.Parent = game:GetService("CoreGui").TopBarApp.TopBarApp
+                Frame1.Size = UDim2.new(1, 0, 0, 48)
+                Frame1.Position = UDim2.new(0, 0, 0, 10 + getVoiceOffset())
+                Frame1.BackgroundTransparency = 1
+
+                local Frame2 = Instance.new("Frame")
+                Frame2.Parent = Frame1
+                Frame2.Size = UDim2.new(1, 0, 0, 44)
+                Frame2.Position = UDim2.new(0, 172, 0, 2)
+                Frame2.BackgroundTransparency = 1
+
+                local UIListLayout = Instance.new("UIListLayout")
+                UIListLayout.Parent = Frame2
+                UIListLayout.Padding = UDim.new(0, 12)
+                UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+                UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+                local Frame3 = Instance.new("Frame")
+                Frame3.Parent = Frame2
+                Frame3.Size = UDim2.new(0, 96, 0, 44)
+                Frame3.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+                Frame3.BackgroundTransparency = 0.08
+
+                local UICorner = Instance.new("UICorner")
+                UICorner.Parent = Frame3
+                UICorner.CornerRadius = UDim.new(1, 0)
+
+                local TextLabel = Instance.new("TextLabel")
+                TextLabel.Parent = Frame3
+                TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                TextLabel.BackgroundTransparency = 1
+                TextLabel.TextColor3 = Color3.new(1,1,1)
+                TextLabel.TextSize = 18
+                TextLabel.Font = Enum.Font.BuilderSansBold
+
+                return Frame1, TextLabel
+            end
+
+            local function createTopbarVersion()
+                local parent = player:WaitForChild("PlayerGui"):WaitForChild("TopbarStandard"):WaitForChild("Holders"):WaitForChild("Left")
+
+                local Frame = Instance.new("Frame")
+                Frame.Parent = parent
+                Frame.Size = UDim2.new(0, 96, 0, 44)
+                Frame.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+                Frame.BackgroundTransparency = 0.08
+
+                local UICorner = Instance.new("UICorner")
+                UICorner.Parent = Frame
+                UICorner.CornerRadius = UDim.new(1, 0)
+
+                local TextLabel = Instance.new("TextLabel")
+                TextLabel.Parent = Frame
+                TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                TextLabel.BackgroundTransparency = 1
+                TextLabel.TextColor3 = Color3.new(1,1,1)
+                TextLabel.Font = Enum.Font.BuilderSansBold
+                TextLabel.TextSize = 18
+
+                return Frame, TextLabel
+            end
+
+            local gui, label
+
+            if not player:WaitForChild("PlayerGui"):FindFirstChild("TopbarStandard") then
+                gui, label = createCoreGuiVersion()
+            else
+                gui, label = createTopbarVersion()
+            end
+
+            _G.fpsGui = gui
+
+            _G.fpsConn = RunService.RenderStepped:Connect(function(dt)
+                if tick() % 0.1 <= dt then
+                    label.Text = string.format("%.0f FPS", 1/dt)
+                end
+            end)
+
+        else
+
+            if _G.fpsConn then
+                _G.fpsConn:Disconnect()
+                _G.fpsConn = nil
+            end
+
+            if _G.fpsGui then
+                _G.fpsGui:Destroy()
+                _G.fpsGui = nil
+            end
+
         end
 
     end
