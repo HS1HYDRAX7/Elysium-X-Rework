@@ -1024,6 +1024,54 @@ SettingsTab:Button({
     end
 })
 
+SettingsTab:Section({
+    Title = "Minor Settings",
+    Icon = "cog",
+})
+
+SettingsTab:Button({
+    Title = "Copy JobId",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local jobId = game.JobId
+
+        if setclipboard then
+            setclipboard(jobId)
+        end
+
+    end
+})
+
+SettingsTab:Button({
+    Title = "ServerHop",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+
+        TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+
+    end
+})
+
+SettingsTab:Button({
+    Title = "Rejoin",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+
+    end
+})
+
 do
     refreshDropdown()
 end
