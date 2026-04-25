@@ -37,6 +37,7 @@ Window:EditOpenButton({
 })
 
 local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local PlayerTab = Window:Tab({ Title = "Player", Icon = "user", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
@@ -129,6 +130,224 @@ MainTab:Toggle({
         else
             Window.User:SetAnonymous(false)
         end
+    end
+})
+
+PlayerTab:Section({
+    Title = "Player attributes",
+    Icon = "user",
+})
+
+PlayerTab:Toggle({
+    Title = "CFrame Speed",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+        local RunService = game:GetService("RunService")
+
+        _G.cframeSpeedEnabled = state
+        _G.cframeSpeedValue = _G.cframeSpeedValue or 2
+
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
+            end
+        end
+
+        if state then
+            _G.cframeConn = RunService.RenderStepped:Connect(function()
+                if not _G.cframeSpeedEnabled then return end
+
+                local char = getCharacter()
+                if not char then return end
+
+                local root = char:FindFirstChild("HumanoidRootPart")
+                local hum = char:FindFirstChildOfClass("Humanoid")
+
+                if root and hum and hum.MoveDirection.Magnitude > 0 then
+                    root.CFrame = root.CFrame + (hum.MoveDirection * _G.cframeSpeedValue)
+                end
+            end)
+        else
+            if _G.cframeConn then
+                _G.cframeConn:Disconnect()
+                _G.cframeConn = nil
+            end
+        end
+
+    end
+})
+
+PlayerTab:Slider({
+    Title = "CFrame Speed Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 0, Max = 300, Default = 2 },
+    Callback = function(value)
+        _G.cframeSpeedValue = value
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "WalkSpeed",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+
+        _G.wsEnabled = state
+        _G.wsValue = _G.wsValue or 16
+
+        local function apply()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    local hum = v:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        hum.WalkSpeed = state and _G.wsValue or 16
+                    end
+                end
+            end
+        end
+
+        if state then
+            apply()
+            _G.wsConn = player.CharacterAdded:Connect(function()
+                task.wait(0.3)
+                apply()
+            end)
+        else
+            apply()
+            if _G.wsConn then
+                _G.wsConn:Disconnect()
+                _G.wsConn = nil
+            end
+        end
+
+    end
+})
+
+PlayerTab:Slider({
+    Title = "WalkSpeed Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 0, Max = 300, Default = 16 },
+    Callback = function(value)
+
+        _G.wsValue = value
+
+        if _G.wsEnabled then
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == game.Players.LocalPlayer.Name then
+                    local hum = v:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        hum.WalkSpeed = value
+                    end
+                end
+            end
+        end
+
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "JumpPower",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local player = game:GetService("Players").LocalPlayer
+
+        _G.jpEnabled = state
+        _G.jpValue = _G.jpValue or 50
+
+        local function apply()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    local hum = v:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        hum.UseJumpPower = true
+                        hum.JumpPower = state and _G.jpValue or 50
+                    end
+                end
+            end
+        end
+
+        if state then
+            apply()
+            _G.jpConn = player.CharacterAdded:Connect(function()
+                task.wait(0.3)
+                apply()
+            end)
+        else
+            apply()
+            if _G.jpConn then
+                _G.jpConn:Disconnect()
+                _G.jpConn = nil
+            end
+        end
+
+    end
+})
+
+PlayerTab:Slider({
+    Title = "JumpPower Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 0, Max = 300, Default = 50 },
+    Callback = function(value)
+
+        _G.jpValue = value
+
+        if _G.jpEnabled then
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == game.Players.LocalPlayer.Name then
+                    local hum = v:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        hum.JumpPower = value
+                    end
+                end
+            end
+        end
+
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Gravity",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        _G.gravEnabled = state
+        _G.gravValue = _G.gravValue or 196.2
+
+        if state then
+            workspace.Gravity = _G.gravValue
+        else
+            workspace.Gravity = 196.2
+        end
+
+    end
+})
+
+PlayerTab:Slider({
+    Title = "Gravity Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 0, Max = 300, Default = 196 },
+    Callback = function(value)
+
+        _G.gravValue = value
+
+        if _G.gravEnabled then
+            workspace.Gravity = value
+        end
+
     end
 })
 
