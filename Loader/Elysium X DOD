@@ -827,11 +827,12 @@ SkillsSelectorTab:Button({
     end
 })
 
-local Scripts = MiscTab:Section({
-    Title = "External Scripts"
+MiscTab:Section({
+    Title = "External Scripts",
+    Icon = "scroll",
 })
 
-Scripts:Button({
+MiscTab:Button({
     Title = "Infinite Yield",
     Icon = "file",
     Locked = false,
@@ -840,7 +841,7 @@ Scripts:Button({
     end
 })
 
-Scripts:Button({
+MiscTab:Button({
     Title = "Dex Explorer",
     Icon = "file",
     Locked = false,
@@ -849,7 +850,7 @@ Scripts:Button({
     end
 })
 
-Scripts:Button({
+MiscTab:Button({
     Title = "Elysium Mobile KeyBoard",
     Icon = "file",
     Locked = false,
@@ -858,11 +859,12 @@ Scripts:Button({
     end
 })
 
-local Settings = SettingsTab:Section({
-    Title = "General Settings"
+MainTab:Section({
+    Title = "General Settings",
+    Icon = "cog",
 })
  
-Settings:Input({
+SettingsTab:Input({
     Title = "Config Name",
     Desc = "",
     Value = "",
@@ -873,7 +875,7 @@ Settings:Input({
     end
 })
 
-local dropdown = Settings:Dropdown({
+local dropdown = SettingsTab:Dropdown({
     Title = "Configs",
     Desc = "",
     Values = {},
@@ -900,7 +902,7 @@ local function refreshDropdown()
     end
 end
 
-Settings:Button({
+SettingsTab:Button({
     Title = "Refresh",
     Desc = "",
     Callback = function()
@@ -915,7 +917,7 @@ Settings:Button({
     end
 })
 
-Settings:Button({
+SettingsTab:Button({
     Title = "Load",
     Desc = "",
     Callback = function()
@@ -966,7 +968,7 @@ Settings:Button({
     end
 })
 
-Settings:Button({
+SettingsTab:Button({
     Title = "Save",
     Desc = "",
     Callback = function()
@@ -994,7 +996,7 @@ Settings:Button({
     end
 })
 
-Settings:Button({
+SettingsTab:Button({
     Title = "Delete",
     Desc = "",
     Callback = function()
