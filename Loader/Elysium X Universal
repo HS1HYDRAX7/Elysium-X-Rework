@@ -353,7 +353,7 @@ PlayerTab:Slider({
 
 MiscTab:Section({
     Title = "External Scripts",
-    Icon = "scroll",
+    Icon = "folder-open",
 })
 
 MiscTab:Button({
