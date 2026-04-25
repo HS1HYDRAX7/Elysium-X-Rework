@@ -1035,10 +1035,8 @@ SettingsTab:Button({
     Locked = false,
     Callback = function()
 
-        local jobId = game.JobId
-
         if setclipboard then
-            setclipboard(jobId)
+            setclipboard(game.PlaceId)
         end
 
     end
