@@ -148,7 +148,7 @@ PlayerTab:Toggle({
         local RunService = game:GetService("RunService")
 
         _G.cframeSpeedEnabled = state
-        _G.cframeSpeedValue = _G.cframeSpeedValue or 2
+        _G.cframeSpeedValue = _G.cframeSpeedValue or 5
 
         local function getCharacter()
             for _,v in ipairs(workspace:GetDescendants()) do
@@ -159,7 +159,7 @@ PlayerTab:Toggle({
         end
 
         if state then
-            _G.cframeConn = RunService.RenderStepped:Connect(function()
+            _G.cframeConn = RunService.RenderStepped:Connect(function(dt)
                 if not _G.cframeSpeedEnabled then return end
 
                 local char = getCharacter()
@@ -169,7 +169,7 @@ PlayerTab:Toggle({
                 local hum = char:FindFirstChildOfClass("Humanoid")
 
                 if root and hum and hum.MoveDirection.Magnitude > 0 then
-                    root.CFrame = root.CFrame + (hum.MoveDirection * _G.cframeSpeedValue)
+                    root.CFrame = root.CFrame + (hum.MoveDirection * _G.cframeSpeedValue * dt)
                 end
             end)
         else
@@ -186,7 +186,7 @@ PlayerTab:Slider({
     Title = "CFrame Speed Value",
     Desc = "",
     Step = 1,
-    Value = { Min = 0, Max = 300, Default = 2 },
+    Value = { Min = 0, Max = 100, Default = 5 },
     Callback = function(value)
         _G.cframeSpeedValue = value
     end
