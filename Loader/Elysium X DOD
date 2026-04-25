@@ -829,7 +829,7 @@ SkillsSelectorTab:Button({
 
 MiscTab:Section({
     Title = "External Scripts",
-    Icon = "scroll",
+    Icon = "folder-open",
 })
 
 MiscTab:Button({
@@ -859,7 +859,7 @@ MiscTab:Button({
     end
 })
 
-MainTab:Section({
+SettingsTab:Section({
     Title = "General Settings",
     Icon = "cog",
 })
