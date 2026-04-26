@@ -1,0 +1,858 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Elysium X Rework",
+    Icon = "biohazard",
+    Author = "By Zenith Studios",
+    Folder = "Elysium X Rework",
+    Transparent = true,
+    Theme = "Crimson",
+    NewElements = true,
+    Resizable = false,
+    HideSearchBar = false,
+    ScrollBarEnabled = true
+})
+
+Window:SetToggleKey(Enum.KeyCode.G)
+
+Window:Tag({
+    Title = "Rework In Progress",
+    Icon = "book-plus",
+    Color = Color3.fromHex("#000080"),
+    Radius = 13,
+})
+
+Window:EditOpenButton({
+    Title = "Elysium X",
+    Icon = "shield-cog-corner",
+    CornerRadius = UDim.new(0,50),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0000"),
+        Color3.fromHex("000080")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
+local AimbotTab = Window:Tab({ Title = "Aimbot", Icon = "crosshair", Locked = false })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
+
+MainTab:Paragraph({
+    Title = "Open or Minimize UI IN PC",
+    Desc = "PRESS G in your keyboard to open the ui or minimize the ui in pc",
+    Color = "Green",
+    Locked = false,
+})
+
+MainTab:Space()
+
+MainTab:Paragraph({
+    Title = "Zenith Studios",
+    Desc = "! Links ¡",
+    Thumbnail = "rbxassetid://81706308103426",
+    ThumbnailSize = 85,
+    Locked = false,
+    Buttons = {
+        {
+            Icon = "globe",
+            Title = "Website",
+            Callback = function()
+                setclipboard("https://hs1hydrax7.github.io/Zenith-Website/")
+                WindUI:Notify({
+                    Title = "Website",
+                    Content = "Link Copied",
+                    Duration = 3,
+                    Icon = "link-2",
+                })
+            end,
+        },
+    }
+})
+
+MainTab:Section({
+    Title = "Interface customization",
+    Icon = "paintbrush",
+})
+
+MainTab:Dropdown({
+    Title = "Theme",
+    Values = { "Rose","Light","MonokaiPro","Plant","Midnight","CottonCandy","Dark","Indigo","Sky","Crimson","Amber","Violet","Red" },
+    Value = "Crimson",
+    Callback = function(option)
+        WindUI:SetTheme(option)
+    end
+})
+
+MainTab:Toggle({
+    Title = "Transparency",
+    Icon = "palette",
+    Value = true,
+    Callback = function(state)
+        Window:ToggleTransparency(state)
+    end
+})
+
+MainTab:Section({
+    Title = "User Profile",
+    Icon = "shield-user",
+})
+
+MainTab:Toggle({
+    Title = "Profile Icon",
+    Desc = "Your profile on your left down",
+    Icon = "user",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:Enable()
+        else
+            Window.User:Disable()
+        end
+    end
+})
+
+MainTab:Toggle({
+    Title = "Set Profile Anonymous",
+    Desc = "Your profile on your left down",
+    Icon = "hat-glasses",
+    Type = "Toggle",
+    Value = false,
+    Callback = function(state)
+        local stateinfo = state
+        if stateinfo then
+            Window.User:SetAnonymous(true)
+        else
+            Window.User:SetAnonymous(false)
+        end
+    end
+})
+
+AimbotTab:Section({
+    Title = "Aimbot",
+    Icon = "crosshair",
+})
+
+AimbotTab:Dropdown({
+    Title = "Select Part",
+    Desc = "",
+    Values = { "Head", "Torso" },
+    Value = "Head",
+    Callback = function(option)
+        _G._aimPart = option
+    end
+})
+
+AimbotTab:Toggle({
+    Title = "Aimbot",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local Camera = workspace.CurrentCamera
+        local player = Players.LocalPlayer
+
+        _G._aimEnabled = state
+        _G._aimStrength = _G._aimStrength or 20
+
+        local function getClosest()
+            local closest, dist = nil, math.huge
+
+            for _,v in ipairs(Players:GetPlayers()) do
+                if v ~= player and v.Character and v.Character.Parent then
+
+                    local partName = (_G._aimPart == "Torso" and "HumanoidRootPart") or "Head"
+                    local part = v.Character:FindFirstChild(partName)
+
+                    if part then
+                        local screenPos, visible = Camera:WorldToViewportPoint(part.Position)
+
+                        if visible then
+                            local mag = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+
+                            if mag < dist then
+                                dist = mag
+                                closest = part
+                            end
+                        end
+                    end
+                end
+            end
+
+            return closest
+        end
+
+        if state then
+            _G._aimConn = RunService.RenderStepped:Connect(function()
+                if not _G._aimEnabled then return end
+
+                local target = getClosest()
+                if not target then return end
+
+                if _G._wallcheck then
+                    local origin = Camera.CFrame.Position
+                    local direction = (target.Position - origin)
+
+                    local ray = Ray.new(origin, direction)
+                    local hit = workspace:FindPartOnRay(ray, player.Character)
+
+                    if hit and not target:IsDescendantOf(hit.Parent) then
+                        return
+                    end
+                end
+
+                local cf = CFrame.new(Camera.CFrame.Position, target.Position)
+                Camera.CFrame = Camera.CFrame:Lerp(cf, _G._aimStrength / 100)
+            end)
+        else
+            if _G._aimConn then
+                _G._aimConn:Disconnect()
+                _G._aimConn = nil
+            end
+        end
+
+    end
+})
+
+AimbotTab:Toggle({
+    Title = "Wallcheck",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        _G._wallcheck = state
+    end
+})
+
+AimbotTab:Slider({
+    Title = "Strength Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 1, Max = 100, Default = 20 },
+    Callback = function(value)
+        _G._aimStrength = value
+    end
+})
+
+AimbotTab:Toggle({
+    Title = "Smooth Aimbot",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local Camera = workspace.CurrentCamera
+        local player = Players.LocalPlayer
+
+        _G._smoothEnabled = state
+        _G._smoothValue = _G._smoothValue or 10
+
+        local function getClosest()
+            local closest, dist = nil, math.huge
+
+            for _,v in ipairs(Players:GetPlayers()) do
+                if v ~= player and v.Character and v.Character.Parent then
+
+                    local partName = (_G._aimPart == "Torso" and "HumanoidRootPart") or "Head"
+                    local part = v.Character:FindFirstChild(partName)
+
+                    if part then
+                        local screenPos, visible = Camera:WorldToViewportPoint(part.Position)
+
+                        if visible then
+                            local mag = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+
+                            if mag < dist then
+                                dist = mag
+                                closest = part
+                            end
+                        end
+                    end
+                end
+            end
+
+            return closest
+        end
+
+        if state then
+            _G._smoothConn = RunService.RenderStepped:Connect(function()
+                if not _G._smoothEnabled then return end
+
+                local target = getClosest()
+                if not target then return end
+
+                if _G._wallcheck then
+                    local origin = Camera.CFrame.Position
+                    local direction = (target.Position - origin)
+
+                    local ray = Ray.new(origin, direction)
+                    local hit = workspace:FindPartOnRay(ray, player.Character)
+
+                    if hit and not target:IsDescendantOf(hit.Parent) then
+                        return
+                    end
+                end
+
+                local cf = CFrame.new(Camera.CFrame.Position, target.Position)
+                Camera.CFrame = Camera.CFrame:Lerp(cf, _G._smoothValue / 100)
+            end)
+        else
+            if _G._smoothConn then
+                _G._smoothConn:Disconnect()
+                _G._smoothConn = nil
+            end
+        end
+
+    end
+})
+
+AimbotTab:Slider({
+    Title = "Smoothness Value",
+    Desc = "",
+    Step = 1,
+    Value = { Min = 1, Max = 100, Default = 10 },
+    Callback = function(value)
+        _G._smoothValue = value
+    end
+})
+
+VisualsTab:Section({
+    Title = "ESP",
+    Icon = "users",
+})
+
+VisualsTab:Toggle({
+    Title = "Players ESP",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local Players = game:GetService("Players")
+
+        _G._espEnabled = state
+        _G._espColor = _G._espColor or Color3.fromRGB(255,255,255)
+
+        local function apply(char)
+            if not char then return end
+
+            local h = char:FindFirstChild("ESP_HIGHLIGHT")
+            if h then h:Destroy() end
+
+            if _G._espEnabled then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "ESP_HIGHLIGHT"
+                highlight.FillColor = _G._espColor
+                highlight.OutlineColor = _G._espColor
+                highlight.Adornee = char
+                highlight.Parent = char
+            end
+        end
+
+        local function setup(plr)
+            if plr == Players.LocalPlayer then return end
+
+            if plr.Character then
+                apply(plr.Character)
+            end
+
+            plr.CharacterAdded:Connect(function(char)
+                task.wait()
+                apply(char)
+            end)
+        end
+
+        if state then
+
+            for _,plr in ipairs(Players:GetPlayers()) do
+                setup(plr)
+            end
+
+            _G._espJoin = Players.PlayerAdded:Connect(function(plr)
+                setup(plr)
+            end)
+
+        else
+
+            if _G._espJoin then
+                _G._espJoin:Disconnect()
+                _G._espJoin = nil
+            end
+
+            for _,plr in ipairs(Players:GetPlayers()) do
+                if plr.Character then
+                    local h = plr.Character:FindFirstChild("ESP_HIGHLIGHT")
+                    if h then h:Destroy() end
+                end
+            end
+
+        end
+
+    end
+})
+
+VisualsTab:Colorpicker({
+    Title = "ESP Color",
+    Desc = "",
+    Default = Color3.fromRGB(255,255,255),
+    Transparency = 0,
+    Locked = false,
+    Callback = function(color)
+
+        _G._espColor = color
+
+        if not _G._espEnabled then return end
+
+        local Players = game:GetService("Players")
+
+        for _,plr in ipairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer and plr.Character then
+                local h = plr.Character:FindFirstChild("ESP_HIGHLIGHT")
+                if h then
+                    h.FillColor = color
+                    h.OutlineColor = color
+                end
+            end
+        end
+
+    end
+})
+
+MiscTab:Section({
+    Title = "External Scripts",
+    Icon = "folder-open",
+})
+
+MiscTab:Button({
+    Title = "Infinite Yield",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Dex Explorer",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+MiscTab:Button({
+    Title = "Elysium Mobile KeyBoard",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HS1HYDRAX7/Elysium-X-Rework/refs/heads/main/External%20Scripts/Elysium%20Mobile%20KeyBoard"))()
+    end
+})
+
+MiscTab:Section({
+    Title = "Music Player",
+    Icon = "music",
+})
+
+MiscTab:Space()
+
+MiscTab:Dropdown({
+    Title = "Musics",
+    Values = (function()
+
+        local file = "musicz.json"
+        if not isfile(file) then
+            writefile(file, "[]")
+        end
+
+        local data = game:GetService("HttpService"):JSONDecode(readfile(file))
+        table.sort(data, function(a,b) return (a.Index or 0) < (b.Index or 0) end)
+
+        local names = {}
+        for _,v in ipairs(data) do
+            table.insert(names, "["..v.Index.."] "..v.Name)
+        end
+
+        _G._musicData = data
+        return names
+
+    end)(),
+    Callback = function(selected)
+
+        _G._selectedMusic = selected
+
+        if not _G._musicData then return end
+
+        for _,v in ipairs(_G._musicData) do
+            local label = "["..v.Index.."] "..v.Name
+
+            if label == selected then
+
+                if _G._sound then
+                    _G._sound:Stop()
+                    _G._sound:Destroy()
+                end
+
+                local sound = Instance.new("Sound")
+                sound.SoundId = "rbxassetid://" .. v.ID
+                sound.Volume = 1
+                sound.Parent = game:GetService("SoundService")
+
+                _G._sound = sound
+                _G._selectedIndex = v.Index
+                break
+            end
+        end
+
+    end
+})
+
+local MPS = MiscTab:Section({
+    Title = "Music player settings",
+})
+
+MPS:Input({
+    Title = "Music Name",
+    Desc = "",
+    Placeholder = "Name",
+    Callback = function(text)
+        _G._newMusicName = text
+    end
+})
+
+MPS:Input({
+    Title = "Music ID",
+    Desc = "",
+    Placeholder = "123456789",
+    Callback = function(text)
+        _G._newMusicID = text
+    end
+})
+
+MPS:Input({
+    Title = "Index",
+    Desc = "",
+    Placeholder = "1",
+    Callback = function(text)
+        _G._musicIndex = tonumber(text)
+    end
+})
+
+MPS:Button({
+    Title = "Save Music",
+    Callback = function()
+
+        local HttpService = game:GetService("HttpService")
+        local file = "musicz.json"
+
+        if not isfile(file) then
+            writefile(file, "[]")
+        end
+
+        local data = HttpService:JSONDecode(readfile(file))
+
+        if _G._musicIndex and _G._newMusicName and _G._newMusicID then
+
+            local replaced = false
+
+            for i,v in ipairs(data) do
+                if v.Index == _G._musicIndex then
+                    data[i] = {
+                        Index = _G._musicIndex,
+                        Name = _G._newMusicName,
+                        ID = _G._newMusicID
+                    }
+                    replaced = true
+                    break
+                end
+            end
+
+            if not replaced then
+                table.insert(data, {
+                    Index = _G._musicIndex,
+                    Name = _G._newMusicName,
+                    ID = _G._newMusicID
+                })
+            end
+
+            table.sort(data, function(a,b) return a.Index < b.Index end)
+
+            writefile(file, HttpService:JSONEncode(data))
+        end
+
+    end
+})
+
+MPS:Button({
+    Title = "Delete Music",
+    Callback = function()
+
+        local HttpService = game:GetService("HttpService")
+        local file = "musicz.json"
+
+        if not isfile(file) then return end
+
+        local data = HttpService:JSONDecode(readfile(file))
+        local newData = {}
+
+        for _,v in ipairs(data) do
+            if v.Index ~= _G._selectedIndex then
+                table.insert(newData, v)
+            end
+        end
+
+        writefile(file, HttpService:JSONEncode(newData))
+
+        if _G._sound then
+            _G._sound:Stop()
+            _G._sound:Destroy()
+            _G._sound = nil
+        end
+
+    end
+})
+
+MiscTab:Space()
+
+local Music = MiscTab:Group({})
+
+Music:Button({
+    Title = "Play",
+    Callback = function()
+        if _G._sound then
+            _G._sound:Play()
+        end
+    end
+})
+
+Music:Button({
+    Title = "Stop",
+    Callback = function()
+        if _G._sound then
+            _G._sound:Pause()
+        end
+    end
+})
+
+SettingsTab:Section({
+    Title = "General Settings",
+    Icon = "cog",
+})
+ 
+SettingsTab:Input({
+    Title = "Config Name",
+    Desc = "",
+    Value = "",
+    Placeholder = "Enter config name...",
+    Callback = function(input)
+        _cfgName = input and input:match("%S") and input or nil
+        _selectedConfig = nil
+    end
+})
+
+local dropdown = SettingsTab:Dropdown({
+    Title = "Configs",
+    Desc = "",
+    Values = {},
+    Value = nil,
+    Callback = function(option)
+        _selectedConfig = option
+        _cfgName = nil
+    end
+})
+
+local function refreshDropdown()
+    local ConfigManager = Window.ConfigManager
+    local ok, values = pcall(function()
+        return ConfigManager:AllConfigs()
+    end)
+
+    if ok and type(values) == "table" then
+        table.sort(values, function(a,b)
+            return tostring(a):lower() < tostring(b):lower()
+        end)
+        dropdown:Refresh(values)
+    else
+        dropdown:Refresh({})
+    end
+end
+
+SettingsTab:Button({
+    Title = "Refresh",
+    Desc = "",
+    Callback = function()
+        refreshDropdown()
+
+        WindUI:Notify({
+            Title = "Config Manager",
+            Content = "Dropdown refreshed",
+            Duration = 5,
+            Icon = "folder-sync",
+        })
+    end
+})
+
+SettingsTab:Button({
+    Title = "Load",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local exists = false
+        local ok, configs = pcall(function()
+            return ConfigManager:AllConfigs()
+        end)
+
+        if ok and type(configs) == "table" then
+            for _,v in pairs(configs) do
+                if v == name then
+                    exists = true
+                    break
+                end
+            end
+        end
+
+        if not exists then
+            _selectedConfig = nil
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") doesn't exist",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+
+            return
+        end
+
+        local success = pcall(function()
+            ConfigManager:CreateConfig(name):Load()
+        end)
+
+        if success then
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") loaded",
+                Duration = 5,
+                Icon = "folder-input",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Save",
+    Desc = "",
+    Callback = function()
+        local ConfigManager = Window.ConfigManager
+        local name = _cfgName or _selectedConfig
+        if not name or name == "" then return end
+
+        local ok = pcall(function()
+            ConfigManager:CreateConfig(name):Save()
+        end)
+
+        if ok then
+            _selectedConfig = name
+            _cfgName = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") saved",
+                Duration = 5,
+                Icon = "folder-open",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Delete",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local ok = pcall(function()
+            ConfigManager:DeleteConfig(name)
+        end)
+
+        if ok then
+            _selectedConfig = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") deleted",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+        end
+    end
+})
+
+SettingsTab:Section({
+    Title = "Minor Settings",
+    Icon = "cog",
+})
+
+SettingsTab:Button({
+    Title = "Copy JobId",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        if setclipboard then
+            setclipboard(game.PlaceId)
+        end
+
+    end
+})
+
+SettingsTab:Button({
+    Title = "ServerHop",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+
+        TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+
+    end
+})
+
+SettingsTab:Button({
+    Title = "Rejoin",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+
+    end
+})
+
+do
+    refreshDropdown()
+end
