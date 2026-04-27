@@ -835,16 +835,13 @@ SkillsSelectorTab:Button({
 
         if #abilities == 0 then return end
 
-        if TestRequire() ~= true then
-            ErrorRequire()
-            return
-        end
-
-        game:GetService("ReplicatedStorage")
-            :WaitForChild("Events")
-            :WaitForChild("RemoteEvents")
-            :WaitForChild("AbilitySelection")
-            :FireServer(abilities)
+        for _,a in ipairs(abilities) do
+    game:GetService("ReplicatedStorage")
+        :WaitForChild("Events")
+        :WaitForChild("RemoteEvents")
+        :WaitForChild("AbilitySelection")
+        :FireServer(unpack({{tostring(a)}}))
+end
 
         if AbilityModule then
             for _,a in ipairs(abilities) do
@@ -893,17 +890,13 @@ SkillsSelectorTab:Button({
                 :WaitForChild("Ability"))
         end)
 
-        if TestRequire() ~= true then
-            ErrorRequire()
-            return
-        end
-
         for _,a in ipairs(Abilities_Table) do
-            game:GetService("ReplicatedStorage")
-                :WaitForChild("Events")
-                :WaitForChild("RemoteEvents")
-                :WaitForChild("AbilitySelection")
-                :FireServer({a})
+    game:GetService("ReplicatedStorage")
+        :WaitForChild("Events")
+        :WaitForChild("RemoteEvents")
+        :WaitForChild("AbilitySelection")
+        :FireServer(unpack({{tostring(a)}}))
+end
 
             if AbilityModule then
                 AbilityModule["CreateAbility"](ReturnAbilityData(a))
