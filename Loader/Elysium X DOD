@@ -207,7 +207,12 @@ MovementTab:Toggle({
     end
 })
 
-MovementTab:Input({
+local MovementMods = MovementTab:Section({
+    Title = "Movement Mods"
+    Icon = "user-cog",
+})
+
+MovementMods:Input({
     Title = "Max Stamina",
     Placeholder = "Type Here!",
     NumbersOnly = true,
@@ -217,7 +222,7 @@ MovementTab:Input({
     end
 })
 
-MovementTab:Input({
+MovementMods:Input({
     Title = "Sprint Speed",
     Placeholder = "Type Here!",
     NumbersOnly = true,
@@ -227,8 +232,8 @@ MovementTab:Input({
     end
 })
 
-MovementTab:Input({
-    Title = "Walk Speed",
+MovementMods:Input({
+    Title = "WalkSpeed",
     Placeholder = "Type Here!",
     NumbersOnly = true,
     OnEnter = true,
@@ -237,8 +242,8 @@ MovementTab:Input({
     end
 })
 
-MovementTab:Input({
-    Title = "Walk Speed Modifier",
+MovementMods:Input({
+    Title = "WalkSpeed Modifier",
     Placeholder = "Type Here!",
     NumbersOnly = true,
     OnEnter = true,
@@ -247,38 +252,43 @@ MovementTab:Input({
     end
 })
 
-MovementTab:Button({
+MovementMods:Button({
     Title = "Apply Changes",
     Callback = function()
 
-        if SetAtt then
-            if _G._maxStamina then
-                SetAtt("MaxStamina", _G._maxStamina)
-            end
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
 
-            if _G._sprintSpeed then
-                SetAtt("SprintSpeed", _G._sprintSpeed)
-            end
-
-            if _G._walkSpeed then
-                SetAtt("WalkSpeed", _G._walkSpeed)
-            end
-
-            if _G._walkSpeedMod then
-                SetAtt("WalkSpeedModifier", _G._walkSpeedMod)
+        local function getCharacter()
+            for _,v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == player.Name then
+                    return v
+                end
             end
         end
 
-        local player = game:GetService("Players").LocalPlayer
-        local char = workspace:FindFirstChild(player.Name)
+        local char = getCharacter()
+        if not char then return end
 
-        if char then
-            if _G._walkSpeed then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.WalkSpeed = _G._walkSpeed
-                end
-            end
+        if _G._maxStamina then
+            char:SetAttribute("MaxStamina", _G._maxStamina)
+        end
+
+        if _G._sprintSpeed then
+            char:SetAttribute("SprintSpeed", _G._sprintSpeed)
+        end
+
+        if _G._walkSpeed then
+            char:SetAttribute("WalkSpeed", _G._walkSpeed)
+        end
+
+        if _G._walkSpeedMod then
+            char:SetAttribute("WalkSpeedModifier", _G._walkSpeedMod)
+        end
+
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum and _G._walkSpeed then
+            hum.WalkSpeed = _G._walkSpeed
         end
 
     end
