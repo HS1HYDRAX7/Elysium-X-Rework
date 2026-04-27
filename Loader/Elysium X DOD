@@ -878,18 +878,20 @@ SkillsSelectorTab:Button({
                 :WaitForChild("Ability"))
         end)
 
-        task.spawn(function()
-            for _,a in ipairs(Abilities_Table) do
+        -- PRIME (ESSENCIAL)
+        Remote:FireServer(unpack({{tostring("Adrenaline"), tostring("Adrenaline")}}))
+        task.wait(0.2)
 
-                Remote:FireServer(unpack({{tostring(a)}}))
+        for _,ability in ipairs(Abilities_Table) do
 
-                if AbilityModule then
-                    AbilityModule.CreateAbility({Name = a})
-                end
+            Remote:FireServer(unpack({{tostring(ability)}}))
 
-                task.wait(0.15) -- ESSENCIAL (evita sobrescrever)
+            if AbilityModule then
+                AbilityModule.CreateAbility(ReturnAbilityData(ability))
             end
-        end)
+
+            task.wait(0.1)
+        end
 
     end
 })
