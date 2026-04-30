@@ -219,11 +219,7 @@ MovementTab:Toggle({
         _G.sprintValue = _G.sprintValue or 5
 
         local function getCharacter()
-            for _,v in ipairs(workspace:GetDescendants()) do
-                if v:IsA("Model") and v.Name == player.Name then
-                    return v
-                end
-            end
+            return player.Character
         end
 
         local function apply(char)
@@ -231,27 +227,38 @@ MovementTab:Toggle({
             if char:GetAttribute("WalkSpeedModifier") == nil then return end
 
             if _G.sprintEnabled then
-                char:SetAttribute("WalkSpeedModifier", _G.sprintValue)
+                if char:GetAttribute("WalkSpeedModifier") ~= _G.sprintValue then
+                    char:SetAttribute("WalkSpeedModifier", _G.sprintValue)
+                end
             else
-                char:SetAttribute("WalkSpeedModifier", 0)
+                if char:GetAttribute("WalkSpeedModifier") ~= 0 then
+                    char:SetAttribute("WalkSpeedModifier", 0)
+                end
             end
+        end
+
+        local function hookAttribute(char)
+            if not char then return end
+
+            if _G.sprintWatchConn then
+                _G.sprintWatchConn:Disconnect()
+            end
+
+            _G.sprintWatchConn = char:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+                apply(char)
+            end)
         end
 
         if state then
 
             local char = getCharacter()
             apply(char)
+            hookAttribute(char)
 
-            _G.sprintCharConn = player.CharacterAdded:Connect(function()
-                task.wait(0.5)
-                apply(getCharacter())
-            end)
-
-            _G.sprintAttrConn = workspace.DescendantAdded:Connect(function(v)
-                if v:IsA("Model") and v.Name == player.Name then
-                    task.wait(0.2)
-                    apply(v)
-                end
+            _G.sprintCharConn = player.CharacterAdded:Connect(function(char)
+                task.wait(0.2)
+                apply(char)
+                hookAttribute(char)
             end)
 
         else
@@ -264,9 +271,9 @@ MovementTab:Toggle({
                 _G.sprintCharConn = nil
             end
 
-            if _G.sprintAttrConn then
-                _G.sprintAttrConn:Disconnect()
-                _G.sprintAttrConn = nil
+            if _G.sprintWatchConn then
+                _G.sprintWatchConn:Disconnect()
+                _G.sprintWatchConn = nil
             end
 
         end
