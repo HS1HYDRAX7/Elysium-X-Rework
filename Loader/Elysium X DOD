@@ -932,11 +932,164 @@ SettingsTab:Section({
     Icon = "cog",
 })
 
-SettingsTab:Paragraph({
-    Title = "WARN",
-    Desc = "Under Construction",
-    Image = "hammer",
-    ImageSize = 24,
+SettingsTab:Input({
+    Title = "Config Name",
+    Desc = "",
+    Value = "",
+    Placeholder = "Enter config name...",
+    Callback = function(input)
+        _cfgName = input and input:match("%S") and input or nil
+        _selectedConfig = nil
+    end
+})
+
+local dropdown = SettingsTab:Dropdown({
+    Title = "Configs",
+    Desc = "",
+    Values = {},
+    Value = nil,
+    Callback = function(option)
+        _selectedConfig = option
+        _cfgName = nil
+    end
+})
+
+local function refreshDropdown()
+    local ConfigManager = Window.ConfigManager
+    local ok, values = pcall(function()
+        return ConfigManager:AllConfigs()
+    end)
+
+    if ok and type(values) == "table" then
+        table.sort(values, function(a,b)
+            return tostring(a):lower() < tostring(b):lower()
+        end)
+        dropdown:Refresh(values)
+    else
+        dropdown:Refresh({})
+    end
+end
+
+SettingsTab:Button({
+    Title = "Refresh",
+    Desc = "",
+    Callback = function()
+        refreshDropdown()
+
+        WindUI:Notify({
+            Title = "Config Manager",
+            Content = "Dropdown refreshed",
+            Duration = 5,
+            Icon = "folder-sync",
+        })
+    end
+})
+
+SettingsTab:Button({
+    Title = "Load",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local exists = false
+        local ok, configs = pcall(function()
+            return ConfigManager:AllConfigs()
+        end)
+
+        if ok and type(configs) == "table" then
+            for _,v in pairs(configs) do
+                if v == name then
+                    exists = true
+                    break
+                end
+            end
+        end
+
+        if not exists then
+            _selectedConfig = nil
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") doesn't exist",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+
+            return
+        end
+
+        local success = pcall(function()
+            ConfigManager:CreateConfig(name):Load()
+        end)
+
+        if success then
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") loaded",
+                Duration = 5,
+                Icon = "folder-input",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Save",
+    Desc = "",
+    Callback = function()
+        local ConfigManager = Window.ConfigManager
+        local name = _cfgName or _selectedConfig
+        if not name or name == "" then return end
+
+        local ok = pcall(function()
+            ConfigManager:CreateConfig(name):Save()
+        end)
+
+        if ok then
+            _selectedConfig = name
+            _cfgName = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") saved",
+                Duration = 5,
+                Icon = "folder-open",
+            })
+        end
+    end
+})
+
+SettingsTab:Button({
+    Title = "Delete",
+    Desc = "",
+    Callback = function()
+        if not _selectedConfig then return end
+
+        local ConfigManager = Window.ConfigManager
+        local name = _selectedConfig
+
+        local ok = pcall(function()
+            ConfigManager:DeleteConfig(name)
+        end)
+
+        if ok then
+            _selectedConfig = nil
+
+            refreshDropdown()
+
+            WindUI:Notify({
+                Title = "Config Manager",
+                Content = "Configuration (" .. name .. ") deleted",
+                Duration = 5,
+                Icon = "folder-closed",
+            })
+        end
+    end
 })
 
 SettingsTab:Section({
@@ -984,3 +1137,100 @@ SettingsTab:Button({
 
     end
 })
+
+local Icon = loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/uuuuuuu/refs/heads/main/Icon.luau"))()
+
+local FlipCooldown = false
+
+local function FortniteFlips()
+	if FlipCooldown then
+		return
+	end
+
+	FlipCooldown = true
+	local character = game:GetService("Players").LocalPlayer.Character
+	local hrp = character and character:FindFirstChild("HumanoidRootPart")
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
+	if not hrp or not humanoid then
+		FlipCooldown = false
+		return
+	end
+
+	local savedTracks = {}
+
+	if animator then
+		for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+			savedTracks[#savedTracks + 1] = { track = track, time = track.TimePosition }
+			track:Stop(0)
+		end
+	end
+
+	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+
+	local duration = 0.45
+	local steps = 120
+	local startCFrame = hrp.CFrame
+	local forwardVector = startCFrame.LookVector
+	local upVector = Vector3.new(0, 1, 0)
+
+	task.spawn(function()
+		local startTime = tick()
+		for i = 1, steps do
+			local t = i / steps
+			local height = 4 * (t - t ^ 2) * 10
+			local nextPos = startCFrame.Position + forwardVector * (35 * t) + upVector * height
+			local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
+
+			hrp.CFrame = CFrame.new(nextPos) * rotation
+			local elapsedTime = tick() - startTime
+			local expectedTime = (duration / steps) * i
+			local waitTime = expectedTime - elapsedTime
+			if waitTime > 0 then
+				task.wait(waitTime)
+			end
+		end
+
+		hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector * 35) * startCFrame.Rotation
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
+		humanoid:ChangeState(Enum.HumanoidStateType.Running)
+
+		if animator then
+			for _, data in ipairs(savedTracks) do
+				local track = data.track
+				track:Play()
+				track.TimePosition = data.time
+			end
+		end
+
+		task.wait(0.25)
+		FlipCooldown = false
+	end)
+end
+
+local flipIcon = Icon.new()
+	:setName("Flip")
+	:setLabel("Flip")
+	:setImage("rbxthumb://type=Asset&id=2714338264&w=150&h=150")
+
+flipIcon:bindEvent("selected", function(icon)
+	FortniteFlips()
+	icon:deselect()
+end)
+
+local UIS = game:GetService("UserInputService")
+
+UIS.InputBegan:Connect(function(input, busy)
+	if input.KeyCode == Enum.KeyCode.F and not busy then
+		FortniteFlips()
+	end
+end)
