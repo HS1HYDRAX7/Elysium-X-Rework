@@ -771,6 +771,125 @@ SkillsSelectorTab:Button({
     end
 })
 
+SkillsSelectorTab:Button({
+    Title = "Give Yourself Stalk Ability",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+
+        local char = player.Character or player.CharacterAdded:Wait()
+        local Humanoid = char:WaitForChild("Humanoid")
+        local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
+
+        local AbilityModule
+        pcall(function()
+            AbilityModule = require(player
+                :WaitForChild("PlayerGui")
+                :WaitForChild("MainGui")
+                :WaitForChild("Client")
+                :WaitForChild("Modules")
+                :WaitForChild("Ability"))
+        end)
+
+        if not AbilityModule then return end
+
+        local function Stalk()
+
+            local function TempAnim(id)
+                local temp_anim = Instance.new("Animation")
+                temp_anim.AnimationId = id
+                return temp_anim
+            end
+
+            local stalk_start = Humanoid:LoadAnimation(TempAnim("rbxassetid://130725432915474"))
+            local stalk_loop = Humanoid:LoadAnimation(TempAnim("rbxassetid://102302720518230"))
+
+            for i = 1,4 do
+                local name = (i == 1 and "Stalk") or ("Stalk"..i)
+                if not HumanoidRootPart:FindFirstChild(name) then
+                    local src = game:GetService("ReplicatedStorage")
+                        .Characters.Killer.Pursuer.Avoider.HumanoidRootPart:FindFirstChild(name)
+                    if src then
+                        src:Clone().Parent = HumanoidRootPart
+                    end
+                end
+            end
+
+            stalk_start:Play()
+
+            for i = 1,2 do
+                if i == 2 then task.wait(1.5) end
+
+                local rnd = math.random(1,4)
+                local sound = (rnd == 1 and HumanoidRootPart:FindFirstChild("Stalk"))
+                    or HumanoidRootPart:FindFirstChild("Stalk"..rnd)
+
+                if sound then sound:Play() end
+            end
+
+            task.wait(2)
+
+            stalk_loop:Play()
+
+            for _ = 1,10 do
+                for _,v in ipairs(Humanoid.Parent:GetDescendants()) do
+                    if (v:IsA("BasePart") or v:IsA("SpecialMesh")) and v.Name ~= "HumanoidRootPart" then
+                        pcall(function()
+                            v.Transparency += 0.1
+                        end)
+                    end
+                end
+                task.wait(.13)
+            end
+
+            stalk_loop:Stop()
+
+            if typeof(ApplyInvisibility) == "function" then
+                ApplyInvisibility(true)
+            end
+
+            task.wait(10)
+
+            if typeof(ApplyInvisibility) == "function" then
+                ApplyInvisibility(false)
+            end
+
+            stalk_loop:Play()
+
+            for _ = 1,10 do
+                for _,v in ipairs(Humanoid.Parent:GetDescendants()) do
+                    if (v:IsA("BasePart") or v:IsA("SpecialMesh")) and v.Name ~= "HumanoidRootPart" then
+                        pcall(function()
+                            v.Transparency -= 0.1
+                        end)
+                    end
+                end
+                task.wait(.13)
+            end
+
+            task.wait(.5)
+
+            stalk_loop:Stop()
+
+        end
+
+        AbilityModule.CreateAbility({
+            Client = true,
+            ClientFunction = Stalk,
+            Name = "Stalk_NH",
+            InputShown = "",
+            Tip = "Turn invisible without changing speed.",
+            Cooldown = 15,
+            Icon = "rbxassetid://92577246919936",
+            DisplayName = "Stalk"
+        })
+
+    end
+})
+
 AntiTab:Section({
     Title = "Anti",
     Icon = "circle-off",
