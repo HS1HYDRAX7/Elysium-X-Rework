@@ -846,6 +846,86 @@ AntiTab:Toggle({
 })
 
 AntiTab:Toggle({
+    Title = "Disable Badware Computers Cooldown",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+
+        local Workspace = game:GetService("Workspace")
+        local Other = Workspace:WaitForChild("GameAssets")
+            :WaitForChild("Teams")
+            :WaitForChild("Other")
+
+        _G.antiComputer = state
+        _G.antiComputerCache = _G.antiComputerCache or {}
+
+        local function apply(prompt)
+            if not prompt:IsA("ProximityPrompt") then return end
+
+            if _G.antiComputer then
+
+                if not _G.antiComputerCache[prompt] then
+                    _G.antiComputerCache[prompt] = {
+                        HoldDuration = prompt.HoldDuration,
+                        RequiresLineOfSight = prompt.RequiresLineOfSight,
+                        Enabled = prompt.Enabled
+                    }
+                end
+
+                prompt.HoldDuration = 0
+                prompt.RequiresLineOfSight = false
+                prompt.Enabled = true
+
+            else
+
+                if _G.antiComputerCache[prompt] then
+                    local data = _G.antiComputerCache[prompt]
+                    prompt.HoldDuration = data.HoldDuration
+                    prompt.RequiresLineOfSight = data.RequiresLineOfSight
+                    prompt.Enabled = data.Enabled
+                end
+
+            end
+        end
+
+        local function scan()
+            for _,v in ipairs(Other:GetChildren()) do
+                local primary = v:FindFirstChild("Primary")
+                if primary then
+                    for _,desc in ipairs(primary:GetDescendants()) do
+                        apply(desc)
+                    end
+                end
+            end
+        end
+
+        scan()
+
+        if state then
+            _G.antiComputerConn = Other.ChildAdded:Connect(function(v)
+                if not _G.antiComputer then return end
+                task.wait(0.05)
+
+                local primary = v:FindFirstChild("Primary")
+                if primary then
+                    for _,desc in ipairs(primary:GetDescendants()) do
+                        apply(desc)
+                    end
+                end
+            end)
+        else
+            if _G.antiComputerConn then
+                _G.antiComputerConn:Disconnect()
+                _G.antiComputerConn = nil
+            end
+
+            scan()
+        end
+
+    end
+})
+
+AntiTab:Toggle({
     Title = "Anti-Killer Only Walls",
     Desc = "",
     Value = false,
