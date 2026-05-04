@@ -1418,22 +1418,6 @@ ElysiumPlusTab:Section({
     Title = "Auto block",
 })
 
-ElysiumPlusTab:Slider({
-    Title = "Auto block detection range",
-    Desc = "",
-    Step = 1,
-    Value = {
-        Min = 1,
-        Max = 100,
-        Default = 20,
-    },
-    Callback = function(value)
-        elysiumplusFeature(function()
-            _G.AutoBlockRange = value
-        end)
-    end
-})
-
 ElysiumPlusTab:Toggle({
     Title = "Auto block",
     Desc = "",
@@ -1486,6 +1470,21 @@ ElysiumPlusTab:Toggle({
                 _G.AutoBlockUnhook = true
                 task.wait(.05); task.wait(.05)
                 _G.AutoBlockUnhook = false
+            end
+        end)
+    end
+})
+
+ElysiumPlusTab:Input({
+    Title = "Detection range",
+    Desc = "",
+    Value = "20",
+    Placeholder = "Placeholder",
+    Callback = function(input)
+        elysiumplusFeature(function()
+            local value = tonumber(input)
+            if value then
+                _G.AutoBlockRange = value
             end
         end)
     end
