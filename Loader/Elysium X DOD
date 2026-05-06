@@ -35,13 +35,15 @@ Window:EditOpenButton({
     Draggable = true,
 })
 
-local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false })
-local MovementTab = Window:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false })
-local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
-local AbilitiesManagerTab = Window:Tab({ Title = "Abilities Manager", Icon = "blocks", Locked = false })
-local AnimationsTab = Window:Tab({ Title = "Animations", Icon = "play", Locked = false })
-local AntiTab = Window:Tab({ Title = "Anti", Icon = "circle-off", Locked = false })
-local ElysiumPlusTab = Window:Tab({ Title = "Elysium plus", Icon = "dollar-sign", Locked = false })
+local Main = Window:Section({ Title = "Main", Icon = "squircle", Opened = false })
+local MainTab = Main:Tab({ Title = "Main", Icon = "squircle", Locked = false })
+local Features = Window:Section({ Title = "Features", Icon = "sparkle", Opened = false })
+local MovementTab = Features:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false })
+local VisualsTab = Features:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
+local AbilitiesManagerTab = Features:Tab({ Title = "Abilities Manager", Icon = "blocks", Locked = false })
+local AnimationsTab = Features:Tab({ Title = "Animations", Icon = "play", Locked = false })
+local AntiTab = Features:Tab({ Title = "Anti", Icon = "circle-off", Locked = false })
+local ElysiumPlusTab = Features:Tab({ Title = "Elysium plus", Icon = "dollar-sign", Locked = false })
 local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
 local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
 
@@ -56,24 +58,11 @@ MainTab:Space()
 
 MainTab:Paragraph({
     Title = "Zenith Studios",
-    Desc = "! Links ¡",
+    Desc = "! Links ยก",
     Thumbnail = "rbxassetid://81706308103426",
     ThumbnailSize = 85,
     Locked = false,
     Buttons = {
-        {
-            Icon = "globe",
-            Title = "Website",
-            Callback = function()
-                setclipboard("https://hs1hydrax7.github.io/Zenith-Website/")
-                WindUI:Notify({
-                    Title = "Website",
-                    Content = "Link Copied",
-                    Duration = 3,
-                    Icon = "link-2",
-                })
-            end,
-        },
         {
             Icon = "message-circle",
             Title = "Discord",
@@ -81,7 +70,7 @@ MainTab:Paragraph({
                 setclipboard("https://discord.gg/D97k9TTCq3")
                 WindUI:Notify({
                     Title = "Discord",
-                    Content = "Invite Copied",
+                    Content = "Invite copied",
                     Duration = 3,
                     Icon = "link-2",
                 })
@@ -91,7 +80,7 @@ MainTab:Paragraph({
 })
 
 MainTab:Section({
-    Title = "Interface customization",
+    Title = "Interface Customization",
     Icon = "paintbrush",
 })
 
@@ -119,7 +108,7 @@ MainTab:Section({
 })
 
 MainTab:Toggle({
-    Title = "Profile Icon",
+    Title = "Profile icon",
     Desc = "Your profile on your left down",
     Icon = "user",
     Type = "Toggle",
@@ -135,7 +124,7 @@ MainTab:Toggle({
 })
 
 MainTab:Toggle({
-    Title = "Set Profile Anonymous",
+    Title = "Set profile anonymous",
     Desc = "Your profile on your left down",
     Icon = "hat-glasses",
     Type = "Toggle",
@@ -156,7 +145,7 @@ MovementTab:Section({
 })
 
 MovementTab:Toggle({
-    Title = "Infinite Stamina",
+    Title = "Infinite stamina",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -210,7 +199,7 @@ MovementTab:Toggle({
 })
 
 MovementTab:Toggle({
-    Title = "Sprint Boost",
+    Title = "Sprint boost",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -307,7 +296,7 @@ MovementTab:Toggle({
 })
 
 MovementTab:Slider({
-    Title = "Sprint Boost Value",
+    Title = "Sprint boost value",
     Desc = "",
     Step = 1,
     Value = {
@@ -656,7 +645,7 @@ AbilitiesManagerTab:Section({
 })
 
 AbilitiesManagerTab:Dropdown({
-    Title = "Select Ability 1",
+    Title = "Select ability 1",
     Desc = "",
     Values = { "None","Adrenaline","Punch","Caretaker","Cloak","Block","Dash","BonusPad","Hotdog","Revolver","Taunt","Banana" },
     Value = "None",
@@ -666,7 +655,7 @@ AbilitiesManagerTab:Dropdown({
 })
 
 AbilitiesManagerTab:Dropdown({
-    Title = "Select Ability 2",
+    Title = "Select ability 2",
     Desc = "",
     Values = { "None","Adrenaline","Punch","Caretaker","Cloak","Block","Dash","BonusPad","Hotdog","Revolver","Taunt","Banana" },
     Value = "None",
@@ -676,7 +665,7 @@ AbilitiesManagerTab:Dropdown({
 })
 
 AbilitiesManagerTab:Button({
-    Title = "Choose Abilities",
+    Title = "Choose abilities",
     Desc = "",
     Callback = function()
 
@@ -733,7 +722,7 @@ AbilitiesManagerTab:Button({
 })
 
 AbilitiesManagerTab:Button({
-    Title = "Give All Abilities",
+    Title = "Give all abilities",
     Desc = "",
     Callback = function()
 
@@ -988,7 +977,7 @@ AnimationsTab:Section({
 })
 
 AnimationsTab:Button({
-    Title = "Civilian Animations",
+    Title = "Apply civilian animations",
     Callback = function()
         local p = presets.Civilian
         setAnims(p.Run, p.Walk, p.Idle)
@@ -996,7 +985,7 @@ AnimationsTab:Button({
 })
 
 AnimationsTab:Button({
-    Title = "Old Civilian Animations",
+    Title = "Apply old civilian animations",
     Callback = function()
         local p = presets.OldCivilian
         setAnims(p.Run, p.Walk, p.Idle)
@@ -1004,7 +993,7 @@ AnimationsTab:Button({
 })
 
 AnimationsTab:Button({
-    Title = "Ghost Animations",
+    Title = "Apply ghost animations",
     Callback = function()
         local p = presets.Ghost
         setAnims(p.Run, p.Walk, p.Idle)
@@ -1101,7 +1090,7 @@ AntiTab:Section({
 })
 
 AntiTab:Toggle({
-    Title = "Anti-Artful Walls",
+    Title = "Anti-Artful walls",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -1170,7 +1159,7 @@ AntiTab:Toggle({
 })
 
 AntiTab:Toggle({
-    Title = "Disable Badware Computers Cooldown",
+    Title = "Disable badware computers cooldown",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -1250,7 +1239,7 @@ AntiTab:Toggle({
 })
 
 AntiTab:Toggle({
-    Title = "Anti-Killer Only Walls",
+    Title = "Anti-Killer only walls",
     Desc = "",
     Value = false,
     Callback = function(state)
@@ -1496,7 +1485,7 @@ MiscTab:Section({
 })
 
 MiscTab:Button({
-    Title = "Infinite Yield",
+    Title = "Infinite yield",
     Icon = "file",
     Locked = false,
     Callback = function()
@@ -1505,7 +1494,7 @@ MiscTab:Button({
 })
 
 MiscTab:Button({
-    Title = "Dex Explorer",
+    Title = "Dex explorer",
     Icon = "file",
     Locked = false,
     Callback = function()
@@ -1514,149 +1503,11 @@ MiscTab:Button({
 })
 
 MiscTab:Button({
-    Title = "Dex Plus",
+    Title = "Dex plus",
     Icon = "file",
     Locked = false,
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/uuuuuuu/refs/heads/main/DexPlusBackup.luau"))()
-    end
-})
-
-MiscTab:Section({
-    Title = "Avatar Copier",
-    Icon = "copy",
-})
-
-MiscTab:Input({
-    Title = "Username",
-    Desc = "",
-    Placeholder = "username",
-    Callback = function(text)
-        _G._avatarUser = text
-    end
-})
-
-MiscTab:Button({
-    Title = "Copy Avatar",
-    Callback = function()
-
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
-
-        if not _G._avatarUser or _G._avatarUser == "" then return end
-
-        local function apply_avatar(username)
-            task.spawn(function()
-                local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-                local hum = char:WaitForChild("Humanoid", 10)
-                if not hum then return end
-
-                if not _G._originalDesc then
-                    _G._originalDesc = hum:GetAppliedDescription()
-                end
-
-                local targetPlayer = nil
-                for _, p in ipairs(Players:GetPlayers()) do
-                    if p.Name:lower() == username:lower() then
-                        targetPlayer = p
-                        break
-                    end
-                end
-
-                local desc
-                if targetPlayer and targetPlayer.Character then
-                    local targetHum = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
-                    if targetHum then
-                        desc = targetHum:GetAppliedDescription()
-                    end
-                end
-
-                if not desc then
-                    local ok, userId = pcall(Players.GetUserIdFromNameAsync, Players, username)
-                    if not ok then return end
-                    local ok2, d = pcall(Players.GetHumanoidDescriptionFromUserId, Players, userId)
-                    if not ok2 then return end
-                    desc = d
-                end
-
-                for _, c in ipairs(char:GetChildren()) do
-                    if c:IsA("Accessory") or c:IsA("Hat") or c:IsA("BodyColors") or
-                       c:IsA("CharacterMesh") or c:IsA("Shirt") or c:IsA("Pants") or
-                       c:IsA("ShirtGraphic") then
-                        c:Destroy()
-                    end
-                end
-
-                pcall(function()
-                    if hum.ApplyDescriptionClientServer then
-                        hum:ApplyDescriptionClientServer(desc)
-                    else
-                        hum:ApplyDescription(desc)
-                    end
-                end)
-
-                local bc = char:FindFirstChildOfClass("BodyColors") or Instance.new("BodyColors")
-                bc.Parent = char
-                bc.HeadColor3 = desc.HeadColor
-                bc.TorsoColor3 = desc.TorsoColor
-                bc.LeftArmColor3 = desc.LeftArmColor
-                bc.RightArmColor3 = desc.RightArmColor
-                bc.LeftLegColor3 = desc.LeftLegColor
-                bc.RightLegColor3 = desc.RightLegColor
-            end)
-        end
-
-        _G._lastAvatarUser = _G._avatarUser
-        apply_avatar(_G._avatarUser)
-
-        if _G._avatarRespawnConn then
-            _G._avatarRespawnConn:Disconnect()
-        end
-
-        _G._avatarRespawnConn = Players.LocalPlayer.CharacterAdded:Connect(function()
-            task.wait(0.65)
-            if _G._lastAvatarUser then
-                apply_avatar(_G._lastAvatarUser)
-            end
-        end)
-
-    end
-})
-
-MiscTab:Button({
-    Title = "Refresh Avatar",
-    Callback = function()
-
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
-
-        if not _G._originalDesc then return end
-
-        local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum then return end
-
-        for _, c in ipairs(char:GetChildren()) do
-            if c:IsA("Accessory") or c:IsA("Hat") or c:IsA("BodyColors") or
-               c:IsA("CharacterMesh") or c:IsA("Shirt") or c:IsA("Pants") or
-               c:IsA("ShirtGraphic") then
-                c:Destroy()
-            end
-        end
-
-        pcall(function()
-            if hum.ApplyDescriptionClientServer then
-                hum:ApplyDescriptionClientServer(_G._originalDesc)
-            else
-                hum:ApplyDescription(_G._originalDesc)
-            end
-        end)
-
-        if _G._avatarRespawnConn then
-            _G._avatarRespawnConn:Disconnect()
-            _G._avatarRespawnConn = nil
-        end
-
     end
 })
 
@@ -1666,7 +1517,7 @@ SettingsTab:Section({
 })
 
 SettingsTab:Input({
-    Title = "Config Name",
+    Title = "Config name",
     Desc = "",
     Value = "",
     Placeholder = "Enter config name...",
@@ -1828,19 +1679,6 @@ SettingsTab:Button({
 SettingsTab:Section({
     Title = "Minor Settings",
     Icon = "cog",
-})
-
-SettingsTab:Button({
-    Title = "Copy JobId",
-    Desc = "",
-    Locked = false,
-    Callback = function()
-
-        if setclipboard then
-            setclipboard(game.PlaceId)
-        end
-
-    end
 })
 
 SettingsTab:Button({
