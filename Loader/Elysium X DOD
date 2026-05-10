@@ -35,17 +35,17 @@ Window:EditOpenButton({
     Draggable = true,
 })
 
-local Main = Window:Section({ Title = "Main", Icon = "squircle", Opened = false })
-local MainTab = Main:Tab({ Title = "Main", Icon = "squircle", Locked = false })
-local Features = Window:Section({ Title = "Features", Icon = "sparkle", Opened = false })
-local MovementTab = Features:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false })
-local VisualsTab = Features:Tab({ Title = "Visuals", Icon = "eye", Locked = false })
-local AbilitiesManagerTab = Features:Tab({ Title = "Abilities Manager", Icon = "blocks", Locked = false })
-local AnimationsTab = Features:Tab({ Title = "Animations", Icon = "play", Locked = false })
-local AntiTab = Features:Tab({ Title = "Anti", Icon = "circle-off", Locked = false })
-local ElysiumPlusTab = Features:Tab({ Title = "Elysium plus", Icon = "dollar-sign", Locked = false })
-local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false })
-local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false})
+local Red = Color3.fromHex("#761818")
+
+local MainTab = Window:Tab({ Title = "Main", Icon = "star", Locked = false, IconShape = "Square", IconColor = Red, })
+local MovementTab = Window:Tab({ Title = "Movement", Icon = "chevrons-right", Locked = false, IconShape = "Square", IconColor = Red, })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye", Locked = false, IconShape = "Square", IconColor = Red, })
+local AbilitiesManagerTab = Window:Tab({ Title = "Abilities Manager", Icon = "blocks", Locked = false, IconShape = "Square", IconColor = Red, })
+local AnimationsTab = Window:Tab({ Title = "Animations", Icon = "play", Locked = false, IconShape = "Square", IconColor = Red, })
+local AntiTab = Window:Tab({ Title = "Anti", Icon = "circle-off", Locked = false, IconShape = "Square", IconColor = Red, })
+local ElysiumPlusTab = Window:Tab({ Title = "Elysium plus", Icon = "dollar-sign", Locked = false, IconShape = "Square", IconColor = Red, })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "folder", Locked = false, IconShape = "Square", IconColor = Red, })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "cog", Locked = false, IconShape = "Square", IconColor = Red, })
 
 MainTab:Paragraph({
     Title = "Open or Minimize UI IN PC",
@@ -142,6 +142,15 @@ MainTab:Toggle({
 MovementTab:Section({
     Title = "Movement",
     Icon = "chevrons-right",
+})
+
+MovementTab:Toggle({
+    Title = "FrontFlip",
+    Desc = "",
+    Value = true,
+    Callback = function(state)
+        FrontFlip(state)
+    end
 })
 
 MovementTab:Toggle({
@@ -2211,22 +2220,32 @@ SettingsTab:Button({
     end
 })
 
-local Icon = loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/uuuuuuu/refs/heads/main/Icon.luau"))()
+local tp = loadstring(game:HttpGet("https://raw.githubusercontent.com/tanhoangviet/ToolForLua/refs/heads/main/TopbarPlus.lua"))()
+local Icon = tp.get()
 
-local FlipCooldown = false
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
 
-local function FortniteFlips()
-	if FlipCooldown then
+local FrontFlipCooldown = false
+local FrontFlipEnabled = false
+
+local flipIcon
+local inputConnection
+
+local function FrontFlips()
+	if FrontFlipCooldown or not FrontFlipEnabled then
 		return
 	end
 
-	FlipCooldown = true
-	local character = game:GetService("Players").LocalPlayer.Character
+	FrontFlipCooldown = true
+
+	local character = Players.LocalPlayer.Character
 	local hrp = character and character:FindFirstChild("HumanoidRootPart")
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
+
 	if not hrp or not humanoid then
-		FlipCooldown = false
+		FrontFlipCooldown = false
 		return
 	end
 
@@ -2234,7 +2253,11 @@ local function FortniteFlips()
 
 	if animator then
 		for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-			savedTracks[#savedTracks + 1] = { track = track, time = track.TimePosition }
+			table.insert(savedTracks, {
+				track = track,
+				time = track.TimePosition
+			})
+
 			track:Stop(0)
 		end
 	end
@@ -2248,83 +2271,112 @@ local function FortniteFlips()
 
 	local duration = 0.45
 	local steps = 120
+
 	local startCFrame = hrp.CFrame
 	local forwardVector = startCFrame.LookVector
 	local upVector = Vector3.new(0, 1, 0)
 
 	task.spawn(function()
 		local startTime = tick()
+
 		for i = 1, steps do
 			local t = i / steps
 			local height = 4 * (t - t ^ 2) * 10
-			local nextPos = startCFrame.Position + forwardVector * (35 * t) + upVector * height
-			local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
+
+			local nextPos =
+				startCFrame.Position
+				+ forwardVector * (35 * t)
+				+ upVector * height
+
+			local rotation =
+				startCFrame.Rotation
+				* CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
 
 			hrp.CFrame = CFrame.new(nextPos) * rotation
+
 			local elapsedTime = tick() - startTime
 			local expectedTime = (duration / steps) * i
 			local waitTime = expectedTime - elapsedTime
+
 			if waitTime > 0 then
 				task.wait(waitTime)
 			end
 		end
 
-		hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector * 35) * startCFrame.Rotation
+		hrp.CFrame =
+			CFrame.new(startCFrame.Position + forwardVector * 35)
+			* startCFrame.Rotation
+
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
+
 		humanoid:ChangeState(Enum.HumanoidStateType.Running)
 
 		if animator then
 			for _, data in ipairs(savedTracks) do
-				local track = data.track
-				track:Play()
-				track.TimePosition = data.time
+				data.track:Play()
+				data.track.TimePosition = data.time
 			end
 		end
 
 		task.wait(0.25)
-		FlipCooldown = false
+
+		FrontFlipCooldown = false
 	end)
 end
 
-local flipIcon = Icon.new()
-	:setName("Flip")
-	:setLabel("Flip")
-	:setImage("rbxthumb://type=Asset&id=2714338264&w=150&h=150")
-
-flipIcon:bindEvent("selected", function(icon)
-	FortniteFlips()
-	icon:deselect()
-end)
-
-local UIS = game:GetService("UserInputService")
-
-UIS.InputBegan:Connect(function(input, busy)
-	if input.KeyCode == Enum.KeyCode.F and not busy then
-		FortniteFlips()
+local function CreateFrontFlip()
+	if flipIcon or not FrontFlipEnabled then
+		return
 	end
-end)
 
-WindUI:Popup({
-    Title = "Welcome to Elysium X Rework",
-    Icon = "sparkles",
-    Content = "Thank you for using our script. When the script is officially released, Plus will be free, but you'll need an key that will last 12 hours.",
-    Buttons = {
-        {
-            Title = "Continue",
-            Icon = "arrow-right",
-            Variant = "Primary",
-            Callback = function()
-                WindUI:Notify({
-                    Title = "Elysium X Rework",
-                    Content = "Hold on, the script is still under development, so there may be some issues",
-                    Duration = 5,
-                    Icon = "circle-alert",
-                })
-            end
-        }
-    }
-})
+	flipIcon = Icon.new()
+		:setImage("rbxthumb://type=Asset&id=2714338264&w=150&h=150")
+		:setImageScale(0.7)
+		:setImageRatio(1)
+		:oneClick()
+		:align("Left")
+
+	flipIcon.deselected:Connect(function()
+		if FrontFlipEnabled then
+			FrontFlips()
+		end
+	end)
+
+	flipIcon:addToJanitor(function()
+		print("FrontFlip icon removed")
+	end)
+
+	inputConnection = UIS.InputBegan:Connect(function(input, busy)
+		if input.KeyCode == Enum.KeyCode.F and not busy and FrontFlipEnabled then
+			FrontFlips()
+		end
+	end)
+end
+
+local function RemoveFrontFlip()
+	if flipIcon then
+		flipIcon:destroy()
+		flipIcon = nil
+	end
+
+	if inputConnection then
+		inputConnection:Disconnect()
+		inputConnection = nil
+	end
+end
+
+function FrontFlip(value)
+	FrontFlipEnabled = value
+
+	if value then
+		CreateFrontFlip()
+	else
+		RemoveFrontFlip()
+	end
+end
+
+FrontFlip(true)
