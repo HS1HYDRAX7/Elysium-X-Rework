@@ -1687,6 +1687,15 @@ MiscTab:Button({
     end
 })
 
+MiscTab:Button({
+    Title = "Dex plus 2",
+    Icon = "file",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"))()
+    end
+})
+
 local SoundService = game:GetService("SoundService")
 
 local MusicFolder = "Elysium X Rework/assets/musics"
